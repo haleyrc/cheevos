@@ -10,6 +10,7 @@ import (
 func TestCreatingAValidUserWithSucceeds(t *testing.T) {
 	ctx := context.Background()
 	svc := cheevos.UserService{}
+
 	resp, err := svc.SignUp(ctx, cheevos.SignUpRequest{
 		Username: "test",
 		Password: "testtest",
@@ -18,6 +19,9 @@ func TestCreatingAValidUserWithSucceeds(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if resp.User.ID == "" {
+		t.Error("ID shouldn't be blank, but it was.")
+	}
 	if resp.User.Username != "test" {
 		t.Errorf("Username should be \"test\", but got %q.", resp.User.Username)
 	}

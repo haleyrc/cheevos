@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
+
+	"github.com/pborman/uuid"
 )
 
 type UserService struct{}
@@ -42,6 +44,7 @@ func (us *UserService) SignUp(ctx context.Context, req SignUpRequest) (*SignUpRe
 	}
 
 	user := &User{
+		ID:       uuid.New(),
 		Username: req.Username,
 	}
 
@@ -50,5 +53,6 @@ func (us *UserService) SignUp(ctx context.Context, req SignUpRequest) (*SignUpRe
 }
 
 type User struct {
+	ID       string
 	Username string
 }
