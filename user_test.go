@@ -40,3 +40,25 @@ func TestCreatingAUserWithAnInvalidUsernameFails(t *testing.T) {
 		})
 	}
 }
+
+func TestCreatingAUserWithAnInvalidPasswordFails(t *testing.T) {
+	ctx := context.Background()
+	svc := cheevos.UserService{}
+
+	testcases := map[string]string{
+		"empty password": "",
+		"blank password": " \t\n",
+	}
+
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			_, err := svc.SignUp(ctx, cheevos.SignUpRequest{
+				Username: "test",
+				Password: tc,
+			})
+			if err == nil {
+				t.Error("expected an error, but got none")
+			}
+		})
+	}
+}
