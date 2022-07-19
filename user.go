@@ -30,7 +30,9 @@ func (req *SignUpRequest) validate() error {
 	return nil
 }
 
-type SignUpResponse struct{}
+type SignUpResponse struct {
+	User *User
+}
 
 func (us *UserService) SignUp(ctx context.Context, req SignUpRequest) (*SignUpResponse, error) {
 	req.normalize()
@@ -39,7 +41,14 @@ func (us *UserService) SignUp(ctx context.Context, req SignUpRequest) (*SignUpRe
 		return nil, fmt.Errorf("sign up failed: %w", err)
 	}
 
-	return nil, nil
+	user := &User{
+		Username: req.Username,
+	}
+
+	resp := &SignUpResponse{User: user}
+	return resp, nil
 }
 
-type User struct{}
+type User struct {
+	Username string
+}

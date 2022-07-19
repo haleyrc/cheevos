@@ -10,12 +10,16 @@ import (
 func TestCreatingAValidUserWithSucceeds(t *testing.T) {
 	ctx := context.Background()
 	svc := cheevos.UserService{}
-	_, err := svc.SignUp(ctx, cheevos.SignUpRequest{
+	resp, err := svc.SignUp(ctx, cheevos.SignUpRequest{
 		Username: "test",
 		Password: "testtest",
 	})
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if resp.User.Username != "test" {
+		t.Errorf("Username should be \"test\", but got %q.", resp.User.Username)
 	}
 }
 
