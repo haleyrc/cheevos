@@ -8,7 +8,9 @@ import (
 	"github.com/pborman/uuid"
 )
 
-type OrganizationService struct{}
+type OrganizationService struct {
+	DB Database
+}
 
 type CreateOrganizationRequest struct {
 	Name string
@@ -40,6 +42,12 @@ func (os *OrganizationService) CreateOrganization(ctx context.Context, req Creat
 	org := &Organization{
 		ID:   uuid.New(),
 		Name: req.Name,
+	}
+	err := os.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("create organization failed: %w", err)
 	}
 
 	resp := &CreateOrganizationResponse{Organization: org}

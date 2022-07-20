@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/internal/mock"
 )
 
 func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	ctx := context.Background()
-	svc := cheevos.OrganizationService{}
+	db := mock.NewDatabase()
+	svc := cheevos.OrganizationService{DB: db}
 
 	resp, err := svc.CreateOrganization(ctx, cheevos.CreateOrganizationRequest{
 		Name: "Test",

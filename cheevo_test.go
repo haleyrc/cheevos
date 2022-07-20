@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/internal/mock"
 )
 
 func TestCreatingAValidCheevoWithSucceeds(t *testing.T) {
 	ctx := context.Background()
-	svc := cheevos.CheevoService{}
+	db := mock.NewDatabase()
+	svc := cheevos.CheevoService{DB: db}
 
 	resp, err := svc.CreateCheevo(ctx, cheevos.CreateCheevoRequest{
 		Name:        "Test",

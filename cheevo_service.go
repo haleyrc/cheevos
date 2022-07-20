@@ -8,7 +8,9 @@ import (
 	"github.com/pborman/uuid"
 )
 
-type CheevoService struct{}
+type CheevoService struct {
+	DB Database
+}
 
 type CreateCheevoRequest struct {
 	Name        string
@@ -47,6 +49,12 @@ func (cs *CheevoService) CreateCheevo(ctx context.Context, req CreateCheevoReque
 		ID:          uuid.New(),
 		Name:        req.Name,
 		Description: req.Description,
+	}
+	err := cs.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("create organization failed: %w", err)
 	}
 
 	resp := &CreateCheevoResponse{Cheevo: cheevo}

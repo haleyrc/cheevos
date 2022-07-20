@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/internal/mock"
 )
 
 func TestCreatingAValidUserWithSucceeds(t *testing.T) {
 	ctx := context.Background()
-	svc := cheevos.UserService{}
+	db := mock.NewDatabase()
+	svc := cheevos.UserService{DB: db}
 
 	resp, err := svc.SignUp(ctx, cheevos.SignUpRequest{
 		Username: "test",

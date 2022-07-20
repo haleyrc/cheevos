@@ -8,7 +8,9 @@ import (
 	"github.com/pborman/uuid"
 )
 
-type UserService struct{}
+type UserService struct {
+	DB Database
+}
 
 type SignUpRequest struct {
 	Username string
@@ -46,6 +48,12 @@ func (us *UserService) SignUp(ctx context.Context, req SignUpRequest) (*SignUpRe
 	user := &User{
 		ID:       uuid.New(),
 		Username: req.Username,
+	}
+	err := us.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("sign up failed: %w", err)
 	}
 
 	resp := &SignUpResponse{User: user}
