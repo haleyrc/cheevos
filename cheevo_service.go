@@ -8,12 +8,21 @@ import (
 	"github.com/pborman/uuid"
 )
 
+// CheevoService is the primary entrypoint for managing cheevos.
 type CheevoService struct {
+	// A connection to the database.
 	DB Database
 }
 
+// CreateCheevoRequest represents the parameters for creating a new cheevo.
 type CreateCheevoRequest struct {
-	Name        string
+	// The short name of the cheevo. This can either be descriptive (e.g. "100
+	// Features Shipped"), but can also be witty or heavily personal (e.g. "1337
+	// haX0r").
+	Name string
+
+	// A long-form description of the act which earns the cheevo (e.g. "Shipped
+	// 100 features!").
 	Description string
 }
 
@@ -34,10 +43,15 @@ func (req CreateCheevoRequest) validate() error {
 	return nil
 }
 
+// CreateCheevoResponse is returned when a cheevo is successfully created.
 type CreateCheevoResponse struct {
+	// The complete persisted cheevo. The ID returned on the model is a unique
+	// identifer for the cheevo for use in further operations.
 	Cheevo *Cheevo
 }
 
+// CreateCheevo creates a new cheevo and persists it to the database. It returns
+// a response containing the full cheevo if successful.
 func (cs *CheevoService) CreateCheevo(ctx context.Context, req CreateCheevoRequest) (*CreateCheevoResponse, error) {
 	req.normalize()
 
