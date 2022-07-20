@@ -11,4 +11,7 @@ type Organization struct {
 
 	// The name of the organization.
 	Name string
+
+	// The owner of the organization.
+	Owner string
 }

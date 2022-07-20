@@ -20,8 +20,15 @@ type CreateOrganizationRequest struct {
 	// The name of the organization does not have to be unique, but should be
 	// representative of the group being created.
 	Name string
+
+	// The User that owns this organization by virtue of being the person that
+	// created it.
+	Owner string
 }
 
+// We don't have to normalize Owner here for the same reason we don't have to
+// test for a blank one: this isn't supplied by a user so it will either exist
+// or it won't.
 func (req *CreateOrganizationRequest) normalize() {
 	req.Name = strings.TrimSpace(req.Name)
 }
@@ -29,6 +36,10 @@ func (req *CreateOrganizationRequest) normalize() {
 func (req *CreateOrganizationRequest) validate() error {
 	if req.Name == "" {
 		return fmt.Errorf("invalid: name is blank")
+	}
+
+	if req.Owner == "" {
+		return fmt.Errorf("invalid: owner is blank")
 	}
 
 	return nil
@@ -53,8 +64,9 @@ func (os *OrganizationService) CreateOrganization(ctx context.Context, req Creat
 	}
 
 	org := &Organization{
-		ID:   uuid.New(),
-		Name: req.Name,
+		ID:    uuid.New(),
+		Name:  req.Name,
+		Owner: req.Owner,
 	}
 	err := os.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
 		return nil

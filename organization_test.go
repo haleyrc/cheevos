@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/pborman/uuid"
+
 	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/mock"
 )
@@ -12,9 +14,11 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	ctx := context.Background()
 	db := mock.NewDatabase()
 	svc := cheevos.OrganizationService{DB: db}
+	ownerID := uuid.New()
 
 	resp, err := svc.CreateOrganization(ctx, cheevos.CreateOrganizationRequest{
-		Name: "Test",
+		Name:  "Test",
+		Owner: ownerID,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -25,6 +29,9 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	}
 	if resp.Organization.Name != "Test" {
 		t.Errorf("Name should be \"Test\", but got %q.", resp.Organization.Name)
+	}
+	if resp.Organization.Owner != ownerID {
+		t.Errorf("Owner should be %q, but got %q.", ownerID, resp.Organization.Owner)
 	}
 }
 
@@ -40,7 +47,32 @@ func TestCreatingAOrganizationWithAnInvalidNameFails(t *testing.T) {
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
 			_, err := svc.CreateOrganization(ctx, cheevos.CreateOrganizationRequest{
-				Name: tc,
+				Name:  tc,
+				Owner: uuid.New(),
+			})
+			if err == nil {
+				t.Error("expected an error, but got none")
+			}
+		})
+	}
+}
+
+func TestCreatingAOrganizationWithAnInvalidOwnerFails(t *testing.T) {
+	ctx := context.Background()
+	svc := cheevos.OrganizationService{}
+
+	// We don't have to test for a blank owner here for the same reason we don't
+	// have to normalize it: it's not coming from the user so it either exists or
+	// it doesn't.
+	testcases := map[string]string{
+		"empty name": "",
+	}
+
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			_, err := svc.CreateOrganization(ctx, cheevos.CreateOrganizationRequest{
+				Name:  "test",
+				Owner: tc,
 			})
 			if err == nil {
 				t.Error("expected an error, but got none")
