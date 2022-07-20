@@ -24,8 +24,14 @@ type CreateCheevoRequest struct {
 	// A long-form description of the act which earns the cheevo (e.g. "Shipped
 	// 100 features!").
 	Description string
+
+	// The parent Organization that owns the Cheevo.
+	Organization string
 }
 
+// We don't have to normalize org here for the same reason we don't have to
+// test for blank: the org ID is not provided by the user so the ID will either
+// exist or it won't.
 func (req *CreateCheevoRequest) normalize() {
 	req.Name = strings.TrimSpace(req.Name)
 	req.Description = strings.TrimSpace(req.Description)
@@ -38,6 +44,10 @@ func (req CreateCheevoRequest) validate() error {
 
 	if req.Description == "" {
 		return fmt.Errorf("invalid: description is blank")
+	}
+
+	if req.Organization == "" {
+		return fmt.Errorf("invalid: organization is blank")
 	}
 
 	return nil
@@ -60,9 +70,10 @@ func (cs *CheevoService) CreateCheevo(ctx context.Context, req CreateCheevoReque
 	}
 
 	cheevo := &Cheevo{
-		ID:          uuid.New(),
-		Name:        req.Name,
-		Description: req.Description,
+		ID:           uuid.New(),
+		Name:         req.Name,
+		Description:  req.Description,
+		Organization: req.Organization,
 	}
 	err := cs.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
 		return nil

@@ -11,4 +11,7 @@ type Cheevo struct {
 
 	// A description of the act that the achievement is recognizing.
 	Description string
+
+	// The parent Organization that owns the Cheevo.
+	Organization string
 }
