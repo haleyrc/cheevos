@@ -10,6 +10,38 @@ import (
 	"github.com/haleyrc/cheevos/internal/mock"
 )
 
+func TestAddingAUserToAnOrganizationSucceeds(t *testing.T) {
+	ctx := context.Background()
+	db := mock.NewDatabase()
+	db.AddUserToOrganizationFn = func(ctx context.Context, orgID, userID string) error {
+		return nil
+	}
+	db.GetOrganizationFn = func(ctx context.Context, orgID string) (*cheevos.Organization, error) {
+		return &cheevos.Organization{ID: orgID, Name: "Test"}, nil
+	}
+	db.GetUserFn = func(ctx context.Context, userID string) (*cheevos.User, error) {
+		return &cheevos.User{ID: userID, Username: "test"}, nil
+	}
+	svc := cheevos.OrganizationService{DB: db}
+	orgID := uuid.New()
+	userID := uuid.New()
+
+	resp, err := svc.AddUserToOrganization(ctx, cheevos.AddUserToOrganizationRequest{
+		Organization: orgID,
+		User:         userID,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.Organization.ID != orgID {
+		t.Errorf("Organization should be %q, but got %q.", orgID, resp.Organization.ID)
+	}
+	if resp.User.ID != userID {
+		t.Errorf("User should be %q, but got %q.", userID, resp.User.ID)
+	}
+}
+
 func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	ctx := context.Background()
 	db := mock.NewDatabase()

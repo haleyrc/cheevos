@@ -14,6 +14,68 @@ type OrganizationService struct {
 	DB Database
 }
 
+type AddUserToOrganizationRequest struct {
+	Organization string
+	User         string
+}
+
+func (req *AddUserToOrganizationRequest) normalize() {
+	req.Organization = strings.TrimSpace(req.Organization)
+	req.User = strings.TrimSpace(req.User)
+}
+
+func (req *AddUserToOrganizationRequest) validate() error {
+	if req.Organization == "" {
+		return fmt.Errorf("invalid: organization is blank")
+	}
+	if req.User == "" {
+		return fmt.Errorf("invalid: user is blank")
+	}
+	return nil
+}
+
+type AddUserToOrganizationResponse struct {
+	Organization *Organization
+	User         *User
+}
+
+func (os *OrganizationService) AddUserToOrganization(ctx context.Context, req AddUserToOrganizationRequest) (*AddUserToOrganizationResponse, error) {
+	req.normalize()
+
+	if err := req.validate(); err != nil {
+		return nil, fmt.Errorf("add user to organization failed: %w", err)
+	}
+
+	var org *Organization
+	var user *User
+	err := os.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
+		var err error
+
+		// TODO: Should these come after the membership creation so we get the new
+		// stats (e.g. member count)?
+		org, err = tx.GetOrganization(ctx, req.Organization)
+		if err != nil {
+			return err
+		}
+
+		user, err = tx.GetUser(ctx, req.User)
+		if err != nil {
+			return err
+		}
+
+		return tx.AddUserToOrganization(ctx, req.Organization, req.User)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("add user to organization failed: %w", err)
+	}
+
+	resp := &AddUserToOrganizationResponse{
+		Organization: org,
+		User:         user,
+	}
+	return resp, nil
+}
+
 // CreateOrganizationRequest represents the parameters for creating a new
 // organization.
 type CreateOrganizationRequest struct {
