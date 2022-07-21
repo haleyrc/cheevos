@@ -14,9 +14,14 @@ type OrganizationService struct {
 	DB Database
 }
 
+// AddUserToOrganizationRequest represents the parameters for adding a User to
+// an Organization.
 type AddUserToOrganizationRequest struct {
+	// The ID of the Organization the User will be joining.
 	Organization string
-	User         string
+
+	// The ID of the User who is joining the Organization.
+	User string
 }
 
 func (req *AddUserToOrganizationRequest) normalize() {
@@ -34,11 +39,21 @@ func (req *AddUserToOrganizationRequest) validate() error {
 	return nil
 }
 
+// AddUserToOrganizationResponse is returned when a User is successfully added
+// to an Organization.
 type AddUserToOrganizationResponse struct {
+	// The complete Organization that received ther User. The Organization's
+	// statistics reflect the latest values after the User has joined.
 	Organization *Organization
-	User         *User
+
+	// The complete User that joined the Organization. The User's statistics
+	// reflect the latest values after joining.
+	User *User
 }
 
+// AddUserToOrganization adds a User to a specific Organization. Statistics for
+// this event are bidirectional: an Organization "tracks" how many users it has
+// and Users "track" how many Organizations they belong to.
 func (os *OrganizationService) AddUserToOrganization(ctx context.Context, req AddUserToOrganizationRequest) (*AddUserToOrganizationResponse, error) {
 	req.normalize()
 

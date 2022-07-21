@@ -14,9 +14,14 @@ type CheevoService struct {
 	DB Database
 }
 
+// AwardCheevoToUserRequest represents the parameters for awarding a specific
+// Cheevo to a User.
 type AwardCheevoToUserRequest struct {
+	// The ID of the Cheevo to be awarded.
 	Cheevo string
-	User   string
+
+	// The ID of the User to receive the Cheevo.
+	User string
 }
 
 func (req *AwardCheevoToUserRequest) normalize() {
@@ -36,11 +41,21 @@ func (req *AwardCheevoToUserRequest) validate() error {
 	return nil
 }
 
+// AwardCheevoToUserResponse is returned when a Cheevo is successfully awarded
+// to a User
 type AwardCheevoToUserResponse struct {
+	// The complete Cheevo that was awarded. The Cheevo's statistics reflect the
+	// latest values after the award.
 	Cheevo *Cheevo
-	User   *User
+
+	// The complete User that received the Cheevo. The User's statistics reflect
+	// the latest values after the award.
+	User *User
 }
 
+// AwardCheevoToUser awards a specific Cheevo to a User. Statistics for this
+// event are bidirectional; a Cheevo "tracks" the number of Users that have
+// received it and Users "track" how many Cheevos they have received.
 func (cs *CheevoService) AwardCheevoToUser(ctx context.Context, req AwardCheevoToUserRequest) (*AwardCheevoToUserResponse, error) {
 	req.normalize()
 
