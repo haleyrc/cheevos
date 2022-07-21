@@ -14,6 +14,72 @@ type CheevoService struct {
 	DB Database
 }
 
+type AwardCheevoToUserRequest struct {
+	Cheevo string
+	User   string
+}
+
+func (req *AwardCheevoToUserRequest) normalize() {
+	req.Cheevo = strings.TrimSpace(req.Cheevo)
+	req.User = strings.TrimSpace(req.User)
+}
+
+func (req *AwardCheevoToUserRequest) validate() error {
+	if req.Cheevo == "" {
+		return fmt.Errorf("invalid: cheevo is blank")
+	}
+
+	if req.User == "" {
+		return fmt.Errorf("invalid: user is blank")
+	}
+
+	return nil
+}
+
+type AwardCheevoToUserResponse struct {
+	Cheevo *Cheevo
+	User   *User
+}
+
+func (cs *CheevoService) AwardCheevoToUser(ctx context.Context, req AwardCheevoToUserRequest) (*AwardCheevoToUserResponse, error) {
+	req.normalize()
+
+	if err := req.validate(); err != nil {
+		return nil, fmt.Errorf("create cheevo failed: %w", err)
+	}
+
+	var cheevo *Cheevo
+	var user *User
+	err := cs.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
+		var err error
+
+		if err = tx.AwardCheevoToUser(ctx, req.Cheevo, req.User); err != nil {
+			return err
+		}
+
+		cheevo, err = tx.GetCheevo(ctx, req.Cheevo)
+		if err != nil {
+			return err
+		}
+
+		user, err = tx.GetUser(ctx, req.User)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("create organization failed: %w", err)
+	}
+
+	resp := &AwardCheevoToUserResponse{
+		Cheevo: cheevo,
+		User:   user,
+	}
+	return resp, nil
+}
+
 // CreateCheevoRequest represents the parameters for creating a new cheevo.
 type CreateCheevoRequest struct {
 	// The short name of the cheevo. This can either be descriptive (e.g. "100

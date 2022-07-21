@@ -10,6 +10,38 @@ import (
 	"github.com/haleyrc/cheevos/internal/mock"
 )
 
+func TestAwardingACheevoToAUserSucceeds(t *testing.T) {
+	ctx := context.Background()
+	db := mock.NewDatabase()
+	db.AwardCheevoToUserFn = func(_ context.Context, _, _ string) error {
+		return nil
+	}
+	db.GetCheevoFn = func(_ context.Context, cheevoID string) (*cheevos.Cheevo, error) {
+		return &cheevos.Cheevo{ID: cheevoID, Name: "Test", Description: "Test cheevo."}, nil
+	}
+	db.GetUserFn = func(_ context.Context, userID string) (*cheevos.User, error) {
+		return &cheevos.User{ID: userID, Username: "test"}, nil
+	}
+	svc := cheevos.CheevoService{DB: db}
+	cheevoID := uuid.New()
+	userID := uuid.New()
+
+	resp, err := svc.AwardCheevoToUser(ctx, cheevos.AwardCheevoToUserRequest{
+		Cheevo: cheevoID,
+		User:   userID,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.Cheevo.ID != cheevoID {
+		t.Errorf("Cheevo should be %q, but got %q.", cheevoID, resp.Cheevo.ID)
+	}
+	if resp.User.ID != userID {
+		t.Errorf("User should be %q, but got %q.", userID, resp.User.ID)
+	}
+}
+
 func TestCreatingAValidCheevoWithSucceeds(t *testing.T) {
 	ctx := context.Background()
 	db := mock.NewDatabase()
