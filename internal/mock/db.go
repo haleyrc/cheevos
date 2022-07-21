@@ -2,6 +2,7 @@ package mock
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/haleyrc/cheevos"
 )
@@ -34,7 +35,7 @@ func (db *Database) Call(ctx context.Context, f func(ctx context.Context, tx che
 // [github.com/haleyrc/cheevos.Transaction] interface.
 func (db *Database) AddUserToOrganization(ctx context.Context, orgID, userID string) error {
 	if db.AddUserToOrganizationFn == nil {
-		panic("AddUserToOrganizationFn is not defined. Please define an implementation in your test to use the mock database.")
+		panicNotDefined("AddUserToOrganizationFn")
 	}
 	return db.AddUserToOrganizationFn(ctx, orgID, userID)
 }
@@ -43,7 +44,7 @@ func (db *Database) AddUserToOrganization(ctx context.Context, orgID, userID str
 // [github.com/haleyrc/cheevos.Transaction] interface.
 func (db *Database) AwardCheevoToUser(ctx context.Context, cheevoID, userID string) error {
 	if db.AwardCheevoToUserFn == nil {
-		panic("AwardCheevoToUserFn is not defined. Please define an implementation in your test to use the mock database.")
+		panicNotDefined("AwardCheevoToUserFn")
 	}
 	return db.AwardCheevoToUserFn(ctx, cheevoID, userID)
 }
@@ -52,7 +53,7 @@ func (db *Database) AwardCheevoToUser(ctx context.Context, cheevoID, userID stri
 // interface.
 func (db *Database) GetCheevo(ctx context.Context, cheevoID string) (*cheevos.Cheevo, error) {
 	if db.GetCheevoFn == nil {
-		panic("GetCheevoFn is not defined. Please define an implementation in your test to use the mock database.")
+		panicNotDefined("GetCheevoFn")
 	}
 	return db.GetCheevoFn(ctx, cheevoID)
 }
@@ -61,7 +62,7 @@ func (db *Database) GetCheevo(ctx context.Context, cheevoID string) (*cheevos.Ch
 // [github.com/haleyrc/cheevos.Transaction] interface.
 func (db *Database) GetOrganization(ctx context.Context, orgID string) (*cheevos.Organization, error) {
 	if db.GetOrganizationFn == nil {
-		panic("GetOrganizationFn is not defined. Please define an implementation in your test to use the mock database.")
+		panicNotDefined("GetOrganizationFn")
 	}
 	return db.GetOrganizationFn(ctx, orgID)
 }
@@ -70,7 +71,11 @@ func (db *Database) GetOrganization(ctx context.Context, orgID string) (*cheevos
 // interface.
 func (db *Database) GetUser(ctx context.Context, userID string) (*cheevos.User, error) {
 	if db.GetUserFn == nil {
-		panic("GetUserFn is not defined. Please define an implementation in your test to use the mock database.")
+		panicNotDefined("GetUserFn")
 	}
 	return db.GetUserFn(ctx, userID)
+}
+
+func panicNotDefined(name string) {
+	panic(fmt.Sprintf("%s is not defined. Please define an implementation in your test to use the mock database.", name))
 }
