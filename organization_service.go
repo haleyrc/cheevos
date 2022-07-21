@@ -51,8 +51,10 @@ func (os *OrganizationService) AddUserToOrganization(ctx context.Context, req Ad
 	err := os.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
 		var err error
 
-		// TODO: Should these come after the membership creation so we get the new
-		// stats (e.g. member count)?
+		if err = tx.AddUserToOrganization(ctx, req.Organization, req.User); err != nil {
+			return err
+		}
+
 		org, err = tx.GetOrganization(ctx, req.Organization)
 		if err != nil {
 			return err
@@ -63,7 +65,7 @@ func (os *OrganizationService) AddUserToOrganization(ctx context.Context, req Ad
 			return err
 		}
 
-		return tx.AddUserToOrganization(ctx, req.Organization, req.User)
+		return nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("add user to organization failed: %w", err)
