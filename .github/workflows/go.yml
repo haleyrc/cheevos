@@ -68,7 +68,7 @@ jobs:
       postgres:
         image: postgres:14.2
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: cheevopw
           POSTGRES_USER: cheevo
           POSTGRES_DB: cheevos
         options: >-
