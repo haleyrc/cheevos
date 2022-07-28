@@ -1,5 +1,7 @@
 # cheevos
 
+[![Test](https://github.com/haleyrc/cheevos/actions/workflows/go.yml/badge.svg)](https://github.com/haleyrc/cheevos/actions/workflows/go.yml)
+
 Cheevos is an app to let people award custom achivements (Cheevos) to their
 friends and colleages.
 
