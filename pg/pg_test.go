@@ -11,9 +11,7 @@ import (
 )
 
 func TestConnectReturnsADatabase(t *testing.T) {
-	if err := godotenv.Load("../.env"); err != nil {
-		t.Skipf("Test skipped. Could not load config file: %v.", err)
-	}
+	godotenv.Load("../.env")
 
 	url := os.Getenv("TEST_DATABASE_URL")
 	if url == "" {
