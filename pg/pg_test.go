@@ -18,13 +18,7 @@ func TestConnectReturnsADatabase(t *testing.T) {
 		t.Skip("Test skipped. To run this test, set the TEST_DATABASE_URL environment variable.")
 	}
 
-	db, err := pg.ConnectWithRetries(context.Background(), 3, pg.Parameters{
-		Database: "cheevos",
-		Host:     "localhost",
-		Password: "cheevopw",
-		Port:     ":5555",
-		Username: "cheevo",
-	}.String())
+	db, err := pg.ConnectWithRetries(context.Background(), 3, url)
 	if err != nil {
 		t.Fatal("ConnectWithRetries() failed with error:", err)
 	}
