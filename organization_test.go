@@ -2,6 +2,7 @@ package cheevos_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/pborman/uuid"
@@ -9,6 +10,110 @@ import (
 	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/mock"
 )
+
+func TestOrganizationLoggerLogsAnErrorFromAddUserToOrganization(t *testing.T) {
+	logger := NewTestLogger()
+
+	cl := &cheevos.OrganizationLogger{
+		Svc: &mock.OrganizationService{
+			AddUserToOrganizationFn: func(_ context.Context, req cheevos.AddUserToOrganizationRequest) (*cheevos.AddUserToOrganizationResponse, error) {
+				return nil, fmt.Errorf("oops")
+			},
+		},
+		Logger: logger,
+	}
+	cl.AddUserToOrganization(context.Background(), cheevos.AddUserToOrganizationRequest{
+		Organization: "783bf2de-dce2-4f32-9f18-f77b904f87c",
+		User:         "4d523938-2baa-4d94-8daf-ea1785ff154",
+	})
+
+	logger.ShouldLog(t,
+		`{"Fields":{"Organization":"783bf2de-dce2-4f32-9f18-f77b904f87c","User":"4d523938-2baa-4d94-8daf-ea1785ff154"},"Message":"adding user to organization"}`,
+		`{"Fields":{"Error":"oops"},"Message":"add user to organization failed"}`,
+	)
+}
+
+func TestOrganizationLoggerLogsTheResponseFromAddUserToOrganization(t *testing.T) {
+	logger := NewTestLogger()
+
+	cl := &cheevos.OrganizationLogger{
+		Svc: &mock.OrganizationService{
+			AddUserToOrganizationFn: func(_ context.Context, req cheevos.AddUserToOrganizationRequest) (*cheevos.AddUserToOrganizationResponse, error) {
+				return &cheevos.AddUserToOrganizationResponse{
+					Organization: &cheevos.Organization{
+						ID:    "783bf2de-dce2-4f32-9f18-f77b904f87cf",
+						Name:  "Test",
+						Owner: "4d523938-2baa-4d94-8daf-ea1785ff154d",
+					},
+					User: &cheevos.User{
+						ID:       "2d7c6d16-c703-4058-a4dd-fb8d34992806",
+						Username: "test",
+					},
+				}, nil
+			},
+		},
+		Logger: logger,
+	}
+	cl.AddUserToOrganization(context.Background(), cheevos.AddUserToOrganizationRequest{
+		Organization: "783bf2de-dce2-4f32-9f18-f77b904f87cf",
+		User:         "4d523938-2baa-4d94-8daf-ea1785ff154d",
+	})
+
+	logger.ShouldLog(t,
+		`{"Fields":{"Organization":"783bf2de-dce2-4f32-9f18-f77b904f87cf","User":"4d523938-2baa-4d94-8daf-ea1785ff154d"},"Message":"adding user to organization"}`,
+		`{"Fields":{"Organization":{"ID":"783bf2de-dce2-4f32-9f18-f77b904f87cf","Name":"Test","Owner":"4d523938-2baa-4d94-8daf-ea1785ff154d"},"User":{"ID":"2d7c6d16-c703-4058-a4dd-fb8d34992806","Username":"test"}},"Message":"user added to organization"}`,
+	)
+}
+
+func TestOrganizationLoggerLogsAnErrorFromCreateOrganization(t *testing.T) {
+	logger := NewTestLogger()
+
+	cl := &cheevos.OrganizationLogger{
+		Svc: &mock.OrganizationService{
+			CreateOrganizationFn: func(_ context.Context, req cheevos.CreateOrganizationRequest) (*cheevos.CreateOrganizationResponse, error) {
+				return nil, fmt.Errorf("oops")
+			},
+		},
+		Logger: logger,
+	}
+	cl.CreateOrganization(context.Background(), cheevos.CreateOrganizationRequest{
+		Name:  "Test",
+		Owner: "783bf2de-dce2-4f32-9f18-f77b904f87c",
+	})
+
+	logger.ShouldLog(t,
+		`{"Fields":{"Name":"Test","Owner":"783bf2de-dce2-4f32-9f18-f77b904f87c"},"Message":"creating organization"}`,
+		`{"Fields":{"Error":"oops"},"Message":"create organization failed"}`,
+	)
+}
+
+func TestOrganizationLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
+	logger := NewTestLogger()
+
+	cl := &cheevos.OrganizationLogger{
+		Svc: &mock.OrganizationService{
+			CreateOrganizationFn: func(_ context.Context, req cheevos.CreateOrganizationRequest) (*cheevos.CreateOrganizationResponse, error) {
+				return &cheevos.CreateOrganizationResponse{
+					Organization: &cheevos.Organization{
+						ID:    "8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea",
+						Name:  "Test",
+						Owner: "238cb95f-8bcd-4cda-8cfc-9d03fecba894",
+					},
+				}, nil
+			},
+		},
+		Logger: logger,
+	}
+	cl.CreateOrganization(context.Background(), cheevos.CreateOrganizationRequest{
+		Name:  "Test",
+		Owner: "238cb95f-8bcd-4cda-8cfc-9d03fecba894",
+	})
+
+	logger.ShouldLog(t,
+		`{"Fields":{"Name":"Test","Owner":"238cb95f-8bcd-4cda-8cfc-9d03fecba894"},"Message":"creating organization"}`,
+		`{"Fields":{"Organization":{"ID":"8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea","Name":"Test","Owner":"238cb95f-8bcd-4cda-8cfc-9d03fecba894"}},"Message":"organization created"}`,
+	)
+}
 
 func TestAddingAUserToAnOrganizationSucceeds(t *testing.T) {
 	ctx := context.Background()

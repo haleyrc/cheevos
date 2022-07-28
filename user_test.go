@@ -2,11 +2,61 @@ package cheevos_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/mock"
 )
+
+func TestUserLoggerLogsAnErrorFromSignUp(t *testing.T) {
+	logger := NewTestLogger()
+
+	cl := &cheevos.UserLogger{
+		Svc: &mock.UserService{
+			SignUpFn: func(_ context.Context, req cheevos.SignUpRequest) (*cheevos.SignUpResponse, error) {
+				return nil, fmt.Errorf("oops")
+			},
+		},
+		Logger: logger,
+	}
+	cl.SignUp(context.Background(), cheevos.SignUpRequest{
+		Username: "Test",
+		Password: "Testtest123",
+	})
+
+	logger.ShouldLog(t,
+		`{"Fields":{"Username":"Test"},"Message":"signing up user"}`,
+		`{"Fields":{"Error":"oops"},"Message":"sign up failed"}`,
+	)
+}
+
+func TestUserLoggerLogsTheResponseFromSignUp(t *testing.T) {
+	logger := NewTestLogger()
+
+	cl := &cheevos.UserLogger{
+		Svc: &mock.UserService{
+			SignUpFn: func(_ context.Context, req cheevos.SignUpRequest) (*cheevos.SignUpResponse, error) {
+				return &cheevos.SignUpResponse{
+					User: &cheevos.User{
+						ID:       "8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea",
+						Username: "Test",
+					},
+				}, nil
+			},
+		},
+		Logger: logger,
+	}
+	cl.SignUp(context.Background(), cheevos.SignUpRequest{
+		Username: "Test",
+		Password: "Testtest123",
+	})
+
+	logger.ShouldLog(t,
+		`{"Fields":{"Username":"Test"},"Message":"signing up user"}`,
+		`{"Fields":{"User":{"ID":"8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea","Username":"Test"}},"Message":"user signed up"}`,
+	)
+}
 
 func TestCreatingAValidUserWithSucceeds(t *testing.T) {
 	ctx := context.Background()
