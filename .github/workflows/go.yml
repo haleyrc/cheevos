@@ -62,3 +62,28 @@ jobs:
 
     - name: Run golint
       run: golint ./...
+
+  integration:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    container: golang:1.18.4-alpine
+
+    services:
+      postgres:
+        image: postgres:14.2
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: cheevo
+          POSTGRES_DB: cheevos
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Run tests
+      run: go test -v -race -count=1 -p=1 ./pg
+      env:
+        TEST_DATABASE_URL: postgres://cheevo:cheevopw@postgres:5432/cheevos?sslmode=disable
