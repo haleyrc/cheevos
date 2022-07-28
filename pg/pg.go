@@ -70,8 +70,6 @@ func ConnectWithRetries(ctx context.Context, retries int, conn string) (*Databas
 
 		i++
 	}
-
-	return nil, fmt.Errorf("connect failed: %w", err)
 }
 
 type Database struct {
