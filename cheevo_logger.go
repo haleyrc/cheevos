@@ -14,8 +14,9 @@ type CheevoLogger struct {
 
 func (cl *CheevoLogger) AwardCheevoToUser(ctx context.Context, req AwardCheevoToUserRequest) (*AwardCheevoToUserResponse, error) {
 	cl.Logger.Debug(ctx, "awarding cheevo to user", Fields{
-		"Cheevo": req.Cheevo,
-		"User":   req.User,
+		"Cheevo":  req.Cheevo,
+		"Awardee": req.Awardee,
+		"Awarder": req.Awarder,
 	})
 
 	resp, err := cl.Svc.AwardCheevoToUser(ctx, req)

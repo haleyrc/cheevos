@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - TEST_DATABASE_URL=postgres://cheevo:cheevopw@postgres:5432/cheevos?sslmode=disable
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:14.2
+    restart: "no"
+    environment:
+      - POSTGRES_PASSWORD=cheevopw
+      - POSTGRES_DB=cheevos
+      - POSTGRES_USER=cheevo
+    volumes:
+      - ./migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5555:5432"

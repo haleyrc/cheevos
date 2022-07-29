@@ -73,11 +73,29 @@ func ConnectWithRetries(ctx context.Context, retries int, conn string) (*Databas
 }
 
 type Database struct {
-	db *sqlx.DB
+	ErrorFunc func(context.Context, error)
+	db        *sqlx.DB
 }
 
-func (db *Database) Call(context.Context, func(ctx context.Context, tx Transaction) error) error {
-	return fmt.Errorf("TODO")
+func (db *Database) Call(ctx context.Context, f func(ctx context.Context, tx cheevos.Transaction) error) error {
+	sqlxTx, err := db.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin transaction failed: %w", err)
+	}
+
+	if err := f(ctx, &Transaction{tx: sqlxTx}); err != nil {
+		rollbackErr := sqlxTx.Rollback()
+		if rollbackErr != nil && db.ErrorFunc != nil {
+			db.ErrorFunc(ctx, rollbackErr)
+		}
+		return fmt.Errorf("transaction failed: %w", err)
+	}
+
+	if err := sqlxTx.Commit(); err != nil {
+		return fmt.Errorf("commit failed: %w", err)
+	}
+
+	return nil
 }
 
 func (db *Database) Close() error {
@@ -92,27 +110,4 @@ func (db *Database) Ping() error {
 		return fmt.Errorf("ping failed: %w", err)
 	}
 	return nil
-}
-
-type Transaction struct {
-}
-
-func (tx *Transaction) AwardCheevoToUser(ctx context.Context, cheevoID, userID string) error {
-	return fmt.Errorf("TODO")
-}
-
-func (tx *Transaction) GetCheevo(ctx context.Context, cheevoID string) (*cheevos.Cheevo, error) {
-	return nil, fmt.Errorf("TODO")
-}
-
-func (tx *Transaction) GetOrganization(ctx context.Context, orgID string) (*cheevos.Organization, error) {
-	return nil, fmt.Errorf("TODO")
-}
-
-func (tx *Transaction) GetUser(ctx context.Context, userID string) (*cheevos.User, error) {
-	return nil, fmt.Errorf("TODO")
-}
-
-func (tx *Transaction) AddUserToOrganization(ctx context.Context, orgID, userID string) error {
-	return fmt.Errorf("TODO")
 }

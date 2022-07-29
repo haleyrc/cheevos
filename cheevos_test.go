@@ -32,10 +32,12 @@ type TestLogger struct {
 }
 
 func (tl *TestLogger) ShouldLog(t *testing.T, want ...string) {
+	t.Helper()
 	diff(t, join(want...), strings.TrimSpace(tl.buff.String()))
 }
 
 func diff(t *testing.T, want, got string) bool {
+	t.Helper()
 	if want != got {
 		t.Errorf("logger output mismatch\nwant:\n%s\ngot:\n%s", want, got)
 		return false

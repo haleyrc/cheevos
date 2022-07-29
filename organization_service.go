@@ -66,10 +66,6 @@ func (os *OrganizationService) AddUserToOrganization(ctx context.Context, req Ad
 	err := os.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
 		var err error
 
-		if err = tx.AddUserToOrganization(ctx, req.Organization, req.User); err != nil {
-			return err
-		}
-
 		org, err = tx.GetOrganization(ctx, req.Organization)
 		if err != nil {
 			return err
@@ -77,6 +73,10 @@ func (os *OrganizationService) AddUserToOrganization(ctx context.Context, req Ad
 
 		user, err = tx.GetUser(ctx, req.User)
 		if err != nil {
+			return err
+		}
+
+		if err = tx.AddUserToOrganization(ctx, org, user); err != nil {
 			return err
 		}
 
@@ -148,7 +148,7 @@ func (os *OrganizationService) CreateOrganization(ctx context.Context, req Creat
 		Owner: req.Owner,
 	}
 	err := os.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
-		return nil
+		return tx.CreateOrganization(ctx, org)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("create organization failed: %w", err)

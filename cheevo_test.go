@@ -76,12 +76,13 @@ func TestCheevoLoggerLogsAnErrorFromAwardCheevoToUser(t *testing.T) {
 		Logger: logger,
 	}
 	cl.AwardCheevoToUser(context.Background(), cheevos.AwardCheevoToUserRequest{
-		Cheevo: "783bf2de-dce2-4f32-9f18-f77b904f87c",
-		User:   "4d523938-2baa-4d94-8daf-ea1785ff154",
+		Cheevo:  "783bf2de-dce2-4f32-9f18-f77b904f87c",
+		Awardee: "4d523938-2baa-4d94-8daf-ea1785ff154",
+		Awarder: "783bf2de-dce2-4f32-9f18-f77b904f87cf",
 	})
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Cheevo":"783bf2de-dce2-4f32-9f18-f77b904f87c","User":"4d523938-2baa-4d94-8daf-ea1785ff154"},"Message":"awarding cheevo to user"}`,
+		`{"Fields":{"Awardee":"4d523938-2baa-4d94-8daf-ea1785ff154","Awarder":"783bf2de-dce2-4f32-9f18-f77b904f87cf","Cheevo":"783bf2de-dce2-4f32-9f18-f77b904f87c"},"Message":"awarding cheevo to user"}`,
 		`{"Fields":{"Error":"oops"},"Message":"award cheevo to user failed"}`,
 	)
 }
@@ -109,12 +110,13 @@ func TestCheevoLoggerLogsTheResponseFromAwardCheevoToUser(t *testing.T) {
 		Logger: logger,
 	}
 	cl.AwardCheevoToUser(context.Background(), cheevos.AwardCheevoToUserRequest{
-		Cheevo: "783bf2de-dce2-4f32-9f18-f77b904f87cf",
-		User:   "4d523938-2baa-4d94-8daf-ea1785ff154d",
+		Cheevo:  "783bf2de-dce2-4f32-9f18-f77b904f87cf",
+		Awardee: "4d523938-2baa-4d94-8daf-ea1785ff154d",
+		Awarder: "783bf2de-dce2-4f32-9f18-f77b904f87cf",
 	})
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Cheevo":"783bf2de-dce2-4f32-9f18-f77b904f87cf","User":"4d523938-2baa-4d94-8daf-ea1785ff154d"},"Message":"awarding cheevo to user"}`,
+		`{"Fields":{"Awardee":"4d523938-2baa-4d94-8daf-ea1785ff154d","Awarder":"783bf2de-dce2-4f32-9f18-f77b904f87cf","Cheevo":"783bf2de-dce2-4f32-9f18-f77b904f87cf"},"Message":"awarding cheevo to user"}`,
 		`{"Fields":{"Cheevo":{"ID":"783bf2de-dce2-4f32-9f18-f77b904f87cf","Name":"Test","Description":"This is a test.","Organization":"4d523938-2baa-4d94-8daf-ea1785ff154d"},"User":{"ID":"2d7c6d16-c703-4058-a4dd-fb8d34992806","Username":"test"}},"Message":"cheevo awarded"}`,
 	)
 }
@@ -122,7 +124,7 @@ func TestCheevoLoggerLogsTheResponseFromAwardCheevoToUser(t *testing.T) {
 func TestAwardingACheevoToAUserSucceeds(t *testing.T) {
 	ctx := context.Background()
 	db := mock.NewDatabase()
-	db.AwardCheevoToUserFn = func(_ context.Context, _, _ string) error {
+	db.AwardCheevoToUserFn = func(_ context.Context, _ *cheevos.Cheevo, _, _ *cheevos.User) error {
 		return nil
 	}
 	db.GetCheevoFn = func(_ context.Context, cheevoID string) (*cheevos.Cheevo, error) {
@@ -133,11 +135,13 @@ func TestAwardingACheevoToAUserSucceeds(t *testing.T) {
 	}
 	svc := cheevos.CheevoService{DB: db}
 	cheevoID := uuid.New()
-	userID := uuid.New()
+	awardeeID := uuid.New()
+	awarderID := uuid.New()
 
 	resp, err := svc.AwardCheevoToUser(ctx, cheevos.AwardCheevoToUserRequest{
-		Cheevo: cheevoID,
-		User:   userID,
+		Cheevo:  cheevoID,
+		Awardee: awardeeID,
+		Awarder: awarderID,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -146,8 +150,8 @@ func TestAwardingACheevoToAUserSucceeds(t *testing.T) {
 	if resp.Cheevo.ID != cheevoID {
 		t.Errorf("Cheevo should be %q, but got %q.", cheevoID, resp.Cheevo.ID)
 	}
-	if resp.User.ID != userID {
-		t.Errorf("User should be %q, but got %q.", userID, resp.User.ID)
+	if resp.User.ID != awardeeID {
+		t.Errorf("User should be %q, but got %q.", awardeeID, resp.User.ID)
 	}
 }
 

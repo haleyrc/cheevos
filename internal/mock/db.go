@@ -19,8 +19,9 @@ func NewDatabase() *Database {
 // [github.com/haleyrc/cheevos.Database] and
 // [github.com/haleyrc/cheevos.Transaction] interfaces.
 type Database struct {
-	AddUserToOrganizationFn func(ctx context.Context, orgID, userID string) error
-	AwardCheevoToUserFn     func(ctx context.Context, cheevoID, userID string) error
+	AddUserToOrganizationFn func(ctx context.Context, org *cheevos.Organization, user *cheevos.User) error
+	AwardCheevoToUserFn     func(ctx context.Context, cheevo *cheevos.Cheevo, awardee, awarder *cheevos.User) error
+	CreateOrganizationFn    func(ctx context.Context, org *cheevos.Organization) error
 	GetCheevoFn             func(ctx context.Context, cheevoID string) (*cheevos.Cheevo, error)
 	GetOrganizationFn       func(ctx context.Context, orgID string) (*cheevos.Organization, error)
 	GetUserFn               func(ctx context.Context, userID string) (*cheevos.User, error)
@@ -33,20 +34,35 @@ func (db *Database) Call(ctx context.Context, f func(ctx context.Context, tx che
 
 // AddUserToOrganization partially implements the
 // [github.com/haleyrc/cheevos.Transaction] interface.
-func (db *Database) AddUserToOrganization(ctx context.Context, orgID, userID string) error {
+func (db *Database) AddUserToOrganization(ctx context.Context, org *cheevos.Organization, user *cheevos.User) error {
 	if db.AddUserToOrganizationFn == nil {
 		panicNotDefined("AddUserToOrganizationFn")
 	}
-	return db.AddUserToOrganizationFn(ctx, orgID, userID)
+	return db.AddUserToOrganizationFn(ctx, org, user)
 }
 
 // AwardCheevoToUser partially implements the
 // [github.com/haleyrc/cheevos.Transaction] interface.
-func (db *Database) AwardCheevoToUser(ctx context.Context, cheevoID, userID string) error {
+func (db *Database) AwardCheevoToUser(ctx context.Context, cheevo *cheevos.Cheevo, awardee, awarder *cheevos.User) error {
 	if db.AwardCheevoToUserFn == nil {
 		panicNotDefined("AwardCheevoToUserFn")
 	}
-	return db.AwardCheevoToUserFn(ctx, cheevoID, userID)
+	return db.AwardCheevoToUserFn(ctx, cheevo, awardee, awarder)
+}
+
+func (db *Database) CreateCheevo(ctx context.Context, cheevo *cheevos.Cheevo) error {
+	return fmt.Errorf("TODO")
+}
+
+func (db *Database) CreateOrganization(ctx context.Context, org *cheevos.Organization) error {
+	if db.CreateOrganizationFn == nil {
+		panicNotDefined("CreateOrganizationFn")
+	}
+	return db.CreateOrganizationFn(ctx, org)
+}
+
+func (db *Database) CreateUser(ctx context.Context, user *cheevos.User) error {
+	return fmt.Errorf("TODO")
 }
 
 // GetCheevo partially implements the [github.com/haleyrc/cheevos.Transaction]

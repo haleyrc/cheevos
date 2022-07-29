@@ -1,0 +1,9 @@
+from golang:1.18 as build
+
+ENV CGO_ENABLED=0
+
+WORKDIR /cheevos
+
+ADD . .
+
+CMD go test -count=1 -cover -p=1 -v ./...

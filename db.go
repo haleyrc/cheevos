@@ -15,9 +15,12 @@ type Database interface {
 
 // Transaction is our primary handle for running persistence methods.
 type Transaction interface {
-	AwardCheevoToUser(ctx context.Context, cheevoID, userID string) error
+	AddUserToOrganization(ctx context.Context, org *Organization, user *User) error
+	AwardCheevoToUser(ctx context.Context, cheevo *Cheevo, awardee, awarder *User) error
+	CreateCheevo(ctx context.Context, cheevo *Cheevo) error
+	CreateOrganization(ctx context.Context, org *Organization) error
+	CreateUser(ctx context.Context, user *User) error
 	GetCheevo(ctx context.Context, cheevoID string) (*Cheevo, error)
 	GetOrganization(ctx context.Context, orgID string) (*Organization, error)
 	GetUser(ctx context.Context, userID string) (*User, error)
-	AddUserToOrganization(ctx context.Context, orgID, userID string) error
 }

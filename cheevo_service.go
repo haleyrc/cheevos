@@ -21,12 +21,16 @@ type AwardCheevoToUserRequest struct {
 	Cheevo string
 
 	// The ID of the User to receive the Cheevo.
-	User string
+	Awardee string
+
+	// The ID of the User awarding the Cheevo.
+	Awarder string
 }
 
 func (req *AwardCheevoToUserRequest) normalize() {
 	req.Cheevo = strings.TrimSpace(req.Cheevo)
-	req.User = strings.TrimSpace(req.User)
+	req.Awardee = strings.TrimSpace(req.Awardee)
+	req.Awarder = strings.TrimSpace(req.Awarder)
 }
 
 func (req *AwardCheevoToUserRequest) validate() error {
@@ -34,8 +38,12 @@ func (req *AwardCheevoToUserRequest) validate() error {
 		return fmt.Errorf("invalid: cheevo is blank")
 	}
 
-	if req.User == "" {
-		return fmt.Errorf("invalid: user is blank")
+	if req.Awardee == "" {
+		return fmt.Errorf("invalid: awardee is blank")
+	}
+
+	if req.Awarder == "" {
+		return fmt.Errorf("invalid: awarder is blank")
 	}
 
 	return nil
@@ -64,21 +72,26 @@ func (cs *CheevoService) AwardCheevoToUser(ctx context.Context, req AwardCheevoT
 	}
 
 	var cheevo *Cheevo
-	var user *User
+	var awardee *User
 	err := cs.DB.Call(ctx, func(ctx context.Context, tx Transaction) error {
 		var err error
-
-		if err = tx.AwardCheevoToUser(ctx, req.Cheevo, req.User); err != nil {
-			return err
-		}
 
 		cheevo, err = tx.GetCheevo(ctx, req.Cheevo)
 		if err != nil {
 			return err
 		}
 
-		user, err = tx.GetUser(ctx, req.User)
+		awardee, err = tx.GetUser(ctx, req.Awardee)
 		if err != nil {
+			return err
+		}
+
+		awarder, err := tx.GetUser(ctx, req.Awarder)
+		if err != nil {
+			return err
+		}
+
+		if err = tx.AwardCheevoToUser(ctx, cheevo, awardee, awarder); err != nil {
 			return err
 		}
 
@@ -90,7 +103,7 @@ func (cs *CheevoService) AwardCheevoToUser(ctx context.Context, req AwardCheevoT
 
 	resp := &AwardCheevoToUserResponse{
 		Cheevo: cheevo,
-		User:   user,
+		User:   awardee,
 	}
 	return resp, nil
 }

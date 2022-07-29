@@ -118,7 +118,7 @@ func TestOrganizationLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
 func TestAddingAUserToAnOrganizationSucceeds(t *testing.T) {
 	ctx := context.Background()
 	db := mock.NewDatabase()
-	db.AddUserToOrganizationFn = func(ctx context.Context, orgID, userID string) error {
+	db.AddUserToOrganizationFn = func(ctx context.Context, _ *cheevos.Organization, _ *cheevos.User) error {
 		return nil
 	}
 	db.GetOrganizationFn = func(ctx context.Context, orgID string) (*cheevos.Organization, error) {
@@ -147,9 +147,12 @@ func TestAddingAUserToAnOrganizationSucceeds(t *testing.T) {
 	}
 }
 
-func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
+func TestCreatingAValidOrganizationSucceeds(t *testing.T) {
 	ctx := context.Background()
 	db := mock.NewDatabase()
+	db.CreateOrganizationFn = func(_ context.Context, _ *cheevos.Organization) error {
+		return nil
+	}
 	svc := cheevos.OrganizationService{DB: db}
 	ownerID := uuid.New()
 
