@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/log"
 )
 
 func NewTestLogger() *TestLogger {
 	var buff bytes.Buffer
-	logger := &cheevos.JSONLogger{
+	logger := &log.JSONLogger{
 		EnableDebug: true,
 		Output:      &buff,
 	}
@@ -27,7 +27,7 @@ func NewTestLogger() *TestLogger {
 }
 
 type TestLogger struct {
-	*cheevos.JSONLogger
+	*log.JSONLogger
 	buff *bytes.Buffer
 }
 

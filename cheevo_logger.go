@@ -2,6 +2,8 @@ package cheevos
 
 import (
 	"context"
+
+	"github.com/haleyrc/cheevos/log"
 )
 
 type CheevoLogger struct {
@@ -9,11 +11,11 @@ type CheevoLogger struct {
 		AwardCheevoToUser(context.Context, AwardCheevoToUserRequest) (*AwardCheevoToUserResponse, error)
 		CreateCheevo(context.Context, CreateCheevoRequest) (*CreateCheevoResponse, error)
 	}
-	Logger Logger
+	Logger log.Logger
 }
 
 func (cl *CheevoLogger) AwardCheevoToUser(ctx context.Context, req AwardCheevoToUserRequest) (*AwardCheevoToUserResponse, error) {
-	cl.Logger.Debug(ctx, "awarding cheevo to user", Fields{
+	cl.Logger.Debug(ctx, "awarding cheevo to user", log.Fields{
 		"Cheevo":  req.Cheevo,
 		"Awardee": req.Awardee,
 		"Awarder": req.Awarder,
@@ -24,7 +26,7 @@ func (cl *CheevoLogger) AwardCheevoToUser(ctx context.Context, req AwardCheevoTo
 		cl.Logger.Error(ctx, "award cheevo to user failed", err)
 		return nil, err
 	}
-	cl.Logger.Log(ctx, "cheevo awarded", Fields{
+	cl.Logger.Log(ctx, "cheevo awarded", log.Fields{
 		"Cheevo": resp.Cheevo,
 		"User":   resp.User,
 	})
@@ -33,7 +35,7 @@ func (cl *CheevoLogger) AwardCheevoToUser(ctx context.Context, req AwardCheevoTo
 }
 
 func (cl *CheevoLogger) CreateCheevo(ctx context.Context, req CreateCheevoRequest) (*CreateCheevoResponse, error) {
-	cl.Logger.Debug(ctx, "creating cheevo", Fields{
+	cl.Logger.Debug(ctx, "creating cheevo", log.Fields{
 		"Name":         req.Name,
 		"Description":  req.Description,
 		"Organization": req.Organization,
@@ -44,7 +46,7 @@ func (cl *CheevoLogger) CreateCheevo(ctx context.Context, req CreateCheevoReques
 		cl.Logger.Error(ctx, "create cheevo failed", err)
 		return nil, err
 	}
-	cl.Logger.Log(ctx, "cheevo created", Fields{"Cheevo": resp.Cheevo})
+	cl.Logger.Log(ctx, "cheevo created", log.Fields{"Cheevo": resp.Cheevo})
 
 	return resp, nil
 }
