@@ -13,9 +13,13 @@ func TestAddUserToOrganizationSucceeds(t *testing.T) {
 	ctx := context.Background()
 	user := fake.User()
 	org := fake.Organization(fake.WithOwner(user))
+	newUser := fake.User()
 
 	err := db.Call(ctx, func(ctx context.Context, tx cheevos.Transaction) error {
 		if err := tx.CreateUser(ctx, user); err != nil {
+			return err
+		}
+		if err := tx.CreateUser(ctx, newUser); err != nil {
 			return err
 		}
 		return tx.CreateOrganization(ctx, org)
@@ -24,11 +28,7 @@ func TestAddUserToOrganizationSucceeds(t *testing.T) {
 		t.Fatal("setup failed with error:", err)
 	}
 
-	newUser := fake.User()
 	err = db.Call(ctx, func(ctx context.Context, tx cheevos.Transaction) error {
-		if err := tx.CreateUser(ctx, newUser); err != nil {
-			return err
-		}
 		return tx.AddUserToOrganization(ctx, org, newUser)
 	})
 	if err != nil {

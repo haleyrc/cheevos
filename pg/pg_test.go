@@ -8,6 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 
+	"github.com/haleyrc/cheevos/log"
 	"github.com/haleyrc/cheevos/pg"
 )
 
@@ -23,7 +24,9 @@ func TestMain(m *testing.M) {
 	}
 
 	var err error
-	db, err = pg.ConnectWithRetries(context.Background(), 3, url)
+	db, err = pg.ConnectWithRetries(context.Background(), 3, url, pg.Options{
+		Logger: log.JSONLogger{EnableDebug: true, Output: os.Stdout},
+	})
 	if err != nil {
 		fmt.Println("ConnectWithRetries() failed with error:", err)
 		os.Exit(1)

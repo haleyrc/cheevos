@@ -9,6 +9,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/log"
 )
 
 func Port(port int) string {
@@ -40,22 +41,38 @@ func (p Parameters) String() string {
 	)
 }
 
-func Connect(ctx context.Context, conn string) (*Database, error) {
-	db, err := sqlx.ConnectContext(ctx, "postgres", conn)
+type Options struct {
+	ErrorFunc func(ctx context.Context, err error)
+	Logger    log.Logger
+}
+
+func Connect(ctx context.Context, conn string, opts Options) (*Database, error) {
+	sqlxDB, err := sqlx.ConnectContext(ctx, "postgres", conn)
 	if err != nil {
 		return nil, fmt.Errorf("connect failed: %w", err)
 	}
-	return &Database{db: db}, nil
+	db := &Database{
+		db:        sqlxDB,
+		ErrorFunc: opts.ErrorFunc,
+		Logger:    opts.Logger,
+	}
+	if db.ErrorFunc == nil {
+		db.ErrorFunc = func(ctx context.Context, err error) {
+			db.Logger.Error(ctx, "unexpected error", err)
+		}
+	}
+	if db.Logger == nil {
+		db.Logger = log.NullLogger{}
+	}
+	return db, nil
 }
 
-func ConnectWithRetries(ctx context.Context, retries int, conn string) (*Database, error) {
-	var db *sqlx.DB
-	var err error
+func ConnectWithRetries(ctx context.Context, retries int, conn string, opts Options) (*Database, error) {
 	var i int
-
+	var lastErr error
 	for {
 		if i+1 > retries {
-			return nil, fmt.Errorf("connect failed: %w", err)
+			return nil, fmt.Errorf("connect failed: %w", lastErr)
 		}
 
 		if i != 0 {
@@ -63,10 +80,11 @@ func ConnectWithRetries(ctx context.Context, retries int, conn string) (*Databas
 			time.Sleep(wait)
 		}
 
-		db, err = sqlx.ConnectContext(ctx, "postgres", conn)
+		db, err := Connect(ctx, conn, opts)
 		if err == nil {
-			return &Database{db: db}, nil
+			return db, nil
 		}
+		lastErr = err
 
 		i++
 	}
@@ -74,18 +92,22 @@ func ConnectWithRetries(ctx context.Context, retries int, conn string) (*Databas
 
 type Database struct {
 	ErrorFunc func(context.Context, error)
+	Logger    log.Logger
 	db        *sqlx.DB
 }
 
 func (db *Database) Call(ctx context.Context, f func(ctx context.Context, tx cheevos.Transaction) error) error {
+	db.Logger.Debug(ctx, "begining transaction", nil)
+	defer db.Logger.Debug(ctx, "ending transaction", nil)
+
 	sqlxTx, err := db.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("begin transaction failed: %w", err)
 	}
 
-	if err := f(ctx, &Transaction{tx: sqlxTx}); err != nil {
+	if err := f(ctx, &Transaction{logger: db.Logger, tx: sqlxTx}); err != nil {
 		rollbackErr := sqlxTx.Rollback()
-		if rollbackErr != nil && db.ErrorFunc != nil {
+		if rollbackErr != nil {
 			db.ErrorFunc(ctx, rollbackErr)
 		}
 		return fmt.Errorf("transaction failed: %w", err)
