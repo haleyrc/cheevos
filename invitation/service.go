@@ -70,19 +70,20 @@ func (is *Service) DeclineInvitation(ctx context.Context, code string) error {
 }
 
 func (is *Service) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
-	invitation := &Invitation{
-		Email:          email,
-		OrganizationID: orgID,
-		Expires:        time.Now().Add(InvitationValidFor),
-	}
-	if err := invitation.Validate(); err != nil {
-		return nil, fmt.Errorf("invite user to organization failed: %w", err)
-	}
-
-	code := random.String(CodeLength)
-	hashedCode := hash.Generate(code)
-
+	var invitation *Invitation
 	err := is.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
+		code := random.String(CodeLength)
+		hashedCode := hash.Generate(code)
+
+		invitation = &Invitation{
+			Email:          email,
+			OrganizationID: orgID,
+			Expires:        time.Now().Add(InvitationValidFor),
+		}
+		if err := invitation.Validate(); err != nil {
+			return err
+		}
+
 		if err := is.Repo.CreateInvitation(ctx, tx, invitation, hashedCode); err != nil {
 			return err
 		}
@@ -101,6 +102,7 @@ func (is *Service) InviteUserToOrganization(ctx context.Context, email, orgID st
 func (is *Service) RefreshInvitation(ctx context.Context, code string) error {
 	err := is.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
 		hashedCode := hash.Generate(code)
+
 		invitation, err := is.Repo.GetInvitationByCode(ctx, tx, hashedCode)
 		if err != nil {
 			return err

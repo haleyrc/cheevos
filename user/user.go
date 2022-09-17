@@ -21,6 +21,8 @@ func (u *User) Normalize() {
 }
 
 func (u *User) Validate() error {
+	u.Normalize()
+
 	if u.ID == "" {
 		return fmt.Errorf("invalid: id is blank")
 	}

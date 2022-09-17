@@ -23,16 +23,17 @@ type Service struct {
 // CreateCheevo creates a new cheevo and persists it to the database. It returns
 // a response containing the full cheevo if successful.
 func (cs *Service) CreateCheevo(ctx context.Context, name, description, orgID string) (*Cheevo, error) {
-	cheevo := &Cheevo{
-		ID:          uuid.New(),
-		Name:        name,
-		Description: description,
-	}
-	if err := cheevo.Validate(); err != nil {
-		return nil, fmt.Errorf("create cheevo failed: %w", err)
-	}
-
+	var cheevo *Cheevo
 	err := cs.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
+		cheevo = &Cheevo{
+			ID:          uuid.New(),
+			Name:        name,
+			Description: description,
+		}
+		if err := cheevo.Validate(); err != nil {
+			return err
+		}
+
 		return cs.Repo.CreateCheevo(ctx, tx, cheevo)
 	})
 	if err != nil {

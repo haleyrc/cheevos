@@ -10,7 +10,7 @@ import (
 	"github.com/haleyrc/cheevos/user"
 )
 
-func TestUserLoggerLogsAnErrorFromSignUp(t *testing.T) {
+func TestLoggerLogsAnErrorFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	cl := &user.Logger{
@@ -21,32 +21,29 @@ func TestUserLoggerLogsAnErrorFromSignUp(t *testing.T) {
 		},
 		Logger: logger,
 	}
-	cl.SignUp(context.Background(), "Test", "Testtest123")
+	cl.SignUp(context.Background(), "username", "password")
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Username":"Test"},"Message":"signing up user"}`,
+		`{"Fields":{"Username":"username"},"Message":"signing up user"}`,
 		`{"Fields":{"Error":"oops"},"Message":"sign up failed"}`,
 	)
 }
 
-func TestUserLoggerLogsTheResponseFromSignUp(t *testing.T) {
+func TestLoggerLogsTheResponseFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	cl := &user.Logger{
 		Svc: &mock.UserService{
 			SignUpFn: func(_ context.Context, _, _ string) (*user.User, error) {
-				return &user.User{
-					ID:       "8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea",
-					Username: "Test",
-				}, nil
+				return &user.User{ID: "id", Username: "username"}, nil
 			},
 		},
 		Logger: logger,
 	}
-	cl.SignUp(context.Background(), "Test", "Testtest123")
+	cl.SignUp(context.Background(), "username", "password")
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Username":"Test"},"Message":"signing up user"}`,
-		`{"Fields":{"User":{"ID":"8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea","Username":"Test"}},"Message":"user signed up"}`,
+		`{"Fields":{"Username":"username"},"Message":"signing up user"}`,
+		`{"Fields":{"User":{"ID":"id","Username":"username"}},"Message":"user signed up"}`,
 	)
 }

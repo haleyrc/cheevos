@@ -23,6 +23,8 @@ func (i *Invitation) Normalize() {
 }
 
 func (i *Invitation) Validate() error {
+	i.Normalize()
+
 	if i.Email == "" {
 		return fmt.Errorf("invalid: email is blank")
 	}

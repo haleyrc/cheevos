@@ -18,16 +18,16 @@ type Service struct {
 }
 
 func (ms *Service) AddMemberToOrganization(ctx context.Context, userID, orgID string) error {
-	mem := &Membership{
-		OrganizationID: orgID,
-		UserID:         userID,
-		Joined:         time.Now(),
-	}
-	if err := mem.Validate(); err != nil {
-		return fmt.Errorf("add member to organization failed: %w", err)
-	}
-
 	err := ms.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
+		mem := &Membership{
+			OrganizationID: orgID,
+			UserID:         userID,
+			Joined:         time.Now(),
+		}
+		if err := mem.Validate(); err != nil {
+			return err
+		}
+
 		return ms.Repo.CreateMembership(ctx, tx, mem)
 	})
 	if err != nil {

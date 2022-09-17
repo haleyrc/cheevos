@@ -11,13 +11,6 @@ import (
 	"github.com/haleyrc/cheevos/lib/time"
 )
 
-/*
-AcceptInvitation(ctx context.Context, userID, code string) error
-DeclineInvitation(ctx context.Context, code string) error
-InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error)
-RefreshInvitation(ctx context.Context, code string) error
-*/
-
 func TestLoggerLogsAnErrorFromAcceptInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 

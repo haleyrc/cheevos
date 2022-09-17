@@ -15,18 +15,26 @@ import (
 func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	time.Freeze()
 
-	ctx := context.Background()
-	repo := mock.Repository{
-		AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) error { return nil },
-		CreateOrganizationFn:      func(_ context.Context, _ db.Transaction, _ *organization.Organization) error { return nil },
-	}
-	svc := organization.Service{
-		DB:   &mock.Database{},
-		Repo: &repo,
-	}
-	ownerID := uuid.New()
+	var (
+		ctx = context.Background()
 
-	org, err := svc.CreateOrganization(ctx, "Test", ownerID)
+		ownerID = uuid.New()
+		name    = "name"
+
+		mockDB = &mock.Database{}
+
+		repo = &mock.Repository{
+			AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) error { return nil },
+			CreateOrganizationFn:      func(_ context.Context, _ db.Transaction, _ *organization.Organization) error { return nil },
+		}
+
+		svc = organization.Service{
+			DB:   mockDB,
+			Repo: repo,
+		}
+	)
+
+	org, err := svc.CreateOrganization(ctx, name, ownerID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,10 +48,10 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 			org.ID, repo.CreateOrganizationCalled.With.Organization.ID,
 		)
 	}
-	if repo.CreateOrganizationCalled.With.Organization.Name != "Test" {
+	if repo.CreateOrganizationCalled.With.Organization.Name != name {
 		t.Errorf(
 			"Expected repository.CreateOrganization to receive name %q, but got %q.",
-			"Test", repo.CreateOrganizationCalled.With.Organization.Name,
+			name, repo.CreateOrganizationCalled.With.Organization.Name,
 		)
 	}
 
@@ -66,8 +74,8 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	if org.ID == "" {
 		t.Error("ID shouldn't be blank, but it was.")
 	}
-	if org.Name != "Test" {
-		t.Errorf("Name should be \"Test\", but got %q.", org.Name)
+	if org.Name != name {
+		t.Errorf("Name should be %q, but got %q.", name, org.Name)
 	}
 	if org.OwnerID != ownerID {
 		t.Errorf("Owner should be %q, but got %q.", ownerID, org.OwnerID)

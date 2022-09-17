@@ -30,6 +30,7 @@ func (as *Service) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID 
 		if err := award.Validate(); err != nil {
 			return err
 		}
+
 		return as.Repo.CreateAward(ctx, tx, award)
 	})
 	if err != nil {

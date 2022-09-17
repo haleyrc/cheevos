@@ -25,16 +25,17 @@ type Service struct {
 // database. It returns a response containing the new organization if
 // successful.
 func (os *Service) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
-	org := &Organization{
-		ID:      uuid.New(),
-		Name:    name,
-		OwnerID: ownerID,
-	}
-	if err := org.Validate(); err != nil {
-		return nil, fmt.Errorf("create organization failed: %w", err)
-	}
-
+	var org *Organization
 	err := os.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
+		org = &Organization{
+			ID:      uuid.New(),
+			Name:    name,
+			OwnerID: ownerID,
+		}
+		if err := org.Validate(); err != nil {
+			return err
+		}
+
 		if err := os.Repo.CreateOrganization(ctx, tx, org); err != nil {
 			return err
 		}

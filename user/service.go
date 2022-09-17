@@ -23,16 +23,18 @@ type Service struct {
 // SignUp creates a new user and persists it to the database. It returns a
 // response containing the new organization if successful.
 func (us *Service) SignUp(ctx context.Context, username, password string) (*User, error) {
-	user := &User{
-		ID:       uuid.New(),
-		Username: username,
-	}
-	if err := user.Validate(); err != nil {
-		return nil, fmt.Errorf("sign up failed: %w", err)
-	}
-
+	var user *User
 	err := us.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
+		user = &User{
+			ID:       uuid.New(),
+			Username: username,
+		}
+		if err := user.Validate(); err != nil {
+			return err
+		}
+
 		hashedPassword := hash.Generate(password)
+
 		return us.Repo.CreateUser(ctx, tx, user, hashedPassword)
 	})
 	if err != nil {

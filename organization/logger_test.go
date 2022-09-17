@@ -11,26 +11,24 @@ import (
 	"github.com/haleyrc/cheevos/organization"
 )
 
-func TestOrganizationLoggerLogsAnErrorFromAddUserToOrganization(t *testing.T) {
+func TestLoggerLogsAnErrorFromAddUserToOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	ol := &organization.Logger{
 		Svc: &mock.OrganizationService{
-			AddMemberToOrganizationFn: func(_ context.Context, _, _ string) error {
-				return fmt.Errorf("oops")
-			},
+			AddMemberToOrganizationFn: func(_ context.Context, _, _ string) error { return fmt.Errorf("oops") },
 		},
 		Logger: logger,
 	}
-	ol.AddMemberToOrganization(context.Background(), "4d523938-2baa-4d94-8daf-ea1785ff154", "783bf2de-dce2-4f32-9f18-f77b904f87c")
+	ol.AddMemberToOrganization(context.Background(), "userid", "orgid")
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Organization":"783bf2de-dce2-4f32-9f18-f77b904f87c","User":"4d523938-2baa-4d94-8daf-ea1785ff154"},"Message":"adding member to organization"}`,
+		`{"Fields":{"Organization":"orgid","User":"userid"},"Message":"adding member to organization"}`,
 		`{"Fields":{"Error":"oops"},"Message":"add member to organization failed"}`,
 	)
 }
 
-func TestOrganizationLoggerLogsTheResponseFromAddUserToOrganization(t *testing.T) {
+func TestLoggerLogsTheResponseFromAddUserToOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	ol := &organization.Logger{
@@ -39,15 +37,15 @@ func TestOrganizationLoggerLogsTheResponseFromAddUserToOrganization(t *testing.T
 		},
 		Logger: logger,
 	}
-	ol.AddMemberToOrganization(context.Background(), "4d523938-2baa-4d94-8daf-ea1785ff154d", "783bf2de-dce2-4f32-9f18-f77b904f87cf")
+	ol.AddMemberToOrganization(context.Background(), "userid", "orgid")
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Organization":"783bf2de-dce2-4f32-9f18-f77b904f87cf","User":"4d523938-2baa-4d94-8daf-ea1785ff154d"},"Message":"adding member to organization"}`,
-		`{"Fields":{"Organization":"783bf2de-dce2-4f32-9f18-f77b904f87cf","User":"4d523938-2baa-4d94-8daf-ea1785ff154d"},"Message":"added member to organization"}`,
+		`{"Fields":{"Organization":"orgid","User":"userid"},"Message":"adding member to organization"}`,
+		`{"Fields":{"Organization":"orgid","User":"userid"},"Message":"added member to organization"}`,
 	)
 }
 
-func TestOrganizationLoggerLogsAnErrorFromCreateOrganization(t *testing.T) {
+func TestLoggerLogsAnErrorFromCreateOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	ol := &organization.Logger{
@@ -58,15 +56,15 @@ func TestOrganizationLoggerLogsAnErrorFromCreateOrganization(t *testing.T) {
 		},
 		Logger: logger,
 	}
-	ol.CreateOrganization(context.Background(), "Test", "783bf2de-dce2-4f32-9f18-f77b904f87c")
+	ol.CreateOrganization(context.Background(), "name", "ownerid")
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Name":"Test","Owner":"783bf2de-dce2-4f32-9f18-f77b904f87c"},"Message":"creating organization"}`,
+		`{"Fields":{"Name":"name","Owner":"ownerid"},"Message":"creating organization"}`,
 		`{"Fields":{"Error":"oops"},"Message":"create organization failed"}`,
 	)
 }
 
-func TestOrganizationLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
+func TestLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
 	time.Freeze()
 
 	logger := testutil.NewTestLogger()
@@ -74,19 +72,15 @@ func TestOrganizationLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
 	ol := &organization.Logger{
 		Svc: &mock.OrganizationService{
 			CreateOrganizationFn: func(_ context.Context, name, ownerID string) (*organization.Organization, error) {
-				return &organization.Organization{
-					ID:      "8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea",
-					Name:    "Test",
-					OwnerID: "238cb95f-8bcd-4cda-8cfc-9d03fecba894",
-				}, nil
+				return &organization.Organization{ID: "id", Name: "name", OwnerID: "ownerid"}, nil
 			},
 		},
 		Logger: logger,
 	}
-	ol.CreateOrganization(context.Background(), "Test", "238cb95f-8bcd-4cda-8cfc-9d03fecba894")
+	ol.CreateOrganization(context.Background(), "name", "ownerid")
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Name":"Test","Owner":"238cb95f-8bcd-4cda-8cfc-9d03fecba894"},"Message":"creating organization"}`,
-		`{"Fields":{"Organization":{"ID":"8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea","Name":"Test","OwnerID":"238cb95f-8bcd-4cda-8cfc-9d03fecba894"}},"Message":"organization created"}`,
+		`{"Fields":{"Name":"name","Owner":"ownerid"},"Message":"creating organization"}`,
+		`{"Fields":{"Organization":{"ID":"id","Name":"name","OwnerID":"ownerid"}},"Message":"organization created"}`,
 	)
 }
