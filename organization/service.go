@@ -9,6 +9,11 @@ import (
 	"github.com/haleyrc/cheevos/lib/db"
 )
 
+type OrganizationRepository interface {
+	AddMemberToOrganization(ctx context.Context, tx db.Transaction, userID, orgID string) (*Member, error)
+	CreateOrganization(ctx context.Context, tx db.Transaction, org *Organization) error
+}
+
 // OrganizationService represents the main entrypoint for managing
 // organizations.
 type OrganizationService struct {

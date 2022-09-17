@@ -13,16 +13,6 @@ type CheevoRepository interface {
 	CreateCheevo(ctx context.Context, tx db.Transaction, cheevo *Cheevo) error
 }
 
-type cheevoRepository struct{}
-
-func (cr *cheevoRepository) AwardCheevoToUser(ctx context.Context, tx db.Transaction, recipientID, cheevoID string) (*Award, error) {
-	return nil, fmt.Errorf("TODO")
-}
-
-func (cr *cheevoRepository) CreateCheevo(ctx context.Context, tx db.Transaction, cheevo *Cheevo) error {
-	return fmt.Errorf("TODO")
-}
-
 // CheevoService is the primary entrypoint for managing cheevos.
 type CheevoService struct {
 	DB db.Database
