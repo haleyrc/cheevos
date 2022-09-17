@@ -78,12 +78,6 @@ func TestOrganizationLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
 					ID:      "8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea",
 					Name:    "Test",
 					OwnerID: "238cb95f-8bcd-4cda-8cfc-9d03fecba894",
-					Owner: &organization.Member{
-						OrganizationID: "7694fabd-d204-4c1e-9b05-95189269cc41",
-						UserID:         "7168191f-b3ff-45b0-af1f-3a3f234bbd88",
-						Username:       "TestUser",
-						Joined:         time.Now(),
-					},
 				}, nil
 			},
 		},
@@ -93,6 +87,6 @@ func TestOrganizationLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
 
 	logger.ShouldLog(t,
 		`{"Fields":{"Name":"Test","Owner":"238cb95f-8bcd-4cda-8cfc-9d03fecba894"},"Message":"creating organization"}`,
-		`{"Fields":{"Organization":{"ID":"8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea","Name":"Test","OwnerID":"238cb95f-8bcd-4cda-8cfc-9d03fecba894","Owner":{"OrganizationID":"7694fabd-d204-4c1e-9b05-95189269cc41","UserID":"7168191f-b3ff-45b0-af1f-3a3f234bbd88","Username":"TestUser","Joined":"2022-09-16T15:02:04Z"}}},"Message":"organization created"}`,
+		`{"Fields":{"Organization":{"ID":"8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea","Name":"Test","OwnerID":"238cb95f-8bcd-4cda-8cfc-9d03fecba894"}},"Message":"organization created"}`,
 	)
 }

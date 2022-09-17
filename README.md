@@ -22,7 +22,9 @@ cheevos they received from the organization are also removed.
 ## TODO
 
 - [ ] Refactor validation runner and compareError
-- [ ] Remove nested types (members, awards)
-- [ ] Move membership and awards to new services
+- [X] Move membership to new service
+- [ ] Move awards to new service
 - [X] Move password hash out of model
 - [ ] Implement an actual random string function
+- [ ] Add ID to invitation and stop using code for lookups
+- [ ] Combine mock repositories into one
