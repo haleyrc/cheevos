@@ -51,39 +51,3 @@ func TestCheevoLoggerLogsTheResponseFromCreateCheevo(t *testing.T) {
 		`{"Fields":{"Cheevo":{"ID":"8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea","Name":"Test","Description":"This is a test."}},"Message":"cheevo created"}`,
 	)
 }
-
-func TestCheevoLoggerLogsAnErrorFromAwardCheevoToUser(t *testing.T) {
-	logger := testutil.NewTestLogger()
-
-	cl := &cheevo.Logger{
-		Svc: &mock.CheevoService{
-			AwardCheevoToUserFn: func(_ context.Context, _, _ string) error {
-				return fmt.Errorf("oops")
-			},
-		},
-		Logger: logger,
-	}
-	cl.AwardCheevoToUser(context.Background(), "4d523938-2baa-4d94-8daf-ea1785ff154", "783bf2de-dce2-4f32-9f18-f77b904f87c")
-
-	logger.ShouldLog(t,
-		`{"Fields":{"Cheevo":"783bf2de-dce2-4f32-9f18-f77b904f87c","User":"4d523938-2baa-4d94-8daf-ea1785ff154"},"Message":"awarding cheevo to user"}`,
-		`{"Fields":{"Error":"oops"},"Message":"award cheevo to user failed"}`,
-	)
-}
-
-func TestCheevoLoggerLogsTheResponseFromAwardCheevoToUser(t *testing.T) {
-	logger := testutil.NewTestLogger()
-
-	cl := &cheevo.Logger{
-		Svc: &mock.CheevoService{
-			AwardCheevoToUserFn: func(_ context.Context, _, _ string) error { return nil },
-		},
-		Logger: logger,
-	}
-	cl.AwardCheevoToUser(context.Background(), "4d523938-2baa-4d94-8daf-ea1785ff154d", "783bf2de-dce2-4f32-9f18-f77b904f87cf")
-
-	logger.ShouldLog(t,
-		`{"Fields":{"Cheevo":"783bf2de-dce2-4f32-9f18-f77b904f87cf","User":"4d523938-2baa-4d94-8daf-ea1785ff154d"},"Message":"awarding cheevo to user"}`,
-		`{"Fields":{"Cheevo":"783bf2de-dce2-4f32-9f18-f77b904f87cf","User":"4d523938-2baa-4d94-8daf-ea1785ff154d"},"Message":"awarded cheevo to user"}`,
-	)
-}
