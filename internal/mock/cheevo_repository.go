@@ -50,5 +50,5 @@ func (cr *CheevoRepository) CreateCheevo(ctx context.Context, tx db.Transaction,
 }
 
 func mockMethodNotDefined(funcName string) error {
-	return fmt.Errorf("Mock method %s is not defined.", funcName)
+	return fmt.Errorf("mock method %s is not defined", funcName)
 }
