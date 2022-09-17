@@ -8,6 +8,7 @@ import (
 
 	"github.com/haleyrc/cheevos/internal/mock"
 	"github.com/haleyrc/cheevos/lib/db"
+	"github.com/haleyrc/cheevos/lib/time"
 	"github.com/haleyrc/cheevos/organization"
 )
 
@@ -45,6 +46,8 @@ func TestAddingAMemberToAnOrganizationSucceeds(t *testing.T) {
 }
 
 func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
+	time.Freeze()
+
 	ctx := context.Background()
 	repo := mock.OrganizationRepository{
 		AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) (*organization.Member, error) {
