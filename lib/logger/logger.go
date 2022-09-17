@@ -1,4 +1,4 @@
-package cheevos
+package logger
 
 import (
 	"context"

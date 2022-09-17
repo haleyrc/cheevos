@@ -3,18 +3,18 @@ package mock
 import (
 	"context"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/cheevo"
 )
 
 type CheevoService struct {
-	AwardCheevoToUserFn func(context.Context, cheevos.AwardCheevoToUserRequest) (*cheevos.AwardCheevoToUserResponse, error)
-	CreateCheevoFn      func(context.Context, cheevos.CreateCheevoRequest) (*cheevos.CreateCheevoResponse, error)
+	AwardCheevoToUserFn func(ctx context.Context, userID, cheevoID string) error
+	CreateCheevoFn      func(ctx context.Context, name, description, orgID string) (*cheevo.Cheevo, error)
 }
 
-func (cs *CheevoService) AwardCheevoToUser(ctx context.Context, req cheevos.AwardCheevoToUserRequest) (*cheevos.AwardCheevoToUserResponse, error) {
-	return cs.AwardCheevoToUserFn(ctx, req)
+func (cs *CheevoService) AwardCheevoToUser(ctx context.Context, userID, cheevoID string) error {
+	return cs.AwardCheevoToUserFn(ctx, userID, cheevoID)
 }
 
-func (cs *CheevoService) CreateCheevo(ctx context.Context, req cheevos.CreateCheevoRequest) (*cheevos.CreateCheevoResponse, error) {
-	return cs.CreateCheevoFn(ctx, req)
+func (cs *CheevoService) CreateCheevo(ctx context.Context, name, description, orgID string) (*cheevo.Cheevo, error) {
+	return cs.CreateCheevoFn(ctx, name, description, orgID)
 }

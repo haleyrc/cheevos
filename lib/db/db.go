@@ -1,4 +1,4 @@
-package cheevos
+package db
 
 import "context"
 
@@ -13,11 +13,17 @@ type Database interface {
 	Call(context.Context, func(ctx context.Context, tx Transaction) error) error
 }
 
+type Transaction interface{}
+
+/*
 // Transaction is our primary handle for running persistence methods.
 type Transaction interface {
-	AwardCheevoToUser(ctx context.Context, cheevoID, userID string) error
+	AddUserToOrganization(ctx context.Context, orgID, userID string) error
 	GetCheevo(ctx context.Context, cheevoID string) (*Cheevo, error)
 	GetOrganization(ctx context.Context, orgID string) (*Organization, error)
 	GetUser(ctx context.Context, userID string) (*User, error)
-	AddUserToOrganization(ctx context.Context, orgID, userID string) error
+	SaveAward(ctx context.Context, award *Award) error
+	SaveMembership(ctx context.Context, membership *Membership) error
+	SaveOrganization(ctx context.Context, org *Organization) error
 }
+*/
