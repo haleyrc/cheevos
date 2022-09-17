@@ -17,7 +17,7 @@ func TestAddingAMemberToAnOrganizationSucceeds(t *testing.T) {
 		AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) (*organization.Member, error) { return nil, nil },
 	}
 	svc := organization.OrganizationService{
-		DB:   mock.NewDatabase(),
+		DB:   &mock.Database{},
 		Repo: &repo,
 	}
 	orgID := uuid.New()
@@ -53,7 +53,7 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 		CreateOrganizationFn: func(_ context.Context, _ db.Transaction, _ *organization.Organization) error { return nil },
 	}
 	svc := organization.OrganizationService{
-		DB:   mock.NewDatabase(),
+		DB:   &mock.Database{},
 		Repo: &repo,
 	}
 	ownerID := uuid.New()
