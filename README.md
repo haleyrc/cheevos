@@ -27,5 +27,5 @@ cheevos they received from the organization are also removed.
 - [X] Move password hash out of model
 - [ ] Implement an actual random string function
 - [ ] Add ID to invitation and stop using code for lookups
-- [ ] Combine mock repositories into one
+- [X] Combine mock repositories into one
 - [ ] Fix package stutter

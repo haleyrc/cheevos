@@ -26,7 +26,7 @@ func TestAcceptingAnInvitationFailsIfTheInvitationIsExpired(t *testing.T) {
 
 		mockDB = &mock.Database{}
 
-		repo = &mock.InvitationRepository{
+		repo = &mock.Repository{
 			GetInvitationByCodeFn: func(_ context.Context, _ db.Transaction, _ string) (*invitation.Invitation, error) { return inv, nil },
 		}
 
@@ -63,7 +63,7 @@ func TestAcceptingAnInvitationSucceeds(t *testing.T) {
 
 		mockDB = &mock.Database{}
 
-		repo = &mock.InvitationRepository{
+		repo = &mock.Repository{
 			AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) error { return nil },
 			GetInvitationByCodeFn:     func(_ context.Context, _ db.Transaction, _ string) (*invitation.Invitation, error) { return inv, nil },
 			DeleteInvitationByCodeFn:  func(_ context.Context, _ db.Transaction, _ string) error { return nil },
@@ -125,7 +125,7 @@ func TestDecliningAnInvitationSucceeds(t *testing.T) {
 
 		mockDB = &mock.Database{}
 
-		repo = &mock.InvitationRepository{
+		repo = &mock.Repository{
 			DeleteInvitationByCodeFn: func(_ context.Context, _ db.Transaction, _ string) error { return nil },
 		}
 
@@ -166,7 +166,7 @@ func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeSav
 			SendInvitationFn: func(_ context.Context, _, _ string) error { return nil },
 		}
 
-		repo = &mock.InvitationRepository{
+		repo = &mock.Repository{
 			CreateInvitationFn: func(_ context.Context, _ db.Transaction, _ *invitation.Invitation, _ string) error {
 				return fmt.Errorf("oops")
 			},
@@ -208,7 +208,7 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 			SendInvitationFn: func(_ context.Context, _, _ string) error { return nil },
 		}
 
-		repo = &mock.InvitationRepository{
+		repo = &mock.Repository{
 			CreateInvitationFn: func(_ context.Context, _ db.Transaction, _ *invitation.Invitation, _ string) error { return nil },
 		}
 
@@ -288,7 +288,7 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 			SendInvitationFn: func(_ context.Context, _, _ string) error { return nil },
 		}
 
-		repo = &mock.InvitationRepository{
+		repo = &mock.Repository{
 			GetInvitationByCodeFn: func(_ context.Context, _ db.Transaction, _ string) (*invitation.Invitation, error) { return inv, nil },
 			SaveInvitationFn:      func(_ context.Context, _ db.Transaction, _ *invitation.Invitation, _ string) error { return nil },
 		}
