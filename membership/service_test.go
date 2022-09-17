@@ -24,7 +24,7 @@ func TestAddingAMemberToAnOrganizationSucceeds(t *testing.T) {
 
 		mockDB = &mock.Database{}
 
-		repo = &mock.MembershipRepository{
+		repo = &mock.Repository{
 			CreateMembershipFn: func(_ context.Context, _ db.Transaction, _ *membership.Membership) error { return nil },
 		}
 

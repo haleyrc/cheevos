@@ -13,7 +13,7 @@ import (
 
 func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 	ctx := context.Background()
-	repo := mock.CheevoRepository{
+	repo := mock.Repository{
 		CreateCheevoFn: func(_ context.Context, _ db.Transaction, _ *cheevo.Cheevo) error {
 			return nil
 		},

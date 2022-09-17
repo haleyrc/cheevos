@@ -24,7 +24,7 @@ func TestAwardingACheevoSucceeds(t *testing.T) {
 
 		mockDB = &mock.Database{}
 
-		repo = &mock.AwardRepository{
+		repo = &mock.Repository{
 			CreateAwardFn: func(_ context.Context, _ db.Transaction, _ *award.Award) error { return nil },
 		}
 

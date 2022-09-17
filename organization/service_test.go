@@ -16,7 +16,7 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	time.Freeze()
 
 	ctx := context.Background()
-	repo := mock.OrganizationRepository{
+	repo := mock.Repository{
 		AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) error { return nil },
 		CreateOrganizationFn:      func(_ context.Context, _ db.Transaction, _ *organization.Organization) error { return nil },
 	}
