@@ -270,6 +270,54 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 	}
 }
 
+func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *testing.T) {
+	time.Freeze()
+
+	var (
+		ctx = context.Background()
+
+		email = "test@example.com"
+		now   = time.Now()
+		orgID = uuid.New()
+		inv   = &invitation.Invitation{Email: email, OrganizationID: orgID, Expires: now}
+		code  = "code"
+
+		mockDB = &mock.Database{}
+
+		emailer = &mock.Emailer{
+			SendInvitationFn: func(_ context.Context, _, _ string) error { return nil },
+		}
+
+		repo = &mock.Repository{
+			GetInvitationByCodeFn: func(_ context.Context, _ db.Transaction, _ string) (*invitation.Invitation, error) { return inv, nil },
+			SaveInvitationFn: func(_ context.Context, _ db.Transaction, _ *invitation.Invitation, _ string) error {
+				return fmt.Errorf("oops")
+			},
+		}
+
+		svc = invitation.Service{
+			DB:    mockDB,
+			Email: emailer,
+			Repo:  repo,
+		}
+	)
+
+	err := svc.RefreshInvitation(ctx, code)
+	if err == nil {
+		t.Error("Expected service to return an error, but it didn't.")
+	}
+
+	if repo.GetInvitationByCodeCalled.Count != 1 {
+		t.Errorf("Expected repository to receive GetInvitationByCode, but it didn't.")
+	}
+	if repo.SaveInvitationCalled.Count != 1 {
+		t.Errorf("Expected repository to receive GetInvitationByCode, but it didn't.")
+	}
+	if emailer.SendInvitationCalled.Count != 0 {
+		t.Errorf("Expected emailer not to receive SendInvitation, but it did.")
+	}
+}
+
 func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 	time.Freeze()
 
