@@ -10,6 +10,10 @@ import (
 	"github.com/haleyrc/cheevos/lib/hash"
 )
 
+type UserRepository interface {
+	CreateUser(ctx context.Context, tx db.Transaction, u *User) error
+}
+
 // UserService represents the main entrypoint for managing user.
 type UserService struct {
 	DB   db.Database
