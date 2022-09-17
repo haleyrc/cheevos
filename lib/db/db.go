@@ -13,4 +13,6 @@ type Database interface {
 	Call(context.Context, func(ctx context.Context, tx Transaction) error) error
 }
 
-type Transaction interface{}
+type Transaction interface {
+	Exec(ctx context.Context, query string, args ...interface{}) error
+}
