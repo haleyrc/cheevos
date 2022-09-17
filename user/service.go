@@ -11,7 +11,7 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(ctx context.Context, tx db.Transaction, u *User) error
+	CreateUser(ctx context.Context, tx db.Transaction, u *User, hashedPassword string) error
 }
 
 // UserService represents the main entrypoint for managing user.
@@ -24,16 +24,16 @@ type UserService struct {
 // response containing the new organization if successful.
 func (us *UserService) SignUp(ctx context.Context, username, password string) (*User, error) {
 	user := &User{
-		ID:           uuid.New(),
-		Username:     username,
-		PasswordHash: hash.Generate(password),
+		ID:       uuid.New(),
+		Username: username,
 	}
 	if err := user.Validate(); err != nil {
 		return nil, fmt.Errorf("sign up failed: %w", err)
 	}
 
 	err := us.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
-		return us.Repo.CreateUser(ctx, tx, user)
+		hashedPassword := hash.Generate(password)
+		return us.Repo.CreateUser(ctx, tx, user, hashedPassword)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("sign up failed: %w", err)

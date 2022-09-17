@@ -2,7 +2,6 @@ package user
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/haleyrc/cheevos/lib/stringutil"
 )
@@ -15,13 +14,10 @@ type User struct {
 
 	// The username for display.
 	Username string
-
-	PasswordHash string
 }
 
 func (u *User) Normalize() {
 	u.Username = stringutil.MakeSafe(u.Username)
-	u.PasswordHash = strings.TrimSpace(u.PasswordHash)
 }
 
 func (u *User) Validate() error {
@@ -31,10 +27,6 @@ func (u *User) Validate() error {
 
 	if u.Username == "" {
 		return fmt.Errorf("invalid: username is blank")
-	}
-
-	if u.PasswordHash == "" {
-		return fmt.Errorf("invalid: password hash is blank")
 	}
 
 	return nil

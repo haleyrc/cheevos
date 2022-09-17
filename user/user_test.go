@@ -22,19 +22,15 @@ func TestValidatingAUser(t *testing.T) {
 		err   string
 	}{
 		"returns an error for a missing id": {
-			input: user.User{ID: "", Username: "username", PasswordHash: "pwhash"},
+			input: user.User{ID: "", Username: "username"},
 			err:   "id is blank",
 		},
 		"returns an error for a missing username": {
-			input: user.User{ID: "id", Username: "", PasswordHash: "pwhash"},
+			input: user.User{ID: "id", Username: ""},
 			err:   "username is blank",
 		},
-		"returns an error for a missing password hash": {
-			input: user.User{ID: "id", Username: "username", PasswordHash: ""},
-			err:   "password hash is blank",
-		},
 		"returns nil for a valid user": {
-			input: user.User{ID: "id", Username: "username", PasswordHash: "pwhash"},
+			input: user.User{ID: "id", Username: "username"},
 			err:   "",
 		},
 	}

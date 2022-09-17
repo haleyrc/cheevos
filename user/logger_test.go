@@ -45,9 +45,8 @@ func TestUserLoggerLogsTheResponseFromSignUp(t *testing.T) {
 	}
 	cl.SignUp(context.Background(), "Test", "Testtest123")
 
-	// TODO: This is an issue because we're not capable of logging this hash that should never leave the service
 	logger.ShouldLog(t,
 		`{"Fields":{"Username":"Test"},"Message":"signing up user"}`,
-		`{"Fields":{"User":{"ID":"8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea","Username":"Test","PasswordHash":""}},"Message":"user signed up"}`,
+		`{"Fields":{"User":{"ID":"8059dcd7-bcc1-46fa-bfc0-3926c0b2c6ea","Username":"Test"}},"Message":"user signed up"}`,
 	)
 }

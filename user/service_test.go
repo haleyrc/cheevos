@@ -12,7 +12,7 @@ import (
 func TestSigningUpSucceeds(t *testing.T) {
 	ctx := context.Background()
 	repo := mock.UserRepository{
-		CreateUserFn: func(_ context.Context, _ db.Transaction, _ *user.User) error { return nil },
+		CreateUserFn: func(_ context.Context, _ db.Transaction, _ *user.User, _ string) error { return nil },
 	}
 	svc := user.UserService{
 		DB:   &mock.Database{},
@@ -39,7 +39,7 @@ func TestSigningUpSucceeds(t *testing.T) {
 			"test", repo.CreateUserCalled.With.User.Username,
 		)
 	}
-	if repo.CreateUserCalled.With.User.PasswordHash == "testtest" {
+	if repo.CreateUserCalled.With.PasswordHash == "testtest" {
 		t.Errorf("Expected repository.CreateUser not to receive a plaintext password, but it did.")
 	}
 
@@ -48,8 +48,5 @@ func TestSigningUpSucceeds(t *testing.T) {
 	}
 	if user.Username != "test" {
 		t.Errorf("Username should be \"test\", but got %q.", user.Username)
-	}
-	if user.PasswordHash == "testtest" {
-		t.Errorf("Password should not be plaintext, but it was.")
 	}
 }
