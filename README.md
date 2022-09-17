@@ -21,7 +21,7 @@ cheevos they received from the organization are also removed.
 
 ## TODO
 
-- [  ] Refactor validation runner and compareError
-- [  ] Remove nested types (members, awards)
-- [  ] Move membership and awards to new services
-- [  ] Move password hash and code hash out of models somehow
+- [ ] Refactor validation runner and compareError
+- [ ] Remove nested types (members, awards)
+- [ ] Move membership and awards to new services
+- [ ] Move password hash and code hash out of models somehow
