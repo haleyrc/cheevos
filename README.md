@@ -21,7 +21,7 @@ cheevos they received from the organization are also removed.
 
 ## TODO
 
-- [ ] Refactor validation runner and compareError
+- [X] Refactor validation runner and compareError
 - [X] Move membership to new service
 - [X] Move awards to new service
 - [X] Move password hash out of model
