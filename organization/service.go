@@ -10,7 +10,7 @@ import (
 )
 
 type OrganizationRepository interface {
-	AddMemberToOrganization(ctx context.Context, tx db.Transaction, userID, orgID string) (*Member, error)
+	AddMemberToOrganization(ctx context.Context, tx db.Transaction, userID, orgID string) error
 	CreateOrganization(ctx context.Context, tx db.Transaction, org *Organization) error
 }
 
@@ -19,18 +19,6 @@ type OrganizationRepository interface {
 type OrganizationService struct {
 	DB   db.Database
 	Repo OrganizationRepository
-}
-
-func (os *OrganizationService) AddMemberToOrganization(ctx context.Context, userID, orgID string) error {
-	err := os.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
-		_, err := os.Repo.AddMemberToOrganization(ctx, tx, userID, orgID)
-		return err
-	})
-	if err != nil {
-		return fmt.Errorf("add member to organization failed: %w", err)
-	}
-
-	return nil
 }
 
 // CreateOrganization creates a new organization and persists it to the
@@ -51,13 +39,7 @@ func (os *OrganizationService) CreateOrganization(ctx context.Context, name, own
 			return err
 		}
 
-		owner, err := os.Repo.AddMemberToOrganization(ctx, tx, ownerID, org.ID)
-		if err != nil {
-			return err
-		}
-		org.Owner = owner
-
-		return nil
+		return os.Repo.AddMemberToOrganization(ctx, tx, ownerID, org.ID)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("create organization failed: %w", err)

@@ -17,7 +17,7 @@ type CreateOrganizationArgs struct {
 }
 
 type OrganizationRepository struct {
-	AddMemberToOrganizationFn     func(ctx context.Context, tx db.Transaction, userID, orgID string) (*organization.Member, error)
+	AddMemberToOrganizationFn     func(ctx context.Context, tx db.Transaction, userID, orgID string) error
 	AddMemberToOrganizationCalled struct {
 		Count int
 		With  AddMemberToOrganizationArgs
@@ -30,9 +30,9 @@ type OrganizationRepository struct {
 	}
 }
 
-func (or *OrganizationRepository) AddMemberToOrganization(ctx context.Context, tx db.Transaction, userID, orgID string) (*organization.Member, error) {
+func (or *OrganizationRepository) AddMemberToOrganization(ctx context.Context, tx db.Transaction, userID, orgID string) error {
 	if or.AddMemberToOrganizationFn == nil {
-		return nil, mockMethodNotDefined("AddMemberToOrganization")
+		return mockMethodNotDefined("AddMemberToOrganization")
 	}
 	or.AddMemberToOrganizationCalled.Count++
 	or.AddMemberToOrganizationCalled.With = AddMemberToOrganizationArgs{OrganizationID: orgID, UserID: userID}

@@ -4,15 +4,7 @@ import (
 	"fmt"
 
 	"github.com/haleyrc/cheevos/lib/stringutil"
-	"github.com/haleyrc/cheevos/lib/time"
 )
-
-type Member struct {
-	OrganizationID string
-	UserID         string
-	Username       string
-	Joined         time.Time
-}
 
 // Organization represents a group of users belonging to a related parent
 // entity. This may be an actual organization or simply a group of friends who
@@ -27,7 +19,6 @@ type Organization struct {
 	Name string
 
 	OwnerID string
-	Owner   *Member
 }
 
 func (o *Organization) Normalize() {

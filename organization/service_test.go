@@ -12,48 +12,13 @@ import (
 	"github.com/haleyrc/cheevos/organization"
 )
 
-func TestAddingAMemberToAnOrganizationSucceeds(t *testing.T) {
-	ctx := context.Background()
-	repo := mock.OrganizationRepository{
-		AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) (*organization.Member, error) { return nil, nil },
-	}
-	svc := organization.OrganizationService{
-		DB:   &mock.Database{},
-		Repo: &repo,
-	}
-	orgID := uuid.New()
-	userID := uuid.New()
-
-	if err := svc.AddMemberToOrganization(ctx, userID, orgID); err != nil {
-		t.Fatal(err)
-	}
-
-	if repo.AddMemberToOrganizationCalled.Count != 1 {
-		t.Errorf("Expected repository to receive AddMemberToOrganization, but it didn't.")
-	}
-	if repo.AddMemberToOrganizationCalled.With.OrganizationID != orgID {
-		t.Errorf(
-			"Expected repository.AddMemberToOrganization to receive organization ID %q, but got %q.",
-			orgID, repo.AddMemberToOrganizationCalled.With.OrganizationID,
-		)
-	}
-	if repo.AddMemberToOrganizationCalled.With.UserID != userID {
-		t.Errorf(
-			"Expected repository.AddMemberToOrganization to receive user ID %q, but got %q.",
-			userID, repo.AddMemberToOrganizationCalled.With.UserID,
-		)
-	}
-}
-
 func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	time.Freeze()
 
 	ctx := context.Background()
 	repo := mock.OrganizationRepository{
-		AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) (*organization.Member, error) {
-			return &organization.Member{}, nil
-		},
-		CreateOrganizationFn: func(_ context.Context, _ db.Transaction, _ *organization.Organization) error { return nil },
+		AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) error { return nil },
+		CreateOrganizationFn:      func(_ context.Context, _ db.Transaction, _ *organization.Organization) error { return nil },
 	}
 	svc := organization.OrganizationService{
 		DB:   &mock.Database{},
@@ -106,8 +71,5 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	}
 	if org.OwnerID != ownerID {
 		t.Errorf("Owner should be %q, but got %q.", ownerID, org.OwnerID)
-	}
-	if org.Owner == nil {
-		t.Error("Owner shouldn't be nil, but it was.")
 	}
 }
