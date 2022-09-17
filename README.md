@@ -29,6 +29,6 @@ cheevos they received from the organization are also removed.
 - [ ] Add ID to invitation and stop using code for lookups
 - [X] Combine mock repositories into one
 - [X] Fix package stutter
-- [ ] Add invitation logger
-- [ ] Add award logger
+- [X] Add invitation logger
+- [X] Add award logger
 - [ ] Add membership logger
