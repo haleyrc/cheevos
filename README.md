@@ -28,3 +28,4 @@ cheevos they received from the organization are also removed.
 - [ ] Implement an actual random string function
 - [ ] Add ID to invitation and stop using code for lookups
 - [ ] Combine mock repositories into one
+- [ ] Fix package stutter
