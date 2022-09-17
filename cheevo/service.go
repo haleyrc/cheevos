@@ -45,7 +45,7 @@ func (cs *CheevoService) CreateCheevo(ctx context.Context, name, description, or
 		Description: description,
 	}
 	if err := cheevo.Validate(); err != nil {
-		return nil, fmt.Errorf("create cheevo failedd: %w", err)
+		return nil, fmt.Errorf("create cheevo failed: %w", err)
 	}
 
 	err := cs.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {

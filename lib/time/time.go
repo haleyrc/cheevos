@@ -6,6 +6,8 @@ type timeFn func() time.Time
 
 var nowFn timeFn = time.Now
 
+const Hour = time.Hour
+
 type Time struct {
 	time.Time
 }

@@ -8,9 +8,9 @@ import (
 )
 
 type Invitation struct {
-	Email    string
-	CodeHash string
-	Expires  time.Time
+	Email          string
+	OrganizationID string
+	Expires        time.Time
 }
 
 func (i *Invitation) Normalize() {
@@ -22,8 +22,8 @@ func (i *Invitation) Validate() error {
 		return fmt.Errorf("invalid: email is blank")
 	}
 
-	if i.CodeHash == "" {
-		return fmt.Errorf("invalid: code hash is blank")
+	if i.OrganizationID == "" {
+		return fmt.Errorf("invalid: organization id is blank")
 	}
 
 	if i.Expires.IsZero() {

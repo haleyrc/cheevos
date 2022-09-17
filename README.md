@@ -25,3 +25,4 @@ cheevos they received from the organization are also removed.
 - [ ] Remove nested types (members, awards)
 - [ ] Move membership and awards to new services
 - [ ] Move password hash and code hash out of models somehow
+- [ ] Implement an actual random string function

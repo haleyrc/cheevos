@@ -23,19 +23,19 @@ func TestValidatingAnInvitation(t *testing.T) {
 		err   string
 	}{
 		"returns an error for a missing email": {
-			input: invitation.Invitation{Email: "", CodeHash: "codehash", Expires: time.Now()},
+			input: invitation.Invitation{Email: "", OrganizationID: "orgid", Expires: time.Now()},
 			err:   "email is blank",
 		},
-		"returns an error for a missing code hash": {
-			input: invitation.Invitation{Email: "email", CodeHash: "", Expires: time.Now()},
-			err:   "code hash is blank",
+		"returns an error for a missing organization id": {
+			input: invitation.Invitation{Email: "email", OrganizationID: "", Expires: time.Now()},
+			err:   "organization id is blank",
 		},
 		"returns an error for a missing expiration": {
-			input: invitation.Invitation{Email: "email", CodeHash: "codehash"},
+			input: invitation.Invitation{Email: "email", OrganizationID: "orgid"},
 			err:   "expires is blank",
 		},
 		"returns nil for a valid invitation": {
-			input: invitation.Invitation{Email: "email", CodeHash: "codehash", Expires: time.Now()},
+			input: invitation.Invitation{Email: "email", OrganizationID: "orgid", Expires: time.Now()},
 			err:   "",
 		},
 	}
