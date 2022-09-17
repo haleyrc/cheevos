@@ -15,7 +15,7 @@ func TestSigningUpSucceeds(t *testing.T) {
 		CreateUserFn: func(_ context.Context, _ db.Transaction, _ *user.User) error { return nil },
 	}
 	svc := user.UserService{
-		DB:   mock.NewDatabase(),
+		DB:   &mock.Database{},
 		Repo: &repo,
 	}
 

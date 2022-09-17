@@ -19,7 +19,7 @@ func TestAwardingACheevoToAUserSucceeds(t *testing.T) {
 		},
 	}
 	svc := cheevo.CheevoService{
-		DB:   mock.NewDatabase(),
+		DB:   &mock.Database{},
 		Repo: &repo,
 	}
 	cheevoID := uuid.New()
@@ -54,7 +54,7 @@ func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 		},
 	}
 	svc := cheevo.CheevoService{
-		DB:   mock.NewDatabase(),
+		DB:   &mock.Database{},
 		Repo: &repo,
 	}
 	orgID := uuid.New()
