@@ -6,14 +6,14 @@ import (
 	"github.com/haleyrc/cheevos/lib/logger"
 )
 
-type UserLogger struct {
+type Logger struct {
 	Svc interface {
 		SignUp(ctx context.Context, username, password string) (*User, error)
 	}
 	Logger logger.Logger
 }
 
-func (ul *UserLogger) SignUp(ctx context.Context, username, password string) (*User, error) {
+func (ul *Logger) SignUp(ctx context.Context, username, password string) (*User, error) {
 	ul.Logger.Debug(ctx, "signing up user", logger.Fields{
 		"Username": username,
 	})

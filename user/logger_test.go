@@ -13,7 +13,7 @@ import (
 func TestUserLoggerLogsAnErrorFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &user.UserLogger{
+	cl := &user.Logger{
 		Svc: &mock.UserService{
 			SignUpFn: func(_ context.Context, _, _ string) (*user.User, error) {
 				return nil, fmt.Errorf("oops")
@@ -32,7 +32,7 @@ func TestUserLoggerLogsAnErrorFromSignUp(t *testing.T) {
 func TestUserLoggerLogsTheResponseFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &user.UserLogger{
+	cl := &user.Logger{
 		Svc: &mock.UserService{
 			SignUpFn: func(_ context.Context, _, _ string) (*user.User, error) {
 				return &user.User{

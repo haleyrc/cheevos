@@ -20,7 +20,7 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 		AddMemberToOrganizationFn: func(_ context.Context, _ db.Transaction, _, _ string) error { return nil },
 		CreateOrganizationFn:      func(_ context.Context, _ db.Transaction, _ *organization.Organization) error { return nil },
 	}
-	svc := organization.OrganizationService{
+	svc := organization.Service{
 		DB:   &mock.Database{},
 		Repo: &repo,
 	}

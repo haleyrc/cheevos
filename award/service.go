@@ -8,19 +8,19 @@ import (
 	"github.com/haleyrc/cheevos/lib/time"
 )
 
-type AwardRepository interface {
+type Repository interface {
 	CreateAward(ctx context.Context, tx db.Transaction, award *Award) error
 }
 
-type AwardService struct {
+type Service struct {
 	DB   db.Database
-	Repo AwardRepository
+	Repo Repository
 }
 
 // AwardCheevoToUser awards a specific Cheevo to a User. Statistics for this
 // event are bidirectional; a Cheevo "tracks" the number of Users that have
 // received it and Users "track" how many Cheevos they have received.
-func (as *AwardService) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error {
+func (as *Service) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error {
 	err := as.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
 		award := &Award{
 			CheevoID: cheevoID,

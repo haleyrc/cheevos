@@ -28,7 +28,7 @@ func TestAwardingACheevoSucceeds(t *testing.T) {
 			CreateAwardFn: func(_ context.Context, _ db.Transaction, _ *award.Award) error { return nil },
 		}
 
-		svc = award.AwardService{
+		svc = award.Service{
 			DB:   mockDB,
 			Repo: repo,
 		}

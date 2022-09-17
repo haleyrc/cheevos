@@ -10,19 +10,19 @@ import (
 	"github.com/haleyrc/cheevos/lib/hash"
 )
 
-type UserRepository interface {
+type Repository interface {
 	CreateUser(ctx context.Context, tx db.Transaction, u *User, hashedPassword string) error
 }
 
-// UserService represents the main entrypoint for managing user.
-type UserService struct {
+// Service represents the main entrypoint for managing user.
+type Service struct {
 	DB   db.Database
-	Repo UserRepository
+	Repo Repository
 }
 
 // SignUp creates a new user and persists it to the database. It returns a
 // response containing the new organization if successful.
-func (us *UserService) SignUp(ctx context.Context, username, password string) (*User, error) {
+func (us *Service) SignUp(ctx context.Context, username, password string) (*User, error) {
 	user := &User{
 		ID:       uuid.New(),
 		Username: username,

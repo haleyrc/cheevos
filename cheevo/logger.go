@@ -6,7 +6,7 @@ import (
 	"github.com/haleyrc/cheevos/lib/logger"
 )
 
-type CheevoLogger struct {
+type Logger struct {
 	Svc interface {
 		AwardCheevoToUser(ctx context.Context, userID, cheevoID string) error
 		CreateCheevo(ctx context.Context, name, description, orgID string) (*Cheevo, error)
@@ -14,7 +14,7 @@ type CheevoLogger struct {
 	Logger logger.Logger
 }
 
-func (cl *CheevoLogger) AwardCheevoToUser(ctx context.Context, userID, cheevoID string) error {
+func (cl *Logger) AwardCheevoToUser(ctx context.Context, userID, cheevoID string) error {
 	cl.Logger.Debug(ctx, "awarding cheevo to user", logger.Fields{
 		"Cheevo": cheevoID,
 		"User":   userID,
@@ -34,7 +34,7 @@ func (cl *CheevoLogger) AwardCheevoToUser(ctx context.Context, userID, cheevoID 
 	return nil
 }
 
-func (cl *CheevoLogger) CreateCheevo(ctx context.Context, name, description, orgID string) (*Cheevo, error) {
+func (cl *Logger) CreateCheevo(ctx context.Context, name, description, orgID string) (*Cheevo, error) {
 	cl.Logger.Debug(ctx, "creating cheevo", logger.Fields{
 		"Name":         name,
 		"Description":  description,
