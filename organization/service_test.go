@@ -71,7 +71,7 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 	}
 	if repo.CreateOrganizationCalled.With.Organization.ID != org.ID {
 		t.Errorf(
-			"Expected repository.CreateOrganization to recieve id %q, but got %q.",
+			"Expected repository.CreateOrganization to receive id %q, but got %q.",
 			org.ID, repo.CreateOrganizationCalled.With.Organization.ID,
 		)
 	}
