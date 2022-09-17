@@ -24,5 +24,5 @@ cheevos they received from the organization are also removed.
 - [ ] Refactor validation runner and compareError
 - [ ] Remove nested types (members, awards)
 - [ ] Move membership and awards to new services
-- [ ] Move password hash out of model
+- [X] Move password hash out of model
 - [ ] Implement an actual random string function
