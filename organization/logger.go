@@ -6,7 +6,7 @@ import (
 	"github.com/haleyrc/cheevos/lib/logger"
 )
 
-type OrganizationLogger struct {
+type Logger struct {
 	Svc interface {
 		AddMemberToOrganization(ctx context.Context, userID, orgID string) error
 		CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error)
@@ -14,7 +14,7 @@ type OrganizationLogger struct {
 	Logger logger.Logger
 }
 
-func (ol *OrganizationLogger) AddMemberToOrganization(ctx context.Context, userID, orgID string) error {
+func (ol *Logger) AddMemberToOrganization(ctx context.Context, userID, orgID string) error {
 	ol.Logger.Debug(ctx, "adding member to organization", logger.Fields{
 		"Organization": orgID,
 		"User":         userID,
@@ -33,7 +33,7 @@ func (ol *OrganizationLogger) AddMemberToOrganization(ctx context.Context, userI
 	return nil
 }
 
-func (ol *OrganizationLogger) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
+func (ol *Logger) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
 	ol.Logger.Debug(ctx, "creating organization", logger.Fields{
 		"Name":  name,
 		"Owner": ownerID,

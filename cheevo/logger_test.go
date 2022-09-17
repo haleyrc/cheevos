@@ -13,7 +13,7 @@ import (
 func TestCheevoLoggerLogsAnErrorFromCreateCheevo(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &cheevo.CheevoLogger{
+	cl := &cheevo.Logger{
 		Svc: &mock.CheevoService{
 			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*cheevo.Cheevo, error) {
 				return nil, fmt.Errorf("oops")
@@ -32,7 +32,7 @@ func TestCheevoLoggerLogsAnErrorFromCreateCheevo(t *testing.T) {
 func TestCheevoLoggerLogsTheResponseFromCreateCheevo(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &cheevo.CheevoLogger{
+	cl := &cheevo.Logger{
 		Svc: &mock.CheevoService{
 			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*cheevo.Cheevo, error) {
 				return &cheevo.Cheevo{
@@ -55,7 +55,7 @@ func TestCheevoLoggerLogsTheResponseFromCreateCheevo(t *testing.T) {
 func TestCheevoLoggerLogsAnErrorFromAwardCheevoToUser(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &cheevo.CheevoLogger{
+	cl := &cheevo.Logger{
 		Svc: &mock.CheevoService{
 			AwardCheevoToUserFn: func(_ context.Context, _, _ string) error {
 				return fmt.Errorf("oops")
@@ -74,7 +74,7 @@ func TestCheevoLoggerLogsAnErrorFromAwardCheevoToUser(t *testing.T) {
 func TestCheevoLoggerLogsTheResponseFromAwardCheevoToUser(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &cheevo.CheevoLogger{
+	cl := &cheevo.Logger{
 		Svc: &mock.CheevoService{
 			AwardCheevoToUserFn: func(_ context.Context, _, _ string) error { return nil },
 		},

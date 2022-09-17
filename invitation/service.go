@@ -18,7 +18,7 @@ type Emailer interface {
 	SendInvitation(ctx context.Context, email, code string) error
 }
 
-type InvitationRepository interface {
+type Repository interface {
 	AddMemberToOrganization(ctx context.Context, tx db.Transaction, userID, orgID string) error
 	CreateInvitation(ctx context.Context, tx db.Transaction, i *Invitation, hashedCode string) error
 	DeleteInvitationByCode(ctx context.Context, tx db.Transaction, hashedCode string) error
@@ -26,13 +26,13 @@ type InvitationRepository interface {
 	SaveInvitation(ctx context.Context, tx db.Transaction, i *Invitation, hashedCode string) error
 }
 
-type InvitationService struct {
+type Service struct {
 	DB    db.Database
 	Email Emailer
-	Repo  InvitationRepository
+	Repo  Repository
 }
 
-func (is *InvitationService) AcceptInvitation(ctx context.Context, userID, code string) error {
+func (is *Service) AcceptInvitation(ctx context.Context, userID, code string) error {
 	err := is.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
 		hashedCode := hash.Generate(code)
 		invitation, err := is.Repo.GetInvitationByCode(ctx, tx, hashedCode)
@@ -57,7 +57,7 @@ func (is *InvitationService) AcceptInvitation(ctx context.Context, userID, code 
 	return nil
 }
 
-func (is *InvitationService) DeclineInvitation(ctx context.Context, code string) error {
+func (is *Service) DeclineInvitation(ctx context.Context, code string) error {
 	err := is.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
 		hashedCode := hash.Generate(code)
 		return is.Repo.DeleteInvitationByCode(ctx, tx, hashedCode)
@@ -69,7 +69,7 @@ func (is *InvitationService) DeclineInvitation(ctx context.Context, code string)
 	return nil
 }
 
-func (is *InvitationService) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
+func (is *Service) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
 	invitation := &Invitation{
 		Email:          email,
 		OrganizationID: orgID,
@@ -98,7 +98,7 @@ func (is *InvitationService) InviteUserToOrganization(ctx context.Context, email
 
 // Refreshing an invitation will invalidate the initial invitation email (as
 // well as any other refresh emails).
-func (is *InvitationService) RefreshInvitation(ctx context.Context, code string) error {
+func (is *Service) RefreshInvitation(ctx context.Context, code string) error {
 	err := is.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
 		hashedCode := hash.Generate(code)
 		invitation, err := is.Repo.GetInvitationByCode(ctx, tx, hashedCode)

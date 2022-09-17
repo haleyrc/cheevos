@@ -8,16 +8,16 @@ import (
 	"github.com/haleyrc/cheevos/lib/time"
 )
 
-type MembershipRepository interface {
+type Repository interface {
 	CreateMembership(ctx context.Context, tx db.Transaction, m *Membership) error
 }
 
-type MembershipService struct {
+type Service struct {
 	DB   db.Database
-	Repo MembershipRepository
+	Repo Repository
 }
 
-func (ms *MembershipService) AddMemberToOrganization(ctx context.Context, userID, orgID string) error {
+func (ms *Service) AddMemberToOrganization(ctx context.Context, userID, orgID string) error {
 	mem := &Membership{
 		OrganizationID: orgID,
 		UserID:         userID,

@@ -30,7 +30,7 @@ func TestAcceptingAnInvitationFailsIfTheInvitationIsExpired(t *testing.T) {
 			GetInvitationByCodeFn: func(_ context.Context, _ db.Transaction, _ string) (*invitation.Invitation, error) { return inv, nil },
 		}
 
-		svc = invitation.InvitationService{
+		svc = invitation.Service{
 			DB:   mockDB,
 			Repo: repo,
 		}
@@ -69,7 +69,7 @@ func TestAcceptingAnInvitationSucceeds(t *testing.T) {
 			DeleteInvitationByCodeFn:  func(_ context.Context, _ db.Transaction, _ string) error { return nil },
 		}
 
-		svc = invitation.InvitationService{
+		svc = invitation.Service{
 			DB:   mockDB,
 			Repo: repo,
 		}
@@ -129,7 +129,7 @@ func TestDecliningAnInvitationSucceeds(t *testing.T) {
 			DeleteInvitationByCodeFn: func(_ context.Context, _ db.Transaction, _ string) error { return nil },
 		}
 
-		svc = invitation.InvitationService{
+		svc = invitation.Service{
 			DB:   mockDB,
 			Repo: repo,
 		}
@@ -172,7 +172,7 @@ func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeSav
 			},
 		}
 
-		svc = invitation.InvitationService{
+		svc = invitation.Service{
 			DB:    mockDB,
 			Email: emailer,
 			Repo:  repo,
@@ -212,7 +212,7 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 			CreateInvitationFn: func(_ context.Context, _ db.Transaction, _ *invitation.Invitation, _ string) error { return nil },
 		}
 
-		svc = invitation.InvitationService{
+		svc = invitation.Service{
 			DB:    mockDB,
 			Email: emailer,
 			Repo:  repo,
@@ -293,7 +293,7 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 			SaveInvitationFn:      func(_ context.Context, _ db.Transaction, _ *invitation.Invitation, _ string) error { return nil },
 		}
 
-		svc = invitation.InvitationService{
+		svc = invitation.Service{
 			DB:    mockDB,
 			Email: emailer,
 			Repo:  repo,

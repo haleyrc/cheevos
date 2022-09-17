@@ -9,22 +9,22 @@ import (
 	"github.com/haleyrc/cheevos/lib/db"
 )
 
-type OrganizationRepository interface {
+type Repository interface {
 	AddMemberToOrganization(ctx context.Context, tx db.Transaction, userID, orgID string) error
 	CreateOrganization(ctx context.Context, tx db.Transaction, org *Organization) error
 }
 
-// OrganizationService represents the main entrypoint for managing
+// Service represents the main entrypoint for managing
 // organizations.
-type OrganizationService struct {
+type Service struct {
 	DB   db.Database
-	Repo OrganizationRepository
+	Repo Repository
 }
 
 // CreateOrganization creates a new organization and persists it to the
 // database. It returns a response containing the new organization if
 // successful.
-func (os *OrganizationService) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
+func (os *Service) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
 	org := &Organization{
 		ID:      uuid.New(),
 		Name:    name,

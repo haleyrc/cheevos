@@ -14,7 +14,7 @@ import (
 func TestOrganizationLoggerLogsAnErrorFromAddUserToOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	ol := &organization.OrganizationLogger{
+	ol := &organization.Logger{
 		Svc: &mock.OrganizationService{
 			AddMemberToOrganizationFn: func(_ context.Context, _, _ string) error {
 				return fmt.Errorf("oops")
@@ -33,7 +33,7 @@ func TestOrganizationLoggerLogsAnErrorFromAddUserToOrganization(t *testing.T) {
 func TestOrganizationLoggerLogsTheResponseFromAddUserToOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	ol := &organization.OrganizationLogger{
+	ol := &organization.Logger{
 		Svc: &mock.OrganizationService{
 			AddMemberToOrganizationFn: func(_ context.Context, userID, ownerID string) error { return nil },
 		},
@@ -50,7 +50,7 @@ func TestOrganizationLoggerLogsTheResponseFromAddUserToOrganization(t *testing.T
 func TestOrganizationLoggerLogsAnErrorFromCreateOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	ol := &organization.OrganizationLogger{
+	ol := &organization.Logger{
 		Svc: &mock.OrganizationService{
 			CreateOrganizationFn: func(_ context.Context, name, ownerID string) (*organization.Organization, error) {
 				return nil, fmt.Errorf("oops")
@@ -71,7 +71,7 @@ func TestOrganizationLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
 
 	logger := testutil.NewTestLogger()
 
-	ol := &organization.OrganizationLogger{
+	ol := &organization.Logger{
 		Svc: &mock.OrganizationService{
 			CreateOrganizationFn: func(_ context.Context, name, ownerID string) (*organization.Organization, error) {
 				return &organization.Organization{

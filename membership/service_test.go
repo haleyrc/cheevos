@@ -28,7 +28,7 @@ func TestAddingAMemberToAnOrganizationSucceeds(t *testing.T) {
 			CreateMembershipFn: func(_ context.Context, _ db.Transaction, _ *membership.Membership) error { return nil },
 		}
 
-		svc = membership.MembershipService{
+		svc = membership.Service{
 			DB:   mockDB,
 			Repo: repo,
 		}

@@ -18,7 +18,7 @@ func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 			return nil
 		},
 	}
-	svc := cheevo.CheevoService{
+	svc := cheevo.Service{
 		DB:   &mock.Database{},
 		Repo: &repo,
 	}
