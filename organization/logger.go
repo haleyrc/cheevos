@@ -8,29 +8,9 @@ import (
 
 type Logger struct {
 	Svc interface {
-		AddMemberToOrganization(ctx context.Context, userID, orgID string) error
 		CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error)
 	}
 	Logger logger.Logger
-}
-
-func (ol *Logger) AddMemberToOrganization(ctx context.Context, userID, orgID string) error {
-	ol.Logger.Debug(ctx, "adding member to organization", logger.Fields{
-		"Organization": orgID,
-		"User":         userID,
-	})
-
-	if err := ol.Svc.AddMemberToOrganization(ctx, userID, orgID); err != nil {
-		ol.Logger.Error(ctx, "add member to organization failed", err)
-		return err
-	}
-
-	ol.Logger.Log(ctx, "added member to organization", logger.Fields{
-		"Organization": orgID,
-		"User":         userID,
-	})
-
-	return nil
 }
 
 func (ol *Logger) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
