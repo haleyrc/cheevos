@@ -7,9 +7,7 @@ type timeFn func() time.Time
 var nowFn timeFn = time.Now
 
 var (
-	Hour       = Duration{d: time.Hour}
-	Nanosecond = Duration{d: time.Nanosecond}
-	Second     = Duration{d: time.Second}
+	Hour = Duration{d: time.Hour}
 )
 
 type Duration struct {
