@@ -31,4 +31,4 @@ cheevos they received from the organization are also removed.
 - [X] Fix package stutter
 - [X] Add invitation logger
 - [X] Add award logger
-- [ ] Add membership logger
+- [X] Add membership logger
