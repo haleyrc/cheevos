@@ -6,7 +6,11 @@ type timeFn func() time.Time
 
 var nowFn timeFn = time.Now
 
-var Hour = Duration{d: time.Hour}
+var (
+	Hour       = Duration{d: time.Hour}
+	Nanosecond = Duration{d: time.Nanosecond}
+	Second     = Duration{d: time.Second}
+)
 
 type Duration struct {
 	d time.Duration
@@ -22,6 +26,14 @@ func (t Time) Add(d Duration) Time {
 
 func (t Time) Before(other Time) bool {
 	return t.t.Before(other.t)
+}
+
+func (t Time) Equals(other Time) bool {
+	return t.EqualsWithResolution(other, Nanosecond)
+}
+
+func (t Time) EqualsWithResolution(other Time, res Duration) bool {
+	return t.t.Round(time.Second) == other.t.Round(time.Second)
 }
 
 func (t Time) IsZero() bool {
