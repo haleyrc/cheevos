@@ -28,14 +28,6 @@ func (t Time) Before(other Time) bool {
 	return t.t.Before(other.t)
 }
 
-func (t Time) Equals(other Time) bool {
-	return t.EqualsWithResolution(other, Nanosecond)
-}
-
-func (t Time) EqualsWithResolution(other Time, res Duration) bool {
-	return t.t.Round(time.Second) == other.t.Round(time.Second)
-}
-
 func (t Time) IsZero() bool {
 	return t.t.IsZero()
 }
@@ -54,7 +46,7 @@ func (t Time) Sub(d Duration) Time {
 
 func Freeze() {
 	nowFn = func() time.Time {
-		t, err := time.Parse(time.RFC3339, "2022-09-16T15:02:04-04:00")
+		t, err := time.ParseInLocation(time.RFC3339, "2022-09-16T15:02:04Z", time.UTC)
 		if err != nil {
 			panic(err)
 		}

@@ -239,7 +239,7 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 			orgID, repo.CreateInvitationCalled.With.Invitation.OrganizationID,
 		)
 	}
-	if !repo.CreateInvitationCalled.With.Invitation.Expires.EqualsWithResolution(expiration, time.Second) {
+	if repo.CreateInvitationCalled.With.Invitation.Expires != expiration {
 		t.Errorf(
 			"Expected repository.CreateInvitation to receive expiration %s, but got %s.",
 			expiration, repo.CreateInvitationCalled.With.Invitation.Expires,
