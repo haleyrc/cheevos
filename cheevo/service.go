@@ -9,7 +9,6 @@ import (
 )
 
 type CheevoRepository interface {
-	AwardCheevoToUser(ctx context.Context, tx db.Transaction, recipientID, cheevoID string) (*Award, error)
 	CreateCheevo(ctx context.Context, tx db.Transaction, cheevo *Cheevo) error
 }
 
@@ -19,21 +18,6 @@ type CheevoService struct {
 
 	// A connection to the database.
 	Repo CheevoRepository
-}
-
-// AwardCheevoToUser awards a specific Cheevo to a User. Statistics for this
-// event are bidirectional; a Cheevo "tracks" the number of Users that have
-// received it and Users "track" how many Cheevos they have received.
-func (cs *CheevoService) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error {
-	err := cs.DB.Call(ctx, func(ctx context.Context, tx db.Transaction) error {
-		_, err := cs.Repo.AwardCheevoToUser(ctx, tx, recipientID, cheevoID)
-		return err
-	})
-	if err != nil {
-		return fmt.Errorf("award cheevo to user failed: %w", err)
-	}
-
-	return nil
 }
 
 // CreateCheevo creates a new cheevo and persists it to the database. It returns

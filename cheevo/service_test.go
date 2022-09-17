@@ -11,41 +11,6 @@ import (
 	"github.com/haleyrc/cheevos/lib/db"
 )
 
-func TestAwardingACheevoToAUserSucceeds(t *testing.T) {
-	ctx := context.Background()
-	repo := mock.CheevoRepository{
-		AwardCheevoToUserFn: func(_ context.Context, _ db.Transaction, _, _ string) (*cheevo.Award, error) {
-			return nil, nil
-		},
-	}
-	svc := cheevo.CheevoService{
-		DB:   &mock.Database{},
-		Repo: &repo,
-	}
-	cheevoID := uuid.New()
-	recipientID := uuid.New()
-
-	if err := svc.AwardCheevoToUser(ctx, recipientID, cheevoID); err != nil {
-		t.Fatal(err)
-	}
-
-	if repo.AwardCheevoToUserCalled.Count != 1 {
-		t.Errorf("Expected repository to receive AwardCheevoToUser, but it didn't.")
-	}
-	if repo.AwardCheevoToUserCalled.With.CheevoID != cheevoID {
-		t.Errorf(
-			"Expected repository.AwardCheevoToUser to receive cheevo ID %q, but got %q.",
-			cheevoID, repo.AwardCheevoToUserCalled.With.CheevoID,
-		)
-	}
-	if repo.AwardCheevoToUserCalled.With.RecipientID != recipientID {
-		t.Errorf(
-			"Expected repository.AwardCheevoToUser to receive recipient ID %q, but got %q.",
-			recipientID, repo.AwardCheevoToUserCalled.With.RecipientID,
-		)
-	}
-}
-
 func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 	ctx := context.Background()
 	repo := mock.CheevoRepository{

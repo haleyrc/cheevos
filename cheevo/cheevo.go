@@ -2,16 +2,9 @@ package cheevo
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/haleyrc/cheevos/lib/stringutil"
 )
-
-type Award struct {
-	CheevoID string
-	UserID   string
-	Awarded  time.Time
-}
 
 // Cheevo represents an achievement that can be awarded to a user by authorized
 // members of an organization.
