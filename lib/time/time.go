@@ -6,10 +6,38 @@ type timeFn func() time.Time
 
 var nowFn timeFn = time.Now
 
-const Hour = time.Hour
+var Hour = Duration{d: time.Hour}
+
+type Duration struct {
+	d time.Duration
+}
 
 type Time struct {
-	time.Time
+	t time.Time
+}
+
+func (t Time) Add(d Duration) Time {
+	return Time{t: t.t.Add(d.d)}
+}
+
+func (t Time) Before(other Time) bool {
+	return t.t.Before(other.t)
+}
+
+func (t Time) IsZero() bool {
+	return t.t.IsZero()
+}
+
+func (t Time) MarshalJSON() ([]byte, error) {
+	return t.t.MarshalJSON()
+}
+
+func (t Time) String() string {
+	return t.t.String()
+}
+
+func (t Time) Sub(d Duration) Time {
+	return Time{t: t.t.Add(-d.d)}
 }
 
 func Freeze() {
@@ -27,5 +55,5 @@ func Unfreeze() {
 }
 
 func Now() Time {
-	return Time{Time: nowFn()}
+	return Time{t: nowFn()}
 }

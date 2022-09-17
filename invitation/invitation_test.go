@@ -3,10 +3,10 @@ package invitation_test
 import (
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/haleyrc/cheevos/internal/testutil"
 	"github.com/haleyrc/cheevos/invitation"
+	"github.com/haleyrc/cheevos/lib/time"
 )
 
 func TestNormalizingAnInvitationNormalizesEmail(t *testing.T) {

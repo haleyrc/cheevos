@@ -2,15 +2,20 @@ package invitation
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/haleyrc/cheevos/lib/stringutil"
+	"github.com/haleyrc/cheevos/lib/time"
 )
 
 type Invitation struct {
 	Email          string
 	OrganizationID string
 	Expires        time.Time
+}
+
+func (i *Invitation) Expired() bool {
+	now := time.Now()
+	return i.Expires.Before(now)
 }
 
 func (i *Invitation) Normalize() {
