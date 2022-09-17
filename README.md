@@ -25,9 +25,12 @@ cheevos they received from the organization are also removed.
 - [X] Move membership to new service
 - [X] Move awards to new service
 - [X] Move password hash out of model
-- [ ] Implement an actual random string function
+- [X] Implement an actual random string function
 - [X] Combine mock repositories into one
 - [X] Fix package stutter
 - [X] Add invitation logger
 - [X] Add award logger
 - [X] Add membership logger
+- [ ] Replace raw errors with error types
+- [ ] Handlers
+- [ ] Database
