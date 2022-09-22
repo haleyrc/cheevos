@@ -2,6 +2,7 @@ package time
 
 import (
 	"database/sql/driver"
+	"fmt"
 	"time"
 )
 
@@ -29,12 +30,29 @@ func (t Time) Before(other Time) bool {
 	return t.t.Before(other.t)
 }
 
+func (t Time) Equal(other Time) bool {
+	return t.t.Equal(other.t)
+}
+
 func (t Time) IsZero() bool {
 	return t.t.IsZero()
 }
 
 func (t Time) MarshalJSON() ([]byte, error) {
 	return t.t.MarshalJSON()
+}
+
+func (t *Time) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	switch value := value.(type) {
+	case time.Time:
+		t.t = value
+	default:
+		return fmt.Errorf("unsupported data type: %T", value)
+	}
+	return nil
 }
 
 func (t Time) String() string {

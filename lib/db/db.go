@@ -14,6 +14,11 @@ type Database interface {
 	WithTx(context.Context, func(ctx context.Context, tx Tx) error) error
 }
 
+type Row interface {
+	Scan(args ...interface{}) error
+}
+
 type Tx interface {
 	Exec(ctx context.Context, query string, args ...interface{}) error
+	QueryRow(ctx context.Context, query string, args ...interface{}) Row
 }

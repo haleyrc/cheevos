@@ -7,6 +7,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+
+	mydb "github.com/haleyrc/cheevos/lib/db"
 )
 
 var db *Database
@@ -37,4 +39,9 @@ type Database struct {
 func (db *Database) Exec(ctx context.Context, query string, args ...interface{}) error {
 	_, err := db.db.ExecContext(ctx, query, args...)
 	return err
+}
+
+func (db *Database) QueryRow(ctx context.Context, query string, args ...interface{}) mydb.Row {
+	row := db.db.QueryRowContext(ctx, query, args...)
+	return row
 }

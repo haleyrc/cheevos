@@ -97,8 +97,6 @@ func TestLoggerLogsAnErrorFromInviteUserToOrganization(t *testing.T) {
 }
 
 func TestLoggerLogsTheResponseFromInviteUserToOrganization(t *testing.T) {
-	time.Freeze()
-
 	ctx := context.Background()
 	logger := testutil.NewTestLogger()
 	inv := &roster.Invitation{
@@ -122,8 +120,6 @@ func TestLoggerLogsTheResponseFromInviteUserToOrganization(t *testing.T) {
 }
 
 func TestLoggerLogsAnErrorFromRefreshInvitation(t *testing.T) {
-	time.Freeze()
-
 	logger := testutil.NewTestLogger()
 
 	il := &roster.Logger{
@@ -141,8 +137,6 @@ func TestLoggerLogsAnErrorFromRefreshInvitation(t *testing.T) {
 }
 
 func TestLoggerLogsTheResponseFromRefreshInvitation(t *testing.T) {
-	time.Freeze()
-
 	logger := testutil.NewTestLogger()
 
 	il := &roster.Logger{
@@ -213,8 +207,6 @@ func TestLoggerLogsAnErrorFromCreateOrganization(t *testing.T) {
 }
 
 func TestLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
-	time.Freeze()
-
 	logger := testutil.NewTestLogger()
 
 	ol := &roster.Logger{

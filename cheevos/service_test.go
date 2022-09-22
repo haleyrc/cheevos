@@ -13,8 +13,6 @@ import (
 )
 
 func TestAwardingACheevoSucceeds(t *testing.T) {
-	time.Freeze()
-
 	var (
 		ctx = context.Background()
 

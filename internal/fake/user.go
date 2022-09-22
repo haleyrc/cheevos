@@ -8,12 +8,15 @@ import (
 	"github.com/haleyrc/cheevos/lib/random"
 )
 
-func User() (*auth.User, string, string) {
-	password := random.String(8)
-	hash := hash.Generate(password)
-	u := &auth.User{
+func User() *auth.User {
+	return &auth.User{
 		ID:       uuid.New(),
 		Username: uniqify("TestUser"),
 	}
-	return u, password, hash
+}
+
+func Password() (string, string) {
+	password := random.String(8)
+	hash := hash.Generate(password)
+	return password, hash
 }

@@ -14,8 +14,6 @@ import (
 )
 
 func TestAcceptingAnInvitationFailsIfTheInvitationIsExpired(t *testing.T) {
-	time.Freeze()
-
 	var (
 		ctx = context.Background()
 
@@ -50,8 +48,6 @@ func TestAcceptingAnInvitationFailsIfTheInvitationIsExpired(t *testing.T) {
 }
 
 func TestAcceptingAnInvitationSucceeds(t *testing.T) {
-	time.Freeze()
-
 	var (
 		ctx = context.Background()
 
@@ -152,8 +148,6 @@ func TestDecliningAnInvitationSucceeds(t *testing.T) {
 }
 
 func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *testing.T) {
-	time.Freeze()
-
 	var (
 		ctx = context.Background()
 
@@ -193,8 +187,6 @@ func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeSav
 }
 
 func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
-	time.Freeze()
-
 	var (
 		ctx = context.Background()
 
@@ -271,8 +263,6 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 }
 
 func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *testing.T) {
-	time.Freeze()
-
 	var (
 		ctx = context.Background()
 
@@ -319,8 +309,6 @@ func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *t
 }
 
 func TestRefreshingAnInvitationSucceeds(t *testing.T) {
-	time.Freeze()
-
 	var (
 		ctx = context.Background()
 
@@ -400,8 +388,6 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 }
 
 func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
-	time.Freeze()
-
 	var (
 		ctx = context.Background()
 

@@ -17,6 +17,8 @@ type Cheevo struct {
 
 	// A description of the act that the achievement is recognizing.
 	Description string
+
+	OrganizationID string
 }
 
 func (c *Cheevo) Normalize() {
@@ -37,6 +39,10 @@ func (c *Cheevo) Validate() error {
 
 	if c.Description == "" {
 		return fmt.Errorf("invalid: description is blank")
+	}
+
+	if c.OrganizationID == "" {
+		return fmt.Errorf("invalid: organization id is blank")
 	}
 
 	return nil

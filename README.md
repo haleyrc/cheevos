@@ -36,3 +36,4 @@ cheevos they received from the organization are also removed.
 - [ ] Database
 - [ ] Consistent variable naming after context merge
 - [ ] Alphabetize methods
+- [ ] Refactor creating test users and orgs in repo tests
