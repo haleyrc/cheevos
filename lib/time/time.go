@@ -1,6 +1,9 @@
 package time
 
-import "time"
+import (
+	"database/sql/driver"
+	"time"
+)
 
 type timeFn func() time.Time
 
@@ -40,6 +43,10 @@ func (t Time) String() string {
 
 func (t Time) Sub(d Duration) Time {
 	return Time{t: t.t.Add(-d.d)}
+}
+
+func (t Time) Value() (driver.Value, error) {
+	return t.t, nil
 }
 
 func Freeze() {
