@@ -34,3 +34,5 @@ cheevos they received from the organization are also removed.
 - [ ] Replace raw errors with error types
 - [ ] Handlers
 - [ ] Database
+- [ ] Consistent variable naming after context merge
+- [ ] Alphabatize methods
