@@ -35,4 +35,4 @@ cheevos they received from the organization are also removed.
 - [ ] Handlers
 - [ ] Database
 - [ ] Consistent variable naming after context merge
-- [ ] Alphabatize methods
+- [ ] Alphabetize methods
