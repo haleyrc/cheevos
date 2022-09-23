@@ -40,11 +40,7 @@ func (cs *CheevosServer) AwardCheevoHandler(w http.ResponseWriter, r *http.Reque
 		return nil, err
 	}
 
-	resp := AwardCheevoResponse{
-		CheevoID:    req.CheevoID,
-		RecipientID: req.RecipientID,
-	}
-
+	resp := AwardCheevoResponse(req)
 	return resp, nil
 }
 
