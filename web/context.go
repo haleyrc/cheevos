@@ -5,7 +5,7 @@ import "context"
 type contextKey int
 
 const (
-	currentUserKey = iota
+	currentUserKey contextKey = iota
 )
 
 func GetCurrentUser(ctx context.Context) string {
