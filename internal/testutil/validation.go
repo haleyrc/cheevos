@@ -12,6 +12,7 @@ type Validator interface {
 func RunValidationTests(t *testing.T, name string, input Validator, err string) {
 	t.Helper()
 	t.Run(name, func(t *testing.T) {
+		t.Helper()
 		got := input.Validate()
 		if err == "" {
 			if got != nil {

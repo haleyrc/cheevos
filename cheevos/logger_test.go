@@ -69,7 +69,7 @@ func TestLoggerLogsTheResponseFromCreateCheevo(t *testing.T) {
 	cl := &cheevos.Logger{
 		Svc: &mock.CheevosService{
 			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*cheevos.Cheevo, error) {
-				return &cheevos.Cheevo{ID: "id", Name: "name", Description: "description"}, nil
+				return &cheevos.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: "orgid"}, nil
 			},
 		},
 		Logger: logger,
@@ -78,6 +78,6 @@ func TestLoggerLogsTheResponseFromCreateCheevo(t *testing.T) {
 
 	logger.ShouldLog(t,
 		`{"Fields":{"Description":"description","Name":"name","Organization":"orgid"},"Message":"creating cheevo"}`,
-		`{"Fields":{"Cheevo":{"ID":"id","Name":"name","Description":"description"}},"Message":"cheevo created"}`,
+		`{"Fields":{"Cheevo":{"ID":"id","Name":"name","Description":"description","OrganizationID":"orgid"}},"Message":"cheevo created"}`,
 	)
 }

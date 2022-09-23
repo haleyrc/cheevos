@@ -29,19 +29,23 @@ func TestValidatingACheevo(t *testing.T) {
 		err   string
 	}{
 		"returns an error for a missing id": {
-			input: cheevos.Cheevo{ID: "", Name: "name", Description: "description"},
+			input: cheevos.Cheevo{ID: "", Name: "name", Description: "description", OrganizationID: "orgid"},
 			err:   "id is blank",
 		},
 		"returns an error for a missing name": {
-			input: cheevos.Cheevo{ID: "id", Name: "", Description: "description"},
+			input: cheevos.Cheevo{ID: "id", Name: "", Description: "description", OrganizationID: "orgid"},
 			err:   "name is blank",
 		},
 		"returns an error for a missing description": {
-			input: cheevos.Cheevo{ID: "id", Name: "name", Description: ""},
+			input: cheevos.Cheevo{ID: "id", Name: "name", Description: "", OrganizationID: "orgid"},
 			err:   "description is blank",
 		},
+		"return an error for a missing organization id": {
+			input: cheevos.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: ""},
+			err:   "organization id is blank",
+		},
 		"returns nil for a valid cheevo": {
-			input: cheevos.Cheevo{ID: "id", Name: "name", Description: "description"},
+			input: cheevos.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: "orgid"},
 			err:   "",
 		},
 	}

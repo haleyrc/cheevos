@@ -11,6 +11,12 @@ import (
 	"github.com/haleyrc/cheevos/roster"
 )
 
+func TestRepositoryCanBeUsedInTheService(t *testing.T) {
+	_ = &cheevos.Service{
+		Repo: &cheevos.Repository{},
+	}
+}
+
 func TestCreateAwardCreatesAnAward(t *testing.T) {
 	var (
 		ctx = context.Background()

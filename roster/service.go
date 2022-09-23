@@ -20,17 +20,20 @@ type Emailer interface {
 	SendInvitation(ctx context.Context, email, code string) error
 }
 
+type IRepository interface {
+	CreateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
+	CreateMembership(ctx context.Context, tx db.Tx, m *Membership) error
+	CreateOrganization(ctx context.Context, tx db.Tx, org *Organization) error
+	DeleteInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) error
+	GetInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) (*Invitation, error)
+	GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error
+	SaveInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
+}
+
 type Service struct {
 	DB    db.Database
 	Email Emailer
-	Repo  interface {
-		CreateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
-		CreateMembership(ctx context.Context, tx db.Tx, m *Membership) error
-		CreateOrganization(ctx context.Context, tx db.Tx, org *Organization) error
-		DeleteInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) error
-		GetInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) (*Invitation, error)
-		SaveInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
-	}
+	Repo  IRepository
 }
 
 func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) error {
@@ -140,6 +143,16 @@ func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID s
 	}
 
 	return invitation, nil
+}
+
+func (svc *Service) IsMember(ctx context.Context, orgID, userID string) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+		return svc.Repo.GetMember(ctx, tx, &Membership{}, orgID, userID)
+	})
+	if err != nil {
+		return fmt.Errorf("is member failed: %w", err)
+	}
+	return nil
 }
 
 // Refreshing an invitation will invalidate the initial invitation email (as

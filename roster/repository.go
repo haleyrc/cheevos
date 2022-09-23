@@ -51,6 +51,15 @@ func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, hashe
 
 	return &i, nil
 }
+
+func (repo *Repository) GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error {
+	query := `SELECT organization_id, user_id, joined_at FROM memberships WHERE organization_id = $1 AND user_id = $2;`
+	if err := tx.QueryRow(ctx, query, orgID, userID).Scan(&m.OrganizationID, &m.UserID, &m.Joined); err != nil {
+		return fmt.Errorf("get member failed: %w", err)
+	}
+	return nil
+}
+
 func (repo *Repository) SaveInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error {
 	query := `UPDATE invitations SET expires_at = $3, hashed_code = $4 WHERE email = $1 AND organization_id = $2;`
 	if err := tx.Exec(ctx, query, i.Email, i.OrganizationID, i.Expires, hashedCode); err != nil {

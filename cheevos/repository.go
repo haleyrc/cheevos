@@ -24,3 +24,11 @@ func (repo *Repository) CreateCheevo(ctx context.Context, tx db.Tx, cheevo *Chee
 	}
 	return nil
 }
+
+func (repo *Repository) GetCheevo(ctx context.Context, tx db.Tx, cheevo *Cheevo, id string) error {
+	query := `SELECT id, name, description, organization_id FROM cheevos WHERE id = $1;`
+	if err := tx.QueryRow(ctx, query, id).Scan(&cheevo.ID, &cheevo.Name, &cheevo.Description, &cheevo.OrganizationID); err != nil {
+		return fmt.Errorf("get cheevo failed: %w", err)
+	}
+	return nil
+}

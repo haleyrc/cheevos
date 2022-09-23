@@ -1,0 +1,129 @@
+package web
+
+import (
+	"net/http"
+
+	"github.com/haleyrc/cheevos/cheevos"
+	"github.com/haleyrc/cheevos/roster"
+)
+
+type CheevosServer struct {
+	Authz   AuthorizationService
+	Cheevos cheevos.Service
+	Roster  roster.Service
+}
+
+type AwardCheevoRequest struct {
+	CheevoID    string `json:"cheevoID"`
+	RecipientID string `json:"recipientID"`
+}
+
+type AwardCheevoResponse struct {
+	CheevoID    string `json:"cheevoID"`
+	RecipientID string `json:"recipientID"`
+}
+
+func (cs *CheevosServer) AwardCheevoHandler(w http.ResponseWriter, r *http.Request) (Response, error) {
+	ctx := r.Context()
+	currentUser := GetCurrentUser(ctx)
+
+	var req AwardCheevoRequest
+	if err := decodeJSON(&req, r.Body); err != nil {
+		return nil, err
+	}
+
+	if err := cs.Authz.CanAwardCheevo(ctx, currentUser, req.RecipientID, req.CheevoID); err != nil {
+		return nil, err
+	}
+
+	if err := cs.Cheevos.AwardCheevoToUser(ctx, req.RecipientID, req.CheevoID); err != nil {
+		return nil, err
+	}
+
+	resp := AwardCheevoResponse{
+		CheevoID:    req.CheevoID,
+		RecipientID: req.RecipientID,
+	}
+
+	return resp, nil
+}
+
+type CreateCheevoRequest struct {
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	OrganizationID string `json:"organizationID"`
+}
+
+type CreateCheevoResponse struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	OrganizationID string `json:"organizationID"`
+}
+
+func (cs *CheevosServer) CreateCheevo(w http.ResponseWriter, r *http.Request) (Response, error) {
+	ctx := r.Context()
+	currentUser := GetCurrentUser(ctx)
+
+	var req CreateCheevoRequest
+	if err := decodeJSON(&req, r.Body); err != nil {
+		return nil, err
+	}
+
+	if err := cs.Authz.CanCreateCheevo(ctx, currentUser, req.OrganizationID); err != nil {
+		return nil, err
+	}
+
+	cheevo, err := cs.Cheevos.CreateCheevo(ctx, req.Name, req.Description, req.OrganizationID)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := CreateCheevoResponse{
+		ID:             cheevo.ID,
+		Name:           cheevo.Name,
+		Description:    cheevo.Description,
+		OrganizationID: cheevo.OrganizationID,
+	}
+
+	return resp, nil
+}
+
+type GetCheevoRequest struct {
+	CheevoID string `json:"cheevoID"`
+}
+
+type GetCheevoResponse struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	OrganizationID string `json:"organizationID"`
+}
+
+func (cs *CheevosServer) GetCheevo(w http.ResponseWriter, r *http.Request) (Response, error) {
+	ctx := r.Context()
+	currentUser := GetCurrentUser(ctx)
+
+	var req GetCheevoRequest
+	if err := decodeJSON(&req, r.Body); err != nil {
+		return nil, err
+	}
+
+	if err := cs.Authz.CanGetCheevo(ctx, currentUser, req.CheevoID); err != nil {
+		return nil, err
+	}
+
+	cheevo, err := cs.Cheevos.GetCheevo(ctx, req.CheevoID)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := GetCheevoResponse{
+		ID:             cheevo.ID,
+		Name:           cheevo.Name,
+		Description:    cheevo.Description,
+		OrganizationID: cheevo.OrganizationID,
+	}
+
+	return resp, nil
+}

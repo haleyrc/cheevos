@@ -10,6 +10,10 @@ import (
 	"github.com/haleyrc/cheevos/roster"
 )
 
+var _ = &auth.Service{Repo: &Repository{}}
+var _ = &cheevos.Service{Repo: &Repository{}}
+var _ = &roster.Service{Repo: &Repository{}}
+
 type CreateAwardArgs struct {
 	Award *cheevos.Award
 }
@@ -40,8 +44,21 @@ type DeleteInvitationByCodeArgs struct {
 	Code string
 }
 
+type GetCheevoArgs struct {
+	ID string
+}
+
 type GetInvitationByCodeArgs struct {
 	Code string
+}
+
+type GetMemberArgs struct {
+	OrganizationID string
+	UserID         string
+}
+
+type GetUserArgs struct {
+	ID string
 }
 
 type SaveInvitationArgs struct {
@@ -92,10 +109,28 @@ type Repository struct {
 		With  DeleteInvitationByCodeArgs
 	}
 
+	GetCheevoFn     func(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo, id string) error
+	GetCheevoCalled struct {
+		Count int
+		With  GetCheevoArgs
+	}
+
 	GetInvitationByCodeFn     func(ctx context.Context, tx db.Tx, code string) (*roster.Invitation, error)
 	GetInvitationByCodeCalled struct {
 		Count int
 		With  GetInvitationByCodeArgs
+	}
+
+	GetMemberFn     func(ctx context.Context, tx db.Tx, m *roster.Membership, orgID, userID string) error
+	GetMemberCalled struct {
+		Count int
+		With  GetMemberArgs
+	}
+
+	GetUserFn     func(ctx context.Context, tx db.Tx, u *auth.User, id string) error
+	GetUserCalled struct {
+		Count int
+		With  GetUserArgs
 	}
 
 	SaveInvitationFn     func(ctx context.Context, tx db.Tx, i *roster.Invitation, hashedCode string) error
@@ -168,6 +203,15 @@ func (repo *Repository) DeleteInvitationByCode(ctx context.Context, tx db.Tx, co
 	return repo.DeleteInvitationByCodeFn(ctx, tx, code)
 }
 
+func (repo *Repository) GetCheevo(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo, id string) error {
+	if repo.GetCheevoFn == nil {
+		return mockMethodNotDefined("GetCheevo")
+	}
+	repo.GetCheevoCalled.Count++
+	repo.GetCheevoCalled.With = GetCheevoArgs{ID: id}
+	return repo.GetCheevoFn(ctx, tx, cheevo, id)
+}
+
 func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, code string) (*roster.Invitation, error) {
 	if repo.GetInvitationByCodeFn == nil {
 		return nil, mockMethodNotDefined("GetInvitationByCode")
@@ -175,6 +219,24 @@ func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, code 
 	repo.GetInvitationByCodeCalled.Count++
 	repo.GetInvitationByCodeCalled.With = GetInvitationByCodeArgs{Code: code}
 	return repo.GetInvitationByCodeFn(ctx, tx, code)
+}
+
+func (repo *Repository) GetMember(ctx context.Context, tx db.Tx, m *roster.Membership, orgID, userID string) error {
+	if repo.GetMemberFn == nil {
+		return mockMethodNotDefined("GetMember")
+	}
+	repo.GetMemberCalled.Count++
+	repo.GetMemberCalled.With = GetMemberArgs{OrganizationID: orgID, UserID: userID}
+	return repo.GetMemberFn(ctx, tx, m, orgID, userID)
+}
+
+func (repo *Repository) GetUser(ctx context.Context, tx db.Tx, u *auth.User, id string) error {
+	if repo.GetUserFn == nil {
+		return mockMethodNotDefined("GetUser")
+	}
+	repo.GetUserCalled.Count++
+	repo.GetUserCalled.With = GetUserArgs{ID: id}
+	return repo.GetUserFn(ctx, tx, u, id)
 }
 
 func (repo *Repository) SaveInvitation(ctx context.Context, tx db.Tx, i *roster.Invitation, hashedCode string) error {
