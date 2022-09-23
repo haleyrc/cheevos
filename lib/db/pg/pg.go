@@ -60,3 +60,7 @@ func (tx Tx) Exec(ctx context.Context, query string, args ...interface{}) error 
 	}
 	return nil
 }
+
+func (tx Tx) QueryRow(ctx context.Context, query string, args ...interface{}) db.Row {
+	return tx.tx.QueryRowContext(ctx, query, args...)
+}
