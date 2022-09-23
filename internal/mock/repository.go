@@ -4,43 +4,35 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/haleyrc/cheevos/award"
-	"github.com/haleyrc/cheevos/cheevo"
-	"github.com/haleyrc/cheevos/invitation"
+	"github.com/haleyrc/cheevos/auth"
+	"github.com/haleyrc/cheevos/cheevos"
 	"github.com/haleyrc/cheevos/lib/db"
-	"github.com/haleyrc/cheevos/membership"
-	"github.com/haleyrc/cheevos/organization"
-	"github.com/haleyrc/cheevos/user"
+	"github.com/haleyrc/cheevos/roster"
 )
 
-type AddMemberToOrganizationArgs struct {
-	OrganizationID string
-	UserID         string
-}
-
 type CreateAwardArgs struct {
-	Award *award.Award
+	Award *cheevos.Award
 }
 
 type CreateCheevoArgs struct {
-	Cheevo *cheevo.Cheevo
+	Cheevo *cheevos.Cheevo
 }
 
 type CreateInvitationArgs struct {
-	Invitation *invitation.Invitation
+	Invitation *roster.Invitation
 	HashedCode string
 }
 
 type CreateMembershipArgs struct {
-	Membership *membership.Membership
+	Membership *roster.Membership
 }
 
 type CreateOrganizationArgs struct {
-	Organization *organization.Organization
+	Organization *roster.Organization
 }
 
 type CreateUserArgs struct {
-	User         *user.User
+	User         *auth.User
 	PasswordHash string
 }
 
@@ -53,82 +45,67 @@ type GetInvitationByCodeArgs struct {
 }
 
 type SaveInvitationArgs struct {
-	Invitation *invitation.Invitation
+	Invitation *roster.Invitation
 	HashedCode string
 }
 
 type Repository struct {
-	AddMemberToOrganizationFn     func(ctx context.Context, tx db.Transaction, userID, orgID string) error
-	AddMemberToOrganizationCalled struct {
-		Count int
-		With  AddMemberToOrganizationArgs
-	}
-
-	CreateAwardFn     func(ctx context.Context, tx db.Transaction, a *award.Award) error
+	CreateAwardFn     func(ctx context.Context, tx db.Tx, a *cheevos.Award) error
 	CreateAwardCalled struct {
 		Count int
 		With  CreateAwardArgs
 	}
 
-	CreateCheevoFn     func(ctx context.Context, tx db.Transaction, cheevo *cheevo.Cheevo) error
+	CreateCheevoFn     func(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo) error
 	CreateCheevoCalled struct {
 		Count int
 		With  CreateCheevoArgs
 	}
 
-	CreateInvitationFn     func(ctx context.Context, tx db.Transaction, i *invitation.Invitation, hashedCode string) error
+	CreateInvitationFn     func(ctx context.Context, tx db.Tx, i *roster.Invitation, hashedCode string) error
 	CreateInvitationCalled struct {
 		Count int
 		With  CreateInvitationArgs
 	}
 
-	CreateMembershipFn     func(ctx context.Context, tx db.Transaction, m *membership.Membership) error
+	CreateMembershipFn     func(ctx context.Context, tx db.Tx, m *roster.Membership) error
 	CreateMembershipCalled struct {
 		Count int
 		With  CreateMembershipArgs
 	}
 
-	CreateOrganizationFn     func(ctx context.Context, tx db.Transaction, org *organization.Organization) error
+	CreateOrganizationFn     func(ctx context.Context, tx db.Tx, org *roster.Organization) error
 	CreateOrganizationCalled struct {
 		Count int
 		With  CreateOrganizationArgs
 	}
 
-	CreateUserFn     func(ctx context.Context, tx db.Transaction, u *user.User, hashedPassword string) error
+	CreateUserFn     func(ctx context.Context, tx db.Tx, u *auth.User, hashedPassword string) error
 	CreateUserCalled struct {
 		Count int
 		With  CreateUserArgs
 	}
 
-	DeleteInvitationByCodeFn     func(ctx context.Context, tx db.Transaction, code string) error
+	DeleteInvitationByCodeFn     func(ctx context.Context, tx db.Tx, code string) error
 	DeleteInvitationByCodeCalled struct {
 		Count int
 		With  DeleteInvitationByCodeArgs
 	}
 
-	GetInvitationByCodeFn     func(ctx context.Context, tx db.Transaction, code string) (*invitation.Invitation, error)
+	GetInvitationByCodeFn     func(ctx context.Context, tx db.Tx, code string) (*roster.Invitation, error)
 	GetInvitationByCodeCalled struct {
 		Count int
 		With  GetInvitationByCodeArgs
 	}
 
-	SaveInvitationFn     func(ctx context.Context, tx db.Transaction, i *invitation.Invitation, hashedCode string) error
+	SaveInvitationFn     func(ctx context.Context, tx db.Tx, i *roster.Invitation, hashedCode string) error
 	SaveInvitationCalled struct {
 		Count int
 		With  SaveInvitationArgs
 	}
 }
 
-func (repo *Repository) AddMemberToOrganization(ctx context.Context, tx db.Transaction, userID, orgID string) error {
-	if repo.AddMemberToOrganizationFn == nil {
-		return mockMethodNotDefined("AddMemberToOrganization")
-	}
-	repo.AddMemberToOrganizationCalled.Count++
-	repo.AddMemberToOrganizationCalled.With = AddMemberToOrganizationArgs{OrganizationID: orgID, UserID: userID}
-	return repo.AddMemberToOrganizationFn(ctx, tx, userID, orgID)
-}
-
-func (repo *Repository) CreateAward(ctx context.Context, tx db.Transaction, a *award.Award) error {
+func (repo *Repository) CreateAward(ctx context.Context, tx db.Tx, a *cheevos.Award) error {
 	if repo.CreateAwardFn == nil {
 		return mockMethodNotDefined("CreateAward")
 	}
@@ -137,7 +114,7 @@ func (repo *Repository) CreateAward(ctx context.Context, tx db.Transaction, a *a
 	return repo.CreateAwardFn(ctx, tx, a)
 }
 
-func (repo *Repository) CreateCheevo(ctx context.Context, tx db.Transaction, cheevo *cheevo.Cheevo) error {
+func (repo *Repository) CreateCheevo(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo) error {
 	if repo.CreateCheevoFn == nil {
 		return mockMethodNotDefined("CreateCheevo")
 	}
@@ -146,7 +123,7 @@ func (repo *Repository) CreateCheevo(ctx context.Context, tx db.Transaction, che
 	return repo.CreateCheevoFn(ctx, tx, cheevo)
 }
 
-func (repo *Repository) CreateInvitation(ctx context.Context, tx db.Transaction, i *invitation.Invitation, hashedCode string) error {
+func (repo *Repository) CreateInvitation(ctx context.Context, tx db.Tx, i *roster.Invitation, hashedCode string) error {
 	if repo.CreateInvitationFn == nil {
 		return mockMethodNotDefined("CreateInvitation")
 	}
@@ -155,7 +132,7 @@ func (repo *Repository) CreateInvitation(ctx context.Context, tx db.Transaction,
 	return repo.CreateInvitationFn(ctx, tx, i, hashedCode)
 }
 
-func (repo *Repository) CreateMembership(ctx context.Context, tx db.Transaction, m *membership.Membership) error {
+func (repo *Repository) CreateMembership(ctx context.Context, tx db.Tx, m *roster.Membership) error {
 	if repo.CreateMembershipFn == nil {
 		return mockMethodNotDefined("CreateMembership")
 	}
@@ -164,7 +141,7 @@ func (repo *Repository) CreateMembership(ctx context.Context, tx db.Transaction,
 	return repo.CreateMembershipFn(ctx, tx, m)
 }
 
-func (repo *Repository) CreateOrganization(ctx context.Context, tx db.Transaction, org *organization.Organization) error {
+func (repo *Repository) CreateOrganization(ctx context.Context, tx db.Tx, org *roster.Organization) error {
 	if repo.CreateOrganizationFn == nil {
 		return mockMethodNotDefined("CreateOrganization")
 	}
@@ -173,7 +150,7 @@ func (repo *Repository) CreateOrganization(ctx context.Context, tx db.Transactio
 	return repo.CreateOrganizationFn(ctx, tx, org)
 }
 
-func (repo *Repository) CreateUser(ctx context.Context, tx db.Transaction, u *user.User, hashedPassword string) error {
+func (repo *Repository) CreateUser(ctx context.Context, tx db.Tx, u *auth.User, hashedPassword string) error {
 	if repo.CreateUserFn == nil {
 		return mockMethodNotDefined("CreateUser")
 	}
@@ -182,7 +159,7 @@ func (repo *Repository) CreateUser(ctx context.Context, tx db.Transaction, u *us
 	return repo.CreateUserFn(ctx, tx, u, hashedPassword)
 }
 
-func (repo *Repository) DeleteInvitationByCode(ctx context.Context, tx db.Transaction, code string) error {
+func (repo *Repository) DeleteInvitationByCode(ctx context.Context, tx db.Tx, code string) error {
 	if repo.DeleteInvitationByCodeFn == nil {
 		return mockMethodNotDefined("DeleteInvitationByCode")
 	}
@@ -191,7 +168,7 @@ func (repo *Repository) DeleteInvitationByCode(ctx context.Context, tx db.Transa
 	return repo.DeleteInvitationByCodeFn(ctx, tx, code)
 }
 
-func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Transaction, code string) (*invitation.Invitation, error) {
+func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, code string) (*roster.Invitation, error) {
 	if repo.GetInvitationByCodeFn == nil {
 		return nil, mockMethodNotDefined("GetInvitationByCode")
 	}
@@ -200,7 +177,7 @@ func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Transacti
 	return repo.GetInvitationByCodeFn(ctx, tx, code)
 }
 
-func (repo *Repository) SaveInvitation(ctx context.Context, tx db.Transaction, i *invitation.Invitation, hashedCode string) error {
+func (repo *Repository) SaveInvitation(ctx context.Context, tx db.Tx, i *roster.Invitation, hashedCode string) error {
 	if repo.GetInvitationByCodeFn == nil {
 		return mockMethodNotDefined("SaveInvitation")
 	}
