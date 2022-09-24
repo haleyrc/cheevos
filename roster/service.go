@@ -25,7 +25,8 @@ type IRepository interface {
 	CreateMembership(ctx context.Context, tx db.Tx, m *Membership) error
 	CreateOrganization(ctx context.Context, tx db.Tx, org *Organization) error
 	DeleteInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) error
-	GetInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) (*Invitation, error)
+	GetInvitation(ctx context.Context, tx db.Tx, i *Invitation, id string) error
+	GetInvitationByCode(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
 	GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error
 	SaveInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
 }
@@ -37,10 +38,10 @@ type Service struct {
 }
 
 func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) error {
+	var invitation *Invitation
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		hashedCode := hash.Generate(code)
-		invitation, err := svc.Repo.GetInvitationByCode(ctx, tx, hashedCode)
-		if err != nil {
+		if err := svc.Repo.GetInvitationByCode(ctx, tx, invitation, hashedCode); err != nil {
 			return err
 		}
 
@@ -117,6 +118,17 @@ func (svc *Service) DeclineInvitation(ctx context.Context, code string) error {
 	return nil
 }
 
+func (svc *Service) GetInvitation(ctx context.Context, id string) (*Invitation, error) {
+	var invitation *Invitation
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+		return svc.Repo.GetInvitation(ctx, tx, invitation, id)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("get invitation failed: %w", err)
+	}
+	return invitation, nil
+}
+
 func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
 	var invitation *Invitation
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
@@ -157,12 +169,10 @@ func (svc *Service) IsMember(ctx context.Context, orgID, userID string) error {
 
 // Refreshing an invitation will invalidate the initial invitation email (as
 // well as any other refresh emails).
-func (svc *Service) RefreshInvitation(ctx context.Context, code string) error {
+func (svc *Service) RefreshInvitation(ctx context.Context, id string) (*Invitation, error) {
+	var invitation *Invitation
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		hashedCode := hash.Generate(code)
-
-		invitation, err := svc.Repo.GetInvitationByCode(ctx, tx, hashedCode)
-		if err != nil {
+		if err := svc.Repo.GetInvitation(ctx, tx, invitation, id); err != nil {
 			return err
 		}
 
@@ -177,8 +187,8 @@ func (svc *Service) RefreshInvitation(ctx context.Context, code string) error {
 		return svc.Email.SendInvitation(ctx, invitation.Email, newCode)
 	})
 	if err != nil {
-		return fmt.Errorf("refresh invitation failed: %w", err)
+		return nil, fmt.Errorf("refresh invitation failed: %w", err)
 	}
 
-	return nil
+	return invitation, nil
 }

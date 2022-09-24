@@ -48,6 +48,10 @@ type GetCheevoArgs struct {
 	ID string
 }
 
+type GetInvitationArgs struct {
+	ID string
+}
+
 type GetInvitationByCodeArgs struct {
 	Code string
 }
@@ -115,7 +119,13 @@ type Repository struct {
 		With  GetCheevoArgs
 	}
 
-	GetInvitationByCodeFn     func(ctx context.Context, tx db.Tx, code string) (*roster.Invitation, error)
+	GetInvitationFn     func(ctx context.Context, tx db.Tx, i *roster.Invitation, id string) error
+	GetInvitationCalled struct {
+		Count int
+		With  GetInvitationArgs
+	}
+
+	GetInvitationByCodeFn     func(ctx context.Context, tx db.Tx, i *roster.Invitation, code string) error
 	GetInvitationByCodeCalled struct {
 		Count int
 		With  GetInvitationByCodeArgs
@@ -212,13 +222,22 @@ func (repo *Repository) GetCheevo(ctx context.Context, tx db.Tx, cheevo *cheevos
 	return repo.GetCheevoFn(ctx, tx, cheevo, id)
 }
 
-func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, code string) (*roster.Invitation, error) {
+func (repo *Repository) GetInvitation(ctx context.Context, tx db.Tx, i *roster.Invitation, id string) error {
+	if repo.GetInvitationFn == nil {
+		return mockMethodNotDefined("GetInvitation")
+	}
+	repo.GetInvitationCalled.Count++
+	repo.GetInvitationCalled.With = GetInvitationArgs{ID: id}
+	return repo.GetInvitationFn(ctx, tx, i, id)
+}
+
+func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, i *roster.Invitation, code string) error {
 	if repo.GetInvitationByCodeFn == nil {
-		return nil, mockMethodNotDefined("GetInvitationByCode")
+		return mockMethodNotDefined("GetInvitationByCode")
 	}
 	repo.GetInvitationByCodeCalled.Count++
 	repo.GetInvitationByCodeCalled.With = GetInvitationByCodeArgs{Code: code}
-	return repo.GetInvitationByCodeFn(ctx, tx, code)
+	return repo.GetInvitationByCodeFn(ctx, tx, i, code)
 }
 
 func (repo *Repository) GetMember(ctx context.Context, tx db.Tx, m *roster.Membership, orgID, userID string) error {

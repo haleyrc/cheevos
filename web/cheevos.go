@@ -23,7 +23,7 @@ type AwardCheevoResponse struct {
 	RecipientID string `json:"recipientID"`
 }
 
-func (cs *CheevosServer) AwardCheevoHandler(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (cs *CheevosServer) AwardCheevo(w http.ResponseWriter, r *http.Request) (Response, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 

@@ -49,3 +49,24 @@ func (svc *AuthorizationService) CanGetCheevo(ctx context.Context, userID, cheev
 
 	return nil
 }
+
+func (svc *AuthorizationService) CanInviteUsersToOrganization(ctx context.Context, userID, orgID string) error {
+	if err := svc.Roster.IsMember(ctx, orgID, userID); err != nil {
+		return fmt.Errorf("authorization failed: %w", err)
+	}
+	return nil
+}
+
+func (svc *AuthorizationService) CanRefreshInvitation(ctx context.Context, userID, invitationID string) error {
+	invitation, err := svc.Roster.GetInvitation(ctx, invitationID)
+	if err != nil {
+		return fmt.Errorf("authorization failed: %w", err)
+	}
+
+	if err := svc.Roster.IsMember(ctx, invitation.OrganizationID, userID); err != nil {
+		return fmt.Errorf("authorization failed: %w", err)
+	}
+
+	return nil
+
+}
