@@ -1,9 +1,11 @@
-package web
+package server
 
 import (
 	"net/http"
 
 	"github.com/haleyrc/cheevos/auth"
+	"github.com/haleyrc/cheevos/lib/json"
+	"github.com/haleyrc/cheevos/lib/web"
 )
 
 type AuthServer struct {
@@ -20,11 +22,11 @@ type SignUpResponse struct {
 	Username string `json:"username"`
 }
 
-func (as *AuthServer) SignUp(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (as *AuthServer) SignUp(w http.ResponseWriter, r *http.Request) (web.Response, error) {
 	ctx := r.Context()
 
 	var req SignUpRequest
-	if err := decodeJSON(&req, r.Body); err != nil {
+	if err := json.Decode(&req, r.Body); err != nil {
 		return nil, err
 	}
 

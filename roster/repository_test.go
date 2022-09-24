@@ -130,8 +130,8 @@ func TestGetInvitationByCodeReturnsAnInvitation(t *testing.T) {
 	rosterRepo.CreateOrganization(ctx, db, org)
 	rosterRepo.CreateInvitation(ctx, db, invitation, codeHash)
 
-	got, err := rosterRepo.GetInvitationByCode(ctx, db, codeHash)
-	if err != nil {
+	var got roster.Invitation
+	if err := rosterRepo.GetInvitationByCode(ctx, db, &got, codeHash); err != nil {
 		t.Fatal(err)
 	}
 
@@ -174,12 +174,12 @@ func TestSaveInvitationSavesAnInvitation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err := rosterRepo.GetInvitationByCode(ctx, db, codeHash); err == nil {
+	if err := rosterRepo.GetInvitationByCode(ctx, db, &roster.Invitation{}, codeHash); err == nil {
 		t.Errorf("Expected to not find an invitation with the old code, but did.")
 	}
 
-	got, err := rosterRepo.GetInvitationByCode(ctx, db, newCodeHash)
-	if err != nil {
+	var got roster.Invitation
+	if err := rosterRepo.GetInvitationByCode(ctx, db, &got, newCodeHash); err != nil {
 		t.Fatal(err)
 	}
 

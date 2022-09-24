@@ -1,9 +1,11 @@
-package web
+package server
 
 import (
 	"net/http"
 
 	"github.com/haleyrc/cheevos/cheevos"
+	"github.com/haleyrc/cheevos/lib/json"
+	"github.com/haleyrc/cheevos/lib/web"
 	"github.com/haleyrc/cheevos/roster"
 )
 
@@ -23,12 +25,12 @@ type AwardCheevoResponse struct {
 	RecipientID string `json:"recipientID"`
 }
 
-func (cs *CheevosServer) AwardCheevo(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (cs *CheevosServer) AwardCheevo(w http.ResponseWriter, r *http.Request) (web.Response, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
 	var req AwardCheevoRequest
-	if err := decodeJSON(&req, r.Body); err != nil {
+	if err := json.Decode(&req, r.Body); err != nil {
 		return nil, err
 	}
 
@@ -57,12 +59,12 @@ type CreateCheevoResponse struct {
 	OrganizationID string `json:"organizationID"`
 }
 
-func (cs *CheevosServer) CreateCheevo(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (cs *CheevosServer) CreateCheevo(w http.ResponseWriter, r *http.Request) (web.Response, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
 	var req CreateCheevoRequest
-	if err := decodeJSON(&req, r.Body); err != nil {
+	if err := json.Decode(&req, r.Body); err != nil {
 		return nil, err
 	}
 
@@ -96,12 +98,12 @@ type GetCheevoResponse struct {
 	OrganizationID string `json:"organizationID"`
 }
 
-func (cs *CheevosServer) GetCheevo(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (cs *CheevosServer) GetCheevo(w http.ResponseWriter, r *http.Request) (web.Response, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
 	var req GetCheevoRequest
-	if err := decodeJSON(&req, r.Body); err != nil {
+	if err := json.Decode(&req, r.Body); err != nil {
 		return nil, err
 	}
 

@@ -100,6 +100,7 @@ func TestLoggerLogsTheResponseFromInviteUserToOrganization(t *testing.T) {
 	ctx := context.Background()
 	logger := testutil.NewTestLogger()
 	inv := &roster.Invitation{
+		ID:             "id",
 		Email:          "email",
 		OrganizationID: "orgid",
 		Expires:        time.Now(),
@@ -115,7 +116,7 @@ func TestLoggerLogsTheResponseFromInviteUserToOrganization(t *testing.T) {
 
 	logger.ShouldLog(t,
 		`{"Fields":{"Email":"email","Organization":"orgid"},"Message":"inviting user to organization"}`,
-		`{"Fields":{"Invitation":{"Email":"email","OrganizationID":"orgid","Expires":"2022-09-16T15:02:04Z"}},"Message":"invited user to organization"}`,
+		`{"Fields":{"Invitation":{"ID":"id","Email":"email","OrganizationID":"orgid","Expires":"2022-09-16T15:02:04Z"}},"Message":"invited user to organization"}`,
 	)
 }
 

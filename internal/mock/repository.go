@@ -259,7 +259,7 @@ func (repo *Repository) GetUser(ctx context.Context, tx db.Tx, u *auth.User, id 
 }
 
 func (repo *Repository) SaveInvitation(ctx context.Context, tx db.Tx, i *roster.Invitation, hashedCode string) error {
-	if repo.GetInvitationByCodeFn == nil {
+	if repo.SaveInvitationFn == nil {
 		return mockMethodNotDefined("SaveInvitation")
 	}
 	repo.SaveInvitationCalled.Count++

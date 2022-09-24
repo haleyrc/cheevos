@@ -7,6 +7,8 @@ import (
 	"github.com/haleyrc/cheevos/lib/db"
 )
 
+var _ IRepository = &Repository{}
+
 type Repository struct{}
 
 func (repo *Repository) CreateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error {
@@ -41,15 +43,20 @@ func (repo *Repository) DeleteInvitationByCode(ctx context.Context, tx db.Tx, ha
 	return nil
 }
 
-func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) (*Invitation, error) {
-	var i Invitation
+func (repo *Repository) GetInvitation(ctx context.Context, tx db.Tx, i *Invitation, id string) error {
+	query := `SELECT email, organization_id, expires_at FROM invitations WHERE id = $1;`
+	if err := tx.QueryRow(ctx, query, id).Scan(&i.Email, &i.OrganizationID, &i.Expires); err != nil {
+		return fmt.Errorf("get invitation failed: %w", err)
+	}
+	return nil
+}
 
+func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error {
 	query := `SELECT email, organization_id, expires_at FROM invitations WHERE hashed_code = $1;`
 	if err := tx.QueryRow(ctx, query, hashedCode).Scan(&i.Email, &i.OrganizationID, &i.Expires); err != nil {
-		return nil, fmt.Errorf("get invitation by code failed: %w", err)
+		return fmt.Errorf("get invitation by code failed: %w", err)
 	}
-
-	return &i, nil
+	return nil
 }
 
 func (repo *Repository) GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error {

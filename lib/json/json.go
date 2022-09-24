@@ -1,4 +1,4 @@
-package web
+package json
 
 import (
 	"bytes"
@@ -7,9 +7,7 @@ import (
 	"io"
 )
 
-type Response interface{}
-
-func decodeJSON(dest interface{}, r io.Reader) error {
+func Decode(dest interface{}, r io.Reader) error {
 	var buff bytes.Buffer
 	if _, err := io.Copy(&buff, r); err != nil {
 		return fmt.Errorf("decode json failed: %w", err)

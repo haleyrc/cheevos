@@ -26,14 +26,16 @@ func RunValidationTests(t *testing.T, name string, input Validator, err string) 
 			return
 		}
 
-		compareError(t, err, got)
+		CompareError(t, err, got)
 	})
 }
 
-func compareError(t *testing.T, want string, got error) {
+func CompareError(t *testing.T, want string, got error) bool {
 	t.Helper()
 	g := got.Error()
 	if !strings.Contains(g, want) {
 		t.Errorf("error %q does not include %q", g, want)
+		return false
 	}
+	return true
 }

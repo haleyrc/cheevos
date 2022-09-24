@@ -1,9 +1,11 @@
-package web
+package server
 
 import (
 	"net/http"
 
+	"github.com/haleyrc/cheevos/lib/json"
 	"github.com/haleyrc/cheevos/lib/time"
+	"github.com/haleyrc/cheevos/lib/web"
 	"github.com/haleyrc/cheevos/roster"
 )
 
@@ -18,12 +20,12 @@ type AcceptInvitationRequest struct {
 
 type AcceptInvitationResponse struct{}
 
-func (rs *RosterServer) AcceptInvitation(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (rs *RosterServer) AcceptInvitation(w http.ResponseWriter, r *http.Request) (web.Response, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
 	var req AcceptInvitationRequest
-	if err := decodeJSON(&req, r.Body); err != nil {
+	if err := json.Decode(&req, r.Body); err != nil {
 		return nil, err
 	}
 
@@ -43,12 +45,12 @@ type CreateOrganizationResponse struct {
 	Name string `json:"name"`
 }
 
-func (rs *RosterServer) CreateOrganization(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (rs *RosterServer) CreateOrganization(w http.ResponseWriter, r *http.Request) (web.Response, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
 	var req CreateOrganizationRequest
-	if err := decodeJSON(&req, r.Body); err != nil {
+	if err := json.Decode(&req, r.Body); err != nil {
 		return nil, err
 	}
 
@@ -71,11 +73,11 @@ type DeclineInvitationRequest struct {
 
 type DeclineInvitationResponse struct{}
 
-func (rs *RosterServer) DeclineInvitation(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (rs *RosterServer) DeclineInvitation(w http.ResponseWriter, r *http.Request) (web.Response, error) {
 	ctx := r.Context()
 
 	var req DeclineInvitationRequest
-	if err := decodeJSON(&req, r.Body); err != nil {
+	if err := json.Decode(&req, r.Body); err != nil {
 		return nil, err
 	}
 
@@ -95,12 +97,12 @@ type InviteUserToOrganizationResponse struct {
 	Expires time.Time `json:"expires"`
 }
 
-func (rs *RosterServer) InviteUserToOrganization(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (rs *RosterServer) InviteUserToOrganization(w http.ResponseWriter, r *http.Request) (web.Response, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
 	var req InviteUserToOrganizationRequest
-	if err := decodeJSON(&req, r.Body); err != nil {
+	if err := json.Decode(&req, r.Body); err != nil {
 		return nil, err
 	}
 
@@ -129,12 +131,12 @@ type RefreshInvitationResponse struct {
 	Expires time.Time `json:"expires"`
 }
 
-func (rs *RosterServer) RefreshInvitation(w http.ResponseWriter, r *http.Request) (Response, error) {
+func (rs *RosterServer) RefreshInvitation(w http.ResponseWriter, r *http.Request) (web.Response, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
 	var req RefreshInvitationRequest
-	if err := decodeJSON(&req, r.Body); err != nil {
+	if err := json.Decode(&req, r.Body); err != nil {
 		return nil, err
 	}
 
