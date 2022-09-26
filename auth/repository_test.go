@@ -12,7 +12,7 @@ import (
 func TestCreateUserCreatesAUser(t *testing.T) {
 	var (
 		ctx     = context.Background()
-		db      = testutil.TestDatabase(ctx)
+		db      = testutil.TestDatabase(ctx, t)
 		repo    = &auth.Repository{}
 		u       = fake.User()
 		_, hash = fake.Password()

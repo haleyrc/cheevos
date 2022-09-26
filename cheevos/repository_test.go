@@ -14,7 +14,7 @@ import (
 func TestCreateAwardCreatesAnAward(t *testing.T) {
 	var (
 		ctx = context.Background()
-		db  = testutil.TestDatabase(ctx)
+		db  = testutil.TestDatabase(ctx, t)
 
 		authRepo    = &auth.Repository{}
 		rosterRepo  = &roster.Repository{}
@@ -44,7 +44,7 @@ func TestCreateAwardCreatesAnAward(t *testing.T) {
 func TestCreateCheevoCreatesACheevo(t *testing.T) {
 	var (
 		ctx = context.Background()
-		db  = testutil.TestDatabase(ctx)
+		db  = testutil.TestDatabase(ctx, t)
 
 		authRepo    = &auth.Repository{}
 		rosterRepo  = &roster.Repository{}

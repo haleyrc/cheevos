@@ -14,7 +14,7 @@ import (
 func TestCreateInvitationCreateAnInvitation(t *testing.T) {
 	var (
 		ctx = context.Background()
-		db  = testutil.TestDatabase(ctx)
+		db  = testutil.TestDatabase(ctx, t)
 
 		rosterRepo = &roster.Repository{}
 		authRepo   = &auth.Repository{}
@@ -38,7 +38,7 @@ func TestCreateInvitationCreateAnInvitation(t *testing.T) {
 func TestCreateMembershipCreatesAMembership(t *testing.T) {
 	var (
 		ctx = context.Background()
-		db  = testutil.TestDatabase(ctx)
+		db  = testutil.TestDatabase(ctx, t)
 
 		rosterRepo = &roster.Repository{}
 		authRepo   = &auth.Repository{}
@@ -61,7 +61,7 @@ func TestCreateMembershipCreatesAMembership(t *testing.T) {
 func TestCreateOrganizationSavesAOrganization(t *testing.T) {
 	var (
 		ctx = context.Background()
-		db  = testutil.TestDatabase(ctx)
+		db  = testutil.TestDatabase(ctx, t)
 
 		rosterRepo = &roster.Repository{}
 		authRepo   = &auth.Repository{}
@@ -82,7 +82,7 @@ func TestCreateOrganizationSavesAOrganization(t *testing.T) {
 func TestDeleteInvitationByCodeDeleteAnInvitation(t *testing.T) {
 	var (
 		ctx = context.Background()
-		db  = testutil.TestDatabase(ctx)
+		db  = testutil.TestDatabase(ctx, t)
 
 		rosterRepo = &roster.Repository{}
 		authRepo   = &auth.Repository{}
@@ -108,7 +108,7 @@ func TestDeleteInvitationByCodeDeleteAnInvitation(t *testing.T) {
 func TestGetInvitationByCodeReturnsAnInvitation(t *testing.T) {
 	var (
 		ctx = context.Background()
-		db  = testutil.TestDatabase(ctx)
+		db  = testutil.TestDatabase(ctx, t)
 
 		rosterRepo = &roster.Repository{}
 		authRepo   = &auth.Repository{}
@@ -145,7 +145,7 @@ func TestGetInvitationByCodeReturnsAnInvitation(t *testing.T) {
 func TestSaveInvitationSavesAnInvitation(t *testing.T) {
 	var (
 		ctx = context.Background()
-		db  = testutil.TestDatabase(ctx)
+		db  = testutil.TestDatabase(ctx, t)
 
 		rosterRepo = &roster.Repository{}
 		authRepo   = &auth.Repository{}
