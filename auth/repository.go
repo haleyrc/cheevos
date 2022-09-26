@@ -18,3 +18,11 @@ func (repo *Repository) CreateUser(ctx context.Context, tx db.Tx, u *User, hashe
 	}
 	return nil
 }
+
+func (repo *Repository) GetUser(ctx context.Context, tx db.Tx, u *User, id string) error {
+	query := `SELECT id, username FROM users WHERE id = $1;`
+	if err := tx.QueryRow(ctx, query, id).Scan(&u.ID, &u.Username); err != nil {
+		return fmt.Errorf("get user failed: %w", err)
+	}
+	return nil
+}
