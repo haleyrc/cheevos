@@ -10,7 +10,7 @@ import (
 	"github.com/haleyrc/cheevos/lib/hash"
 )
 
-type IRepository interface {
+type UsersRepository interface {
 	CreateUser(ctx context.Context, tx db.Tx, u *User, hashedPassword string) error
 	GetUser(ctx context.Context, tx db.Tx, u *User, id string) error
 }
@@ -18,7 +18,9 @@ type IRepository interface {
 // Service represents the main entrypoint for managing user.
 type Service struct {
 	DB   db.Database
-	Repo IRepository
+	Repo interface {
+		UsersRepository
+	}
 }
 
 func (us *Service) GetUser(ctx context.Context, id string) (*User, error) {

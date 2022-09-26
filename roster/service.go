@@ -20,21 +20,31 @@ type Emailer interface {
 	SendInvitation(ctx context.Context, email, code string) error
 }
 
-type IRepository interface {
+type InvitationsRepository interface {
 	CreateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
-	CreateMembership(ctx context.Context, tx db.Tx, m *Membership) error
-	CreateOrganization(ctx context.Context, tx db.Tx, org *Organization) error
 	DeleteInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) error
 	GetInvitation(ctx context.Context, tx db.Tx, i *Invitation, id string) error
 	GetInvitationByCode(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
-	GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error
 	SaveInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
+}
+
+type MembershipsRepository interface {
+	CreateMembership(ctx context.Context, tx db.Tx, m *Membership) error
+	GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error
+}
+
+type OrganizationsRepository interface {
+	CreateOrganization(ctx context.Context, tx db.Tx, org *Organization) error
 }
 
 type Service struct {
 	DB    db.Database
 	Email Emailer
-	Repo  IRepository
+	Repo  interface {
+		InvitationsRepository
+		MembershipsRepository
+		OrganizationsRepository
+	}
 }
 
 func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) error {

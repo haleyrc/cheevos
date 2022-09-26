@@ -7,7 +7,9 @@ import (
 	"github.com/haleyrc/cheevos/lib/db"
 )
 
-var _ IRepository = &Repository{}
+var _ InvitationsRepository = &Repository{}
+var _ MembershipsRepository = &Repository{}
+var _ OrganizationsRepository = &Repository{}
 
 type Repository struct{}
 

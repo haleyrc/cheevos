@@ -10,15 +10,21 @@ import (
 	"github.com/haleyrc/cheevos/lib/time"
 )
 
-type IRepository interface {
+type AwardsRepository interface {
 	CreateAward(ctx context.Context, tx db.Tx, award *Award) error
+}
+
+type CheevosRepository interface {
 	CreateCheevo(ctx context.Context, tx db.Tx, cheevo *Cheevo) error
 	GetCheevo(ctx context.Context, tx db.Tx, cheevo *Cheevo, id string) error
 }
 
 type Service struct {
 	DB   db.Database
-	Repo IRepository
+	Repo interface {
+		AwardsRepository
+		CheevosRepository
+	}
 }
 
 // AwardCheevoToUser awards a specific Cheevo to a User. Statistics for this
