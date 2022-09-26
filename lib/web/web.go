@@ -20,18 +20,18 @@ func ResponseHandler(f ServerFunc) http.HandlerFunc {
 	}
 }
 
-type webError struct {
+type Error struct {
 	Message string `json:"message"`
 }
 
 type errorResponse struct {
-	Error webError `json:"error"`
+	Error Error `json:"error"`
 }
 
 func handleError(w http.ResponseWriter, err error) {
 	code := errorCode(err)
 	respondWithJSON(w, code, errorResponse{
-		Error: webError{Message: err.Error()},
+		Error: Error{Message: err.Error()},
 	})
 }
 
