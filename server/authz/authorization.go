@@ -1,4 +1,4 @@
-package server
+package authz
 
 import (
 	"context"
@@ -8,12 +8,12 @@ import (
 	"github.com/haleyrc/cheevos/roster"
 )
 
-type AuthorizationService struct {
+type Service struct {
 	Cheevos cheevos.Service
 	Roster  roster.Service
 }
 
-func (svc *AuthorizationService) CanAwardCheevo(ctx context.Context, fromUserID, toUserID, cheevoID string) error {
+func (svc *Service) CanAwardCheevo(ctx context.Context, fromUserID, toUserID, cheevoID string) error {
 	cheevo, err := svc.Cheevos.GetCheevo(ctx, cheevoID)
 	if err != nil {
 		return fmt.Errorf("authorization failed: %w", err)
@@ -30,14 +30,14 @@ func (svc *AuthorizationService) CanAwardCheevo(ctx context.Context, fromUserID,
 	return nil
 }
 
-func (svc *AuthorizationService) CanCreateCheevo(ctx context.Context, userID, orgID string) error {
+func (svc *Service) CanCreateCheevo(ctx context.Context, userID, orgID string) error {
 	if err := svc.Roster.IsMember(ctx, orgID, userID); err != nil {
 		return fmt.Errorf("authorization failed: %w", err)
 	}
 	return nil
 }
 
-func (svc *AuthorizationService) CanGetCheevo(ctx context.Context, userID, cheevoID string) error {
+func (svc *Service) CanGetCheevo(ctx context.Context, userID, cheevoID string) error {
 	cheevo, err := svc.Cheevos.GetCheevo(ctx, cheevoID)
 	if err != nil {
 		return fmt.Errorf("authorization failed: %w", err)
@@ -50,14 +50,14 @@ func (svc *AuthorizationService) CanGetCheevo(ctx context.Context, userID, cheev
 	return nil
 }
 
-func (svc *AuthorizationService) CanInviteUsersToOrganization(ctx context.Context, userID, orgID string) error {
+func (svc *Service) CanInviteUsersToOrganization(ctx context.Context, userID, orgID string) error {
 	if err := svc.Roster.IsMember(ctx, orgID, userID); err != nil {
 		return fmt.Errorf("authorization failed: %w", err)
 	}
 	return nil
 }
 
-func (svc *AuthorizationService) CanRefreshInvitation(ctx context.Context, userID, invitationID string) error {
+func (svc *Service) CanRefreshInvitation(ctx context.Context, userID, invitationID string) error {
 	invitation, err := svc.Roster.GetInvitation(ctx, invitationID)
 	if err != nil {
 		return fmt.Errorf("authorization failed: %w", err)

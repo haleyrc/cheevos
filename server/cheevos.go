@@ -7,10 +7,11 @@ import (
 	"github.com/haleyrc/cheevos/lib/json"
 	"github.com/haleyrc/cheevos/lib/web"
 	"github.com/haleyrc/cheevos/roster"
+	"github.com/haleyrc/cheevos/server/authz"
 )
 
 type CheevosServer struct {
-	Authz   AuthorizationService
+	Authz   authz.Service
 	Cheevos cheevos.Service
 	Roster  roster.Service
 }
