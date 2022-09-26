@@ -8,6 +8,7 @@ import (
 )
 
 type Invitation struct {
+	ID             string
 	Email          string
 	OrganizationID string
 	Expires        time.Time
@@ -24,6 +25,10 @@ func (i *Invitation) Normalize() {
 
 func (i *Invitation) Validate() error {
 	i.Normalize()
+
+	if i.ID == "" {
+		return fmt.Errorf("invalid: id is blank")
+	}
 
 	if i.Email == "" {
 		return fmt.Errorf("invalid: email is blank")

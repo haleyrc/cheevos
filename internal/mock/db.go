@@ -2,7 +2,6 @@ package mock
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/haleyrc/cheevos/lib/db"
 )
@@ -24,5 +23,4 @@ func (db *Database) Exec(ctx context.Context, query string, args ...interface{})
 func (db *Database) QueryRow(ctx context.Context, query string, args ...interface{}) db.Row {
 	panic("mock/Database.QueryRow is a placeholder. If you are seeing this error," +
 		" you are attempting to call low-level database methods from the wrong place.")
-	return &sql.Row{}
 }

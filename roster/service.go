@@ -20,24 +20,38 @@ type Emailer interface {
 	SendInvitation(ctx context.Context, email, code string) error
 }
 
+type InvitationsRepository interface {
+	CreateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
+	DeleteInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) error
+	GetInvitation(ctx context.Context, tx db.Tx, i *Invitation, id string) error
+	GetInvitationByCode(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
+	SaveInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
+}
+
+type MembershipsRepository interface {
+	CreateMembership(ctx context.Context, tx db.Tx, m *Membership) error
+	GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error
+}
+
+type OrganizationsRepository interface {
+	CreateOrganization(ctx context.Context, tx db.Tx, org *Organization) error
+}
+
 type Service struct {
 	DB    db.Database
 	Email Emailer
 	Repo  interface {
-		CreateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
-		CreateMembership(ctx context.Context, tx db.Tx, m *Membership) error
-		CreateOrganization(ctx context.Context, tx db.Tx, org *Organization) error
-		DeleteInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) error
-		GetInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) (*Invitation, error)
-		SaveInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
+		InvitationsRepository
+		MembershipsRepository
+		OrganizationsRepository
 	}
 }
 
 func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) error {
+	var invitation Invitation
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		hashedCode := hash.Generate(code)
-		invitation, err := svc.Repo.GetInvitationByCode(ctx, tx, hashedCode)
-		if err != nil {
+		if err := svc.Repo.GetInvitationByCode(ctx, tx, &invitation, hashedCode); err != nil {
 			return err
 		}
 
@@ -114,6 +128,17 @@ func (svc *Service) DeclineInvitation(ctx context.Context, code string) error {
 	return nil
 }
 
+func (svc *Service) GetInvitation(ctx context.Context, id string) (*Invitation, error) {
+	var invitation *Invitation
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+		return svc.Repo.GetInvitation(ctx, tx, invitation, id)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("get invitation failed: %w", err)
+	}
+	return invitation, nil
+}
+
 func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
 	var invitation *Invitation
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
@@ -121,6 +146,7 @@ func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID s
 		hashedCode := hash.Generate(code)
 
 		invitation = &Invitation{
+			ID:             uuid.New(),
 			Email:          email,
 			OrganizationID: orgID,
 			Expires:        time.Now().Add(InvitationValidFor),
@@ -142,14 +168,22 @@ func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID s
 	return invitation, nil
 }
 
+func (svc *Service) IsMember(ctx context.Context, orgID, userID string) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+		return svc.Repo.GetMember(ctx, tx, &Membership{}, orgID, userID)
+	})
+	if err != nil {
+		return fmt.Errorf("is member failed: %w", err)
+	}
+	return nil
+}
+
 // Refreshing an invitation will invalidate the initial invitation email (as
 // well as any other refresh emails).
-func (svc *Service) RefreshInvitation(ctx context.Context, code string) error {
+func (svc *Service) RefreshInvitation(ctx context.Context, id string) (*Invitation, error) {
+	var invitation Invitation
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		hashedCode := hash.Generate(code)
-
-		invitation, err := svc.Repo.GetInvitationByCode(ctx, tx, hashedCode)
-		if err != nil {
+		if err := svc.Repo.GetInvitation(ctx, tx, &invitation, id); err != nil {
 			return err
 		}
 
@@ -157,15 +191,15 @@ func (svc *Service) RefreshInvitation(ctx context.Context, code string) error {
 		newCodeHash := hash.Generate(newCode)
 		invitation.Expires = time.Now().Add(InvitationValidFor)
 
-		if err := svc.Repo.SaveInvitation(ctx, tx, invitation, newCodeHash); err != nil {
+		if err := svc.Repo.SaveInvitation(ctx, tx, &invitation, newCodeHash); err != nil {
 			return err
 		}
 
 		return svc.Email.SendInvitation(ctx, invitation.Email, newCode)
 	})
 	if err != nil {
-		return fmt.Errorf("refresh invitation failed: %w", err)
+		return nil, fmt.Errorf("refresh invitation failed: %w", err)
 	}
 
-	return nil
+	return &invitation, nil
 }

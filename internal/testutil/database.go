@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"testing"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -13,14 +14,16 @@ import (
 
 var db *Database
 
-func TestDatabase(ctx context.Context) *Database {
+func TestDatabase(ctx context.Context, t *testing.T) *Database {
+	t.Helper()
+
 	if db != nil {
 		return db
 	}
 
 	url := os.Getenv("TEST_DATABASE_URL")
 	if url == "" {
-		panic("failed to connect to test database: TEST_DATABASE_URL is not set")
+		t.Skip("Test was skipped because TEST_DATABASE_URL is not set.")
 	}
 
 	sqlxDB, err := sqlx.ConnectContext(ctx, "postgres", url)

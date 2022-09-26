@@ -10,11 +10,20 @@ import (
 	"github.com/haleyrc/cheevos/lib/time"
 )
 
+type AwardsRepository interface {
+	CreateAward(ctx context.Context, tx db.Tx, award *Award) error
+}
+
+type CheevosRepository interface {
+	CreateCheevo(ctx context.Context, tx db.Tx, cheevo *Cheevo) error
+	GetCheevo(ctx context.Context, tx db.Tx, cheevo *Cheevo, id string) error
+}
+
 type Service struct {
 	DB   db.Database
 	Repo interface {
-		CreateAward(ctx context.Context, tx db.Tx, award *Award) error
-		CreateCheevo(ctx context.Context, tx db.Tx, cheevo *Cheevo) error
+		AwardsRepository
+		CheevosRepository
 	}
 }
 
@@ -47,9 +56,10 @@ func (cs *Service) CreateCheevo(ctx context.Context, name, description, orgID st
 	var cheevo *Cheevo
 	err := cs.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		cheevo = &Cheevo{
-			ID:          uuid.New(),
-			Name:        name,
-			Description: description,
+			ID:             uuid.New(),
+			Name:           name,
+			Description:    description,
+			OrganizationID: orgID,
 		}
 		if err := cheevo.Validate(); err != nil {
 			return err
@@ -62,4 +72,17 @@ func (cs *Service) CreateCheevo(ctx context.Context, name, description, orgID st
 	}
 
 	return cheevo, nil
+}
+
+func (cs *Service) GetCheevo(ctx context.Context, id string) (*Cheevo, error) {
+	var cheevo Cheevo
+
+	err := cs.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+		return cs.Repo.GetCheevo(ctx, tx, &cheevo, id)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("get cheevo failed: %w", err)
+	}
+
+	return &cheevo, nil
 }

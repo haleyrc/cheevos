@@ -8,6 +8,7 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos/internal/mock"
+	"github.com/haleyrc/cheevos/internal/testutil"
 	"github.com/haleyrc/cheevos/lib/db"
 	"github.com/haleyrc/cheevos/lib/time"
 	"github.com/haleyrc/cheevos/roster"
@@ -17,15 +18,13 @@ func TestAcceptingAnInvitationFailsIfTheInvitationIsExpired(t *testing.T) {
 	var (
 		ctx = context.Background()
 
-		inv = &roster.Invitation{Expires: time.Now().Sub(time.Hour)}
-
 		code   = "code"
 		userID = uuid.New()
 
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, _ string) (*roster.Invitation, error) { return inv, nil },
+			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
 		}
 
 		svc = roster.Service{
@@ -51,17 +50,19 @@ func TestAcceptingAnInvitationSucceeds(t *testing.T) {
 	var (
 		ctx = context.Background()
 
-		orgID = uuid.New()
-		inv   = &roster.Invitation{OrganizationID: orgID, Expires: time.Now().Add(time.Hour)}
-
 		code   = "code"
+		orgID  = uuid.New()
 		userID = uuid.New()
 
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			CreateMembershipFn:       func(_ context.Context, _ db.Tx, _ *roster.Membership) error { return nil },
-			GetInvitationByCodeFn:    func(_ context.Context, _ db.Tx, _ string) (*roster.Invitation, error) { return inv, nil },
+			CreateMembershipFn: func(_ context.Context, _ db.Tx, _ *roster.Membership) error { return nil },
+			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, inv *roster.Invitation, _ string) error {
+				inv.OrganizationID = orgID
+				inv.Expires = time.Now().Add(time.Hour)
+				return nil
+			},
 			DeleteInvitationByCodeFn: func(_ context.Context, _ db.Tx, _ string) error { return nil },
 		}
 
@@ -175,7 +176,10 @@ func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeSav
 
 	_, err := svc.InviteUserToOrganization(ctx, email, orgID)
 	if err == nil {
-		t.Errorf("Expected to service to return an error, but it didn't.")
+		t.Fatal("Expected to service to return an error, but it didn't.")
+	}
+	if ok := testutil.CompareError(t, "oops", err); !ok {
+		t.FailNow()
 	}
 
 	if repo.CreateInvitationCalled.Count != 1 {
@@ -266,11 +270,7 @@ func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *t
 	var (
 		ctx = context.Background()
 
-		email = "test@example.com"
-		now   = time.Now()
-		orgID = uuid.New()
-		inv   = &roster.Invitation{Email: email, OrganizationID: orgID, Expires: now}
-		code  = "code"
+		code = "code"
 
 		mockDB = &mock.Database{}
 
@@ -279,7 +279,7 @@ func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *t
 		}
 
 		repo = &mock.Repository{
-			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, _ string) (*roster.Invitation, error) { return inv, nil },
+			GetInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
 			SaveInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error {
 				return fmt.Errorf("oops")
 			},
@@ -292,16 +292,19 @@ func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *t
 		}
 	)
 
-	err := svc.RefreshInvitation(ctx, code)
+	_, err := svc.RefreshInvitation(ctx, code)
 	if err == nil {
-		t.Error("Expected service to return an error, but it didn't.")
+		t.Fatal("Expected service to return an error, but it didn't.")
+	}
+	if ok := testutil.CompareError(t, "oops", err); !ok {
+		t.FailNow()
 	}
 
-	if repo.GetInvitationByCodeCalled.Count != 1 {
-		t.Errorf("Expected repository to receive GetInvitationByCode, but it didn't.")
+	if repo.GetInvitationCalled.Count != 1 {
+		t.Errorf("Expected repository to receive GetInvitation, but it didn't.")
 	}
 	if repo.SaveInvitationCalled.Count != 1 {
-		t.Errorf("Expected repository to receive GetInvitationByCode, but it didn't.")
+		t.Errorf("Expected repository to receive GetInvitation, but it didn't.")
 	}
 	if emailer.SendInvitationCalled.Count != 0 {
 		t.Errorf("Expected emailer not to receive SendInvitation, but it did.")
@@ -315,7 +318,6 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 		email = "test@example.com"
 		now   = time.Now()
 		orgID = uuid.New()
-		inv   = &roster.Invitation{Email: email, OrganizationID: orgID, Expires: now}
 		code  = "code"
 
 		mockDB = &mock.Database{}
@@ -325,8 +327,12 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 		}
 
 		repo = &mock.Repository{
-			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, _ string) (*roster.Invitation, error) { return inv, nil },
-			SaveInvitationFn:      func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
+			GetInvitationFn: func(_ context.Context, _ db.Tx, inv *roster.Invitation, _ string) error {
+				inv.Email = email
+				inv.OrganizationID = orgID
+				return nil
+			},
+			SaveInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
 		}
 
 		svc = roster.Service{
@@ -336,23 +342,20 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 		}
 	)
 
-	err := svc.RefreshInvitation(ctx, code)
+	_, err := svc.RefreshInvitation(ctx, code)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if repo.GetInvitationByCodeCalled.Count != 1 {
-		t.Errorf("Expected repository to receive GetInvitationByCode, but it didn't.")
+	if repo.GetInvitationCalled.Count != 1 {
+		t.Errorf("Expected repository to receive GetInvitation, but it didn't.")
 	}
-	if repo.GetInvitationByCodeCalled.With.Code == "" {
-		t.Errorf("Expected repository.GetInvitationByCode to receive a hashed code, but it didn't.")
-	}
-	if repo.GetInvitationByCodeCalled.With.Code == code {
-		t.Errorf("Expected repository.GetInvitationByCode not to receive a plaintext code, but it did.")
+	if repo.GetInvitationCalled.With.ID == "" {
+		t.Errorf("Expected repository.GetInvitation to receive an id, but it didn't.")
 	}
 
 	if repo.SaveInvitationCalled.Count != 1 {
-		t.Errorf("Expected repository to receive GetInvitationByCode, but it didn't.")
+		t.Errorf("Expected repository to receive SaveInvitation, but it didn't.")
 	}
 	if repo.SaveInvitationCalled.With.Invitation.Email != email {
 		t.Errorf(

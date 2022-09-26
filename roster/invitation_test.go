@@ -21,20 +21,24 @@ func TestValidatingAnInvitation(t *testing.T) {
 		input roster.Invitation
 		err   string
 	}{
+		"returns an error for a missing id": {
+			input: roster.Invitation{ID: "", Email: "email", OrganizationID: "orgid", Expires: time.Now()},
+			err:   "id is blank",
+		},
 		"returns an error for a missing email": {
-			input: roster.Invitation{Email: "", OrganizationID: "orgid", Expires: time.Now()},
+			input: roster.Invitation{ID: "id", Email: "", OrganizationID: "orgid", Expires: time.Now()},
 			err:   "email is blank",
 		},
 		"returns an error for a missing organization id": {
-			input: roster.Invitation{Email: "email", OrganizationID: "", Expires: time.Now()},
+			input: roster.Invitation{ID: "id", Email: "email", OrganizationID: "", Expires: time.Now()},
 			err:   "organization id is blank",
 		},
 		"returns an error for a missing expiration": {
-			input: roster.Invitation{Email: "email", OrganizationID: "orgid"},
+			input: roster.Invitation{ID: "id", Email: "email", OrganizationID: "orgid"},
 			err:   "expires is blank",
 		},
 		"returns nil for a valid invitation": {
-			input: roster.Invitation{Email: "email", OrganizationID: "orgid", Expires: time.Now()},
+			input: roster.Invitation{ID: "id", Email: "email", OrganizationID: "orgid", Expires: time.Now()},
 			err:   "",
 		},
 	}
