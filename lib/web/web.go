@@ -5,48 +5,32 @@ import (
 	"net/http"
 )
 
-type Response interface{}
-
-type ServerFunc func(w http.ResponseWriter, r *http.Request) (Response, error)
-
-func ResponseHandler(f ServerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		resp, err := f(w, r)
-		if err != nil {
-			handleError(w, err)
-			return
-		}
-		handleResponse(w, resp)
-	}
+type Coded interface {
+	Code() int
 }
+
+type Data interface{}
 
 type Error struct {
 	Message string `json:"message"`
 }
 
-type errorResponse struct {
-	Error Error `json:"error"`
+type Response struct {
+	Error *Error      `json:"error,omitempty"`
+	Data  interface{} `json:"data,omitempty"`
 }
 
-func handleError(w http.ResponseWriter, err error) {
-	code := errorCode(err)
-	respondWithJSON(w, code, errorResponse{
-		Error: Error{Message: err.Error()},
-	})
-}
+type ServerFunc func(w http.ResponseWriter, r *http.Request) (Data, error)
 
-type successResponse struct {
-	Data interface{} `json:"data"`
-}
-
-func handleResponse(w http.ResponseWriter, data interface{}) {
-	respondWithJSON(w, http.StatusOK, successResponse{
-		Data: data,
-	})
-}
-
-type Coded interface {
-	Code() int
+func ResponseHandler(f ServerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data, err := f(w, r)
+		if err != nil {
+			handleError(w, err)
+			return
+		}
+		handleData(w, data)
+	}
 }
 
 func errorCode(err error) int {
@@ -57,6 +41,16 @@ func errorCode(err error) int {
 	return code
 }
 
+func handleError(w http.ResponseWriter, err error) {
+	code := errorCode(err)
+	respondWithJSON(w, code, Response{
+		Error: &Error{Message: err.Error()},
+	})
+}
+
+func handleData(w http.ResponseWriter, data interface{}) {
+	respondWithJSON(w, http.StatusOK, Response{Data: data})
+}
 func respondWithJSON(w http.ResponseWriter, code int, body interface{}) {
 	bytes, err := json.MarshalIndent(body, "", "  ")
 	if err != nil {

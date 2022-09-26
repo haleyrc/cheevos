@@ -20,7 +20,7 @@ type AcceptInvitationRequest struct {
 
 type AcceptInvitationResponse struct{}
 
-func (rs *RosterServer) AcceptInvitation(w http.ResponseWriter, r *http.Request) (web.Response, error) {
+func (rs *RosterServer) AcceptInvitation(w http.ResponseWriter, r *http.Request) (web.Data, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
@@ -45,7 +45,7 @@ type CreateOrganizationResponse struct {
 	Name string `json:"name"`
 }
 
-func (rs *RosterServer) CreateOrganization(w http.ResponseWriter, r *http.Request) (web.Response, error) {
+func (rs *RosterServer) CreateOrganization(w http.ResponseWriter, r *http.Request) (web.Data, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
@@ -73,7 +73,7 @@ type DeclineInvitationRequest struct {
 
 type DeclineInvitationResponse struct{}
 
-func (rs *RosterServer) DeclineInvitation(w http.ResponseWriter, r *http.Request) (web.Response, error) {
+func (rs *RosterServer) DeclineInvitation(w http.ResponseWriter, r *http.Request) (web.Data, error) {
 	ctx := r.Context()
 
 	var req DeclineInvitationRequest
@@ -97,7 +97,7 @@ type InviteUserToOrganizationResponse struct {
 	Expires time.Time `json:"expires"`
 }
 
-func (rs *RosterServer) InviteUserToOrganization(w http.ResponseWriter, r *http.Request) (web.Response, error) {
+func (rs *RosterServer) InviteUserToOrganization(w http.ResponseWriter, r *http.Request) (web.Data, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
@@ -131,7 +131,7 @@ type RefreshInvitationResponse struct {
 	Expires time.Time `json:"expires"`
 }
 
-func (rs *RosterServer) RefreshInvitation(w http.ResponseWriter, r *http.Request) (web.Response, error) {
+func (rs *RosterServer) RefreshInvitation(w http.ResponseWriter, r *http.Request) (web.Data, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 

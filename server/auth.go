@@ -22,7 +22,7 @@ type SignUpResponse struct {
 	Username string `json:"username"`
 }
 
-func (as *AuthServer) SignUp(w http.ResponseWriter, r *http.Request) (web.Response, error) {
+func (as *AuthServer) SignUp(w http.ResponseWriter, r *http.Request) (web.Data, error) {
 	ctx := r.Context()
 
 	var req SignUpRequest

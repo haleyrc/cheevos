@@ -25,7 +25,7 @@ type AwardCheevoResponse struct {
 	RecipientID string `json:"recipientID"`
 }
 
-func (cs *CheevosServer) AwardCheevo(w http.ResponseWriter, r *http.Request) (web.Response, error) {
+func (cs *CheevosServer) AwardCheevo(w http.ResponseWriter, r *http.Request) (web.Data, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
@@ -59,7 +59,7 @@ type CreateCheevoResponse struct {
 	OrganizationID string `json:"organizationID"`
 }
 
-func (cs *CheevosServer) CreateCheevo(w http.ResponseWriter, r *http.Request) (web.Response, error) {
+func (cs *CheevosServer) CreateCheevo(w http.ResponseWriter, r *http.Request) (web.Data, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
@@ -98,7 +98,7 @@ type GetCheevoResponse struct {
 	OrganizationID string `json:"organizationID"`
 }
 
-func (cs *CheevosServer) GetCheevo(w http.ResponseWriter, r *http.Request) (web.Response, error) {
+func (cs *CheevosServer) GetCheevo(w http.ResponseWriter, r *http.Request) (web.Data, error) {
 	ctx := r.Context()
 	currentUser := GetCurrentUser(ctx)
 
