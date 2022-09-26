@@ -8,9 +8,18 @@ import (
 	"github.com/haleyrc/cheevos/roster"
 )
 
+type CheevosService interface {
+	GetCheevo(ctx context.Context, id string) (*cheevos.Cheevo, error)
+}
+
+type RosterService interface {
+	GetInvitation(ctx context.Context, id string) (*roster.Invitation, error)
+	IsMember(ctx context.Context, orgID, userID string) error
+}
+
 type Service struct {
-	Cheevos cheevos.Service
-	Roster  roster.Service
+	Cheevos CheevosService
+	Roster  RosterService
 }
 
 func (svc *Service) CanAwardCheevo(ctx context.Context, fromUserID, toUserID, cheevoID string) error {

@@ -3,17 +3,14 @@ package server
 import (
 	"net/http"
 
-	"github.com/haleyrc/cheevos/cheevos"
 	"github.com/haleyrc/cheevos/lib/json"
 	"github.com/haleyrc/cheevos/lib/web"
-	"github.com/haleyrc/cheevos/roster"
-	"github.com/haleyrc/cheevos/server/authz"
 )
 
 type CheevosServer struct {
-	Authz   authz.Service
-	Cheevos cheevos.Service
-	Roster  roster.Service
+	Authz   AuthorizationService
+	Cheevos CheevosService
+	Roster  RosterService
 }
 
 type AwardCheevoRequest struct {

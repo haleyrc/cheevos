@@ -6,13 +6,11 @@ import (
 	"github.com/haleyrc/cheevos/lib/json"
 	"github.com/haleyrc/cheevos/lib/time"
 	"github.com/haleyrc/cheevos/lib/web"
-	"github.com/haleyrc/cheevos/roster"
-	"github.com/haleyrc/cheevos/server/authz"
 )
 
 type RosterServer struct {
-	Authz  authz.Service
-	Roster roster.Service
+	Authz  AuthorizationService
+	Roster RosterService
 }
 
 type AcceptInvitationRequest struct {

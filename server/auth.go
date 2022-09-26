@@ -3,13 +3,12 @@ package server
 import (
 	"net/http"
 
-	"github.com/haleyrc/cheevos/auth"
 	"github.com/haleyrc/cheevos/lib/json"
 	"github.com/haleyrc/cheevos/lib/web"
 )
 
 type AuthServer struct {
-	Auth auth.Service
+	Auth AuthenticationService
 }
 
 type SignUpRequest struct {
