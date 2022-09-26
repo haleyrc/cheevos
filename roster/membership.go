@@ -8,7 +8,8 @@ import (
 
 type Membership struct {
 	OrganizationID string
-	UserID         string
+
+	UserID string
 
 	Joined time.Time
 }

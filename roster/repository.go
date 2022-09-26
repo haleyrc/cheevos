@@ -61,7 +61,7 @@ func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, i *In
 	return nil
 }
 
-func (repo *Repository) GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error {
+func (repo *Repository) GetMembership(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error {
 	query := `SELECT organization_id, user_id, joined_at FROM memberships WHERE organization_id = $1 AND user_id = $2;`
 	if err := tx.QueryRow(ctx, query, orgID, userID).Scan(&m.OrganizationID, &m.UserID, &m.Joined); err != nil {
 		return fmt.Errorf("get member failed: %w", err)
