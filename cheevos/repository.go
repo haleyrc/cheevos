@@ -7,6 +7,9 @@ import (
 	"github.com/haleyrc/cheevos/lib/db"
 )
 
+var _ AwardsRepository = &Repository{}
+var _ CheevosRepository = &Repository{}
+
 type Repository struct{}
 
 func (repo *Repository) CreateAward(ctx context.Context, tx db.Tx, award *Award) error {

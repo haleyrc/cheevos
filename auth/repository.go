@@ -7,6 +7,8 @@ import (
 	"github.com/haleyrc/cheevos/lib/db"
 )
 
+var _ UsersRepository = &Repository{}
+
 type Repository struct{}
 
 func (repo *Repository) CreateUser(ctx context.Context, tx db.Tx, u *User, hashedPassword string) error {

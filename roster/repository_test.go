@@ -11,10 +11,6 @@ import (
 	"github.com/haleyrc/cheevos/roster"
 )
 
-func TestRepositoryIsARepository(t *testing.T) {
-	_ = &roster.Service{Repo: &roster.Repository{}}
-}
-
 func TestCreateInvitationCreateAnInvitation(t *testing.T) {
 	var (
 		ctx = context.Background()
