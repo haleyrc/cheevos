@@ -32,7 +32,7 @@ cheevos they received from the organization are also removed.
 - [X] Add award logger
 - [X] Add membership logger
 - [ ] Replace raw errors with error types
-- [ ] Handlers
+- [X] Handlers
 - [X] Database
 - [ ] Consistent variable naming after context merge
 - [ ] Alphabetize methods
