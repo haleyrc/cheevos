@@ -14,8 +14,8 @@ var _ OrganizationsRepository = &Repository{}
 type Repository struct{}
 
 func (repo *Repository) CreateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error {
-	query := `INSERT INTO invitations (email, organization_id, expires_at, hashed_code) VALUES ($1, $2, $3, $4);`
-	if err := tx.Exec(ctx, query, i.Email, i.OrganizationID, i.Expires, hashedCode); err != nil {
+	query := `INSERT INTO invitations (id, email, organization_id, expires_at, hashed_code) VALUES ($1, $2, $3, $4, $5);`
+	if err := tx.Exec(ctx, query, i.ID, i.Email, i.OrganizationID, i.Expires, hashedCode); err != nil {
 		return fmt.Errorf("create invitation failed: %w", err)
 	}
 	return nil
@@ -61,7 +61,7 @@ func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, i *In
 	return nil
 }
 
-func (repo *Repository) GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error {
+func (repo *Repository) GetMembership(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error {
 	query := `SELECT organization_id, user_id, joined_at FROM memberships WHERE organization_id = $1 AND user_id = $2;`
 	if err := tx.QueryRow(ctx, query, orgID, userID).Scan(&m.OrganizationID, &m.UserID, &m.Joined); err != nil {
 		return fmt.Errorf("get member failed: %w", err)

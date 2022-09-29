@@ -15,7 +15,7 @@ func TestLoggerLogsAnErrorFromAcceptInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	il := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			AcceptInvitationFn: func(_ context.Context, _, _ string) error { return fmt.Errorf("oops") },
 		},
 		Logger: logger,
@@ -32,7 +32,7 @@ func TestLoggerLogsTheResponseFromAcceptInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	il := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			AcceptInvitationFn: func(_ context.Context, _, _ string) error { return nil },
 		},
 		Logger: logger,
@@ -49,7 +49,7 @@ func TestLoggerLogsAnErrorFromDeclineInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	il := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			DeclineInvitationFn: func(_ context.Context, _ string) error { return fmt.Errorf("oops") },
 		},
 		Logger: logger,
@@ -66,7 +66,7 @@ func TestLoggerLogsTheResponseFromDeclineInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	il := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			DeclineInvitationFn: func(_ context.Context, _ string) error { return nil },
 		},
 		Logger: logger,
@@ -83,7 +83,7 @@ func TestLoggerLogsAnErrorFromInviteUserToOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	il := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			InviteUserToOrganizationFn: func(_ context.Context, _, _ string) (*roster.Invitation, error) { return nil, fmt.Errorf("oops") },
 		},
 		Logger: logger,
@@ -107,7 +107,7 @@ func TestLoggerLogsTheResponseFromInviteUserToOrganization(t *testing.T) {
 	}
 
 	il := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			InviteUserToOrganizationFn: func(_ context.Context, _, _ string) (*roster.Invitation, error) { return inv, nil },
 		},
 		Logger: logger,
@@ -124,7 +124,7 @@ func TestLoggerLogsAnErrorFromRefreshInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	il := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			RefreshInvitationFn: func(_ context.Context, _ string) error { return fmt.Errorf("oops") },
 		},
 		Logger: logger,
@@ -141,7 +141,7 @@ func TestLoggerLogsTheResponseFromRefreshInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	il := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			RefreshInvitationFn: func(_ context.Context, _ string) error { return nil },
 		},
 		Logger: logger,
@@ -158,7 +158,7 @@ func TestLoggerLogsAnErrorFromAddMemberToOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	ml := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			AddMemberToOrganizationFn: func(ctx context.Context, userID, orgID string) error { return fmt.Errorf("oops") },
 		},
 		Logger: logger,
@@ -175,7 +175,7 @@ func TestLoggerLogsTheResponseFromAddMemberToOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	ml := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			AddMemberToOrganizationFn: func(ctx context.Context, userID, orgID string) error { return nil },
 		},
 		Logger: logger,
@@ -192,7 +192,7 @@ func TestLoggerLogsAnErrorFromCreateOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	ol := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			CreateOrganizationFn: func(_ context.Context, name, ownerID string) (*roster.Organization, error) {
 				return nil, fmt.Errorf("oops")
 			},
@@ -211,7 +211,7 @@ func TestLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	ol := &roster.Logger{
-		Svc: &mock.RosterService{
+		Service: &mock.RosterService{
 			CreateOrganizationFn: func(_ context.Context, name, ownerID string) (*roster.Organization, error) {
 				return &roster.Organization{ID: "id", Name: "name", OwnerID: "ownerid"}, nil
 			},

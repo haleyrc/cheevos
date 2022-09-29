@@ -14,7 +14,7 @@ func TestLoggerLogsAnErrorFromAwardCheevoToUser(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	al := &cheevos.Logger{
-		Svc: &mock.CheevosService{
+		Service: &mock.CheevosService{
 			AwardCheevoToUserFn: func(_ context.Context, _, _ string) error { return fmt.Errorf("oops") },
 		},
 		Logger: logger,
@@ -31,7 +31,7 @@ func TestLoggerLogsTheResponseFromFromAwardCheevoToUser(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	al := &cheevos.Logger{
-		Svc: &mock.CheevosService{
+		Service: &mock.CheevosService{
 			AwardCheevoToUserFn: func(_ context.Context, _, _ string) error { return nil },
 		},
 		Logger: logger,
@@ -48,7 +48,7 @@ func TestLoggerLogsAnErrorFromCreateCheevo(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	cl := &cheevos.Logger{
-		Svc: &mock.CheevosService{
+		Service: &mock.CheevosService{
 			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*cheevos.Cheevo, error) {
 				return nil, fmt.Errorf("oops")
 			},
@@ -67,7 +67,7 @@ func TestLoggerLogsTheResponseFromCreateCheevo(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	cl := &cheevos.Logger{
-		Svc: &mock.CheevosService{
+		Service: &mock.CheevosService{
 			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*cheevos.Cheevo, error) {
 				return &cheevos.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: "orgid"}, nil
 			},

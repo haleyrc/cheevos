@@ -7,24 +7,24 @@ import (
 )
 
 type Logger struct {
-	Svc interface {
+	Logger  logger.Logger
+	Service interface {
 		SignUp(ctx context.Context, username, password string) (*User, error)
 	}
-	Logger logger.Logger
 }
 
-func (ul *Logger) SignUp(ctx context.Context, username, password string) (*User, error) {
-	ul.Logger.Debug(ctx, "signing up user", logger.Fields{
+func (l *Logger) SignUp(ctx context.Context, username, password string) (*User, error) {
+	l.Logger.Debug(ctx, "signing up user", logger.Fields{
 		"Username": username,
 	})
 
-	user, err := ul.Svc.SignUp(ctx, username, password)
+	user, err := l.Service.SignUp(ctx, username, password)
 	if err != nil {
-		ul.Logger.Error(ctx, "sign up failed", err)
+		l.Logger.Error(ctx, "sign up failed", err)
 		return nil, err
 	}
 
-	ul.Logger.Log(ctx, "user signed up", logger.Fields{
+	l.Logger.Log(ctx, "user signed up", logger.Fields{
 		"User": user,
 	})
 

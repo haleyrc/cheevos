@@ -14,7 +14,7 @@ func TestLoggerLogsAnErrorFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	cl := &auth.Logger{
-		Svc: &mock.AuthService{
+		Service: &mock.AuthService{
 			SignUpFn: func(_ context.Context, _, _ string) (*auth.User, error) {
 				return nil, fmt.Errorf("oops")
 			},
@@ -33,7 +33,7 @@ func TestLoggerLogsTheResponseFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
 	cl := &auth.Logger{
-		Svc: &mock.AuthService{
+		Service: &mock.AuthService{
 			SignUpFn: func(_ context.Context, _, _ string) (*auth.User, error) {
 				return &auth.User{ID: "id", Username: "username"}, nil
 			},

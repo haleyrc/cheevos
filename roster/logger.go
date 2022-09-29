@@ -7,7 +7,8 @@ import (
 )
 
 type Logger struct {
-	Svc interface {
+	Logger  logger.Logger
+	Service interface {
 		AcceptInvitation(ctx context.Context, userID, code string) error
 		AddMemberToOrganization(ctx context.Context, userID, orgID string) error
 		CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error)
@@ -15,7 +16,6 @@ type Logger struct {
 		InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error)
 		RefreshInvitation(ctx context.Context, code string) error
 	}
-	Logger logger.Logger
 }
 
 func (l *Logger) AcceptInvitation(ctx context.Context, userID, code string) error {
@@ -24,7 +24,7 @@ func (l *Logger) AcceptInvitation(ctx context.Context, userID, code string) erro
 		"User": userID,
 	})
 
-	if err := l.Svc.AcceptInvitation(ctx, userID, code); err != nil {
+	if err := l.Service.AcceptInvitation(ctx, userID, code); err != nil {
 		l.Logger.Error(ctx, "accept invitation failed", err)
 		return err
 	}
@@ -43,7 +43,7 @@ func (l *Logger) AddMemberToOrganization(ctx context.Context, userID, orgID stri
 		"User":         userID,
 	})
 
-	if err := l.Svc.AddMemberToOrganization(ctx, userID, orgID); err != nil {
+	if err := l.Service.AddMemberToOrganization(ctx, userID, orgID); err != nil {
 		l.Logger.Error(ctx, "add member to organization failed", err)
 		return err
 	}
@@ -62,7 +62,7 @@ func (l *Logger) CreateOrganization(ctx context.Context, name, ownerID string) (
 		"Owner": ownerID,
 	})
 
-	org, err := l.Svc.CreateOrganization(ctx, name, ownerID)
+	org, err := l.Service.CreateOrganization(ctx, name, ownerID)
 	if err != nil {
 		l.Logger.Error(ctx, "create organization failed", err)
 		return nil, err
@@ -80,7 +80,7 @@ func (l *Logger) DeclineInvitation(ctx context.Context, code string) error {
 		"Code": code,
 	})
 
-	if err := l.Svc.DeclineInvitation(ctx, code); err != nil {
+	if err := l.Service.DeclineInvitation(ctx, code); err != nil {
 		l.Logger.Error(ctx, "decline invitation failed", err)
 		return err
 	}
@@ -98,7 +98,7 @@ func (l *Logger) InviteUserToOrganization(ctx context.Context, email, orgID stri
 		"Organization": orgID,
 	})
 
-	invitation, err := l.Svc.InviteUserToOrganization(ctx, email, orgID)
+	invitation, err := l.Service.InviteUserToOrganization(ctx, email, orgID)
 	if err != nil {
 		l.Logger.Error(ctx, "invite user to organization failed", err)
 		return nil, err
@@ -116,7 +116,7 @@ func (l *Logger) RefreshInvitation(ctx context.Context, code string) error {
 		"Code": code,
 	})
 
-	if err := l.Svc.RefreshInvitation(ctx, code); err != nil {
+	if err := l.Service.RefreshInvitation(ctx, code); err != nil {
 		l.Logger.Error(ctx, "refresh invitation failed", err)
 		return err
 	}

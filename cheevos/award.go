@@ -8,8 +8,10 @@ import (
 
 type Award struct {
 	CheevoID string
-	UserID   string
-	Awarded  time.Time
+
+	UserID string
+
+	Awarded time.Time
 }
 
 func (a *Award) Validate() error {

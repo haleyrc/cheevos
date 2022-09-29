@@ -56,7 +56,7 @@ type GetInvitationByCodeArgs struct {
 	Code string
 }
 
-type GetMemberArgs struct {
+type GetMembershipArgs struct {
 	OrganizationID string
 	UserID         string
 }
@@ -131,10 +131,10 @@ type Repository struct {
 		With  GetInvitationByCodeArgs
 	}
 
-	GetMemberFn     func(ctx context.Context, tx db.Tx, m *roster.Membership, orgID, userID string) error
-	GetMemberCalled struct {
+	GetMembershipFn     func(ctx context.Context, tx db.Tx, m *roster.Membership, orgID, userID string) error
+	GetMembershipCalled struct {
 		Count int
-		With  GetMemberArgs
+		With  GetMembershipArgs
 	}
 
 	GetUserFn     func(ctx context.Context, tx db.Tx, u *auth.User, id string) error
@@ -240,13 +240,13 @@ func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, i *ro
 	return repo.GetInvitationByCodeFn(ctx, tx, i, code)
 }
 
-func (repo *Repository) GetMember(ctx context.Context, tx db.Tx, m *roster.Membership, orgID, userID string) error {
-	if repo.GetMemberFn == nil {
-		return mockMethodNotDefined("GetMember")
+func (repo *Repository) GetMembership(ctx context.Context, tx db.Tx, m *roster.Membership, orgID, userID string) error {
+	if repo.GetMembershipFn == nil {
+		return mockMethodNotDefined("GetMembership")
 	}
-	repo.GetMemberCalled.Count++
-	repo.GetMemberCalled.With = GetMemberArgs{OrganizationID: orgID, UserID: userID}
-	return repo.GetMemberFn(ctx, tx, m, orgID, userID)
+	repo.GetMembershipCalled.Count++
+	repo.GetMembershipCalled.With = GetMembershipArgs{OrganizationID: orgID, UserID: userID}
+	return repo.GetMembershipFn(ctx, tx, m, orgID, userID)
 }
 
 func (repo *Repository) GetUser(ctx context.Context, tx db.Tx, u *auth.User, id string) error {

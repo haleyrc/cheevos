@@ -8,15 +8,17 @@ import (
 )
 
 type Invitation struct {
-	ID             string
-	Email          string
+	ID string
+
+	Email string
+
 	OrganizationID string
-	Expires        time.Time
+
+	Expires time.Time
 }
 
 func (i *Invitation) Expired() bool {
-	now := time.Now()
-	return i.Expires.Before(now)
+	return i.Expires.Before(time.Now())
 }
 
 func (i *Invitation) Normalize() {

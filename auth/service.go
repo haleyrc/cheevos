@@ -15,7 +15,6 @@ type UsersRepository interface {
 	GetUser(ctx context.Context, tx db.Tx, u *User, id string) error
 }
 
-// Service represents the main entrypoint for managing user.
 type Service struct {
 	DB   db.Database
 	Repo interface {
@@ -23,11 +22,11 @@ type Service struct {
 	}
 }
 
-func (us *Service) GetUser(ctx context.Context, id string) (*User, error) {
+func (svc *Service) GetUser(ctx context.Context, id string) (*User, error) {
 	var user User
 
-	err := us.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		return us.Repo.GetUser(ctx, tx, &user, id)
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+		return svc.Repo.GetUser(ctx, tx, &user, id)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("get user failed: %w", err)
@@ -38,25 +37,22 @@ func (us *Service) GetUser(ctx context.Context, id string) (*User, error) {
 
 // SignUp creates a new user and persists it to the database. It returns a
 // response containing the new organization if successful.
-func (us *Service) SignUp(ctx context.Context, username, password string) (*User, error) {
-	var user *User
+func (svc *Service) SignUp(ctx context.Context, username, password string) (*User, error) {
+	var user User
 
-	err := us.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		user = &User{
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+		user = User{
 			ID:       uuid.New(),
 			Username: username,
 		}
 		if err := user.Validate(); err != nil {
 			return err
 		}
-
-		hashedPassword := hash.Generate(password)
-
-		return us.Repo.CreateUser(ctx, tx, user, hashedPassword)
+		return svc.Repo.CreateUser(ctx, tx, &user, hash.Generate(password))
 	})
 	if err != nil {
 		return nil, fmt.Errorf("sign up failed: %w", err)
 	}
 
-	return user, nil
+	return &user, nil
 }

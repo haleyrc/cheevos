@@ -12,9 +12,13 @@ import (
 	"github.com/haleyrc/cheevos/lib/time"
 )
 
-var InvitationValidFor = time.Hour
+var (
+	InvitationValidFor = time.Hour
+)
 
-const CodeLength = 32
+const (
+	CodeLength = 32
+)
 
 type Emailer interface {
 	SendInvitation(ctx context.Context, email, code string) error
@@ -30,7 +34,7 @@ type InvitationsRepository interface {
 
 type MembershipsRepository interface {
 	CreateMembership(ctx context.Context, tx db.Tx, m *Membership) error
-	GetMember(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error
+	GetMembership(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error
 }
 
 type OrganizationsRepository interface {
@@ -48,8 +52,9 @@ type Service struct {
 }
 
 func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) error {
-	var invitation Invitation
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+		var invitation Invitation
+
 		hashedCode := hash.Generate(code)
 		if err := svc.Repo.GetInvitationByCode(ctx, tx, &invitation, hashedCode); err != nil {
 			return err
@@ -84,9 +89,10 @@ func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) e
 // database. It returns a response containing the new organization if
 // successful.
 func (svc *Service) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
-	var org *Organization
+	var org Organization
+
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		org = &Organization{
+		org = Organization{
 			ID:      uuid.New(),
 			Name:    name,
 			OwnerID: ownerID,
@@ -94,6 +100,7 @@ func (svc *Service) CreateOrganization(ctx context.Context, name, ownerID string
 		if err := org.Validate(); err != nil {
 			return err
 		}
+
 		membership := &Membership{
 			OrganizationID: org.ID,
 			UserID:         ownerID,
@@ -103,7 +110,7 @@ func (svc *Service) CreateOrganization(ctx context.Context, name, ownerID string
 			return err
 		}
 
-		if err := svc.Repo.CreateOrganization(ctx, tx, org); err != nil {
+		if err := svc.Repo.CreateOrganization(ctx, tx, &org); err != nil {
 			return err
 		}
 
@@ -113,39 +120,37 @@ func (svc *Service) CreateOrganization(ctx context.Context, name, ownerID string
 		return nil, fmt.Errorf("create organization failed: %w", err)
 	}
 
-	return org, nil
+	return &org, nil
 }
 
 func (svc *Service) DeclineInvitation(ctx context.Context, code string) error {
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		hashedCode := hash.Generate(code)
-		return svc.Repo.DeleteInvitationByCode(ctx, tx, hashedCode)
+		return svc.Repo.DeleteInvitationByCode(ctx, tx, hash.Generate(code))
 	})
 	if err != nil {
 		return fmt.Errorf("decline invitation failed: %w", err)
 	}
-
 	return nil
 }
 
 func (svc *Service) GetInvitation(ctx context.Context, id string) (*Invitation, error) {
-	var invitation *Invitation
+	var invitation Invitation
+
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		return svc.Repo.GetInvitation(ctx, tx, invitation, id)
+		return svc.Repo.GetInvitation(ctx, tx, &invitation, id)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("get invitation failed: %w", err)
 	}
-	return invitation, nil
+
+	return &invitation, nil
 }
 
 func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
-	var invitation *Invitation
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		code := random.String(CodeLength)
-		hashedCode := hash.Generate(code)
+	var invitation Invitation
 
-		invitation = &Invitation{
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+		invitation = Invitation{
 			ID:             uuid.New(),
 			Email:          email,
 			OrganizationID: orgID,
@@ -155,7 +160,8 @@ func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID s
 			return err
 		}
 
-		if err := svc.Repo.CreateInvitation(ctx, tx, invitation, hashedCode); err != nil {
+		code := random.String(CodeLength)
+		if err := svc.Repo.CreateInvitation(ctx, tx, &invitation, hash.Generate(code)); err != nil {
 			return err
 		}
 
@@ -165,12 +171,12 @@ func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID s
 		return nil, fmt.Errorf("invite user to organization failed: %w", err)
 	}
 
-	return invitation, nil
+	return &invitation, nil
 }
 
 func (svc *Service) IsMember(ctx context.Context, orgID, userID string) error {
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		return svc.Repo.GetMember(ctx, tx, &Membership{}, orgID, userID)
+		return svc.Repo.GetMembership(ctx, tx, &Membership{}, orgID, userID)
 	})
 	if err != nil {
 		return fmt.Errorf("is member failed: %w", err)
@@ -182,16 +188,16 @@ func (svc *Service) IsMember(ctx context.Context, orgID, userID string) error {
 // well as any other refresh emails).
 func (svc *Service) RefreshInvitation(ctx context.Context, id string) (*Invitation, error) {
 	var invitation Invitation
+
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		if err := svc.Repo.GetInvitation(ctx, tx, &invitation, id); err != nil {
 			return err
 		}
 
-		newCode := random.String(CodeLength)
-		newCodeHash := hash.Generate(newCode)
 		invitation.Expires = time.Now().Add(InvitationValidFor)
 
-		if err := svc.Repo.SaveInvitation(ctx, tx, &invitation, newCodeHash); err != nil {
+		newCode := random.String(CodeLength)
+		if err := svc.Repo.SaveInvitation(ctx, tx, &invitation, hash.Generate(newCode)); err != nil {
 			return err
 		}
 
