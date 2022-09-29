@@ -3,9 +3,10 @@ package roster_test
 import (
 	"testing"
 
+	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/cheevos/lib/time"
 	"github.com/haleyrc/cheevos/roster"
+	"github.com/pborman/uuid"
 )
 
 func TestNormalizingAnInvitationNormalizesEmail(t *testing.T) {
@@ -16,33 +17,19 @@ func TestNormalizingAnInvitationNormalizesEmail(t *testing.T) {
 	}
 }
 
-func TestValidatingAnInvitation(t *testing.T) {
-	testcases := map[string]struct {
-		input roster.Invitation
-		err   string
-	}{
-		"returns an error for a missing id": {
-			input: roster.Invitation{ID: "", Email: "email", OrganizationID: "orgid", Expires: time.Now()},
-			err:   "id is blank",
-		},
-		"returns an error for a missing email": {
-			input: roster.Invitation{ID: "id", Email: "", OrganizationID: "orgid", Expires: time.Now()},
-			err:   "email is blank",
-		},
-		"returns an error for a missing organization id": {
-			input: roster.Invitation{ID: "id", Email: "email", OrganizationID: "", Expires: time.Now()},
-			err:   "organization id is blank",
-		},
-		"returns an error for a missing expiration": {
-			input: roster.Invitation{ID: "id", Email: "email", OrganizationID: "orgid"},
-			err:   "expires is blank",
-		},
-		"returns nil for a valid invitation": {
-			input: roster.Invitation{ID: "id", Email: "email", OrganizationID: "orgid", Expires: time.Now()},
-			err:   "",
-		},
+func TestInvitationValidationReturnsNilForAValidInvitation(t *testing.T) {
+	i := fake.Invitation(uuid.New())
+	if err := i.Validate(); err != nil {
+		t.Errorf("Expected validate to return nil, but got %v.", err)
 	}
-	for name, tc := range testcases {
-		testutil.RunValidationTests(t, name, &tc.input, tc.err)
-	}
+}
+
+func TestInvitationValidationReturnsAnErrorForAnInvalidInvitation(t *testing.T) {
+	var i roster.Invitation
+	testutil.RunValidationTests(t, &i, "validation failed: Invitation is invalid", map[string]string{
+		"ID":             "ID can't be blank.",
+		"Email":          "Email can't be blank.",
+		"OrganizationID": "Organization ID can't be blank.",
+		"Expires":        "Expiration time can't be blank.",
+	})
 }

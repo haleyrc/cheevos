@@ -3,31 +3,38 @@ package testutil
 import (
 	"strings"
 	"testing"
+
+	"github.com/haleyrc/cheevos/core"
 )
 
-type Validator interface {
-	Validate() error
-}
+type Validator interface{ Validate() error }
 
-func RunValidationTests(t *testing.T, name string, input Validator, err string) {
+func RunValidationTests(t *testing.T, v Validator, msg string, fieldErrors map[string]string) {
 	t.Helper()
-	t.Run(name, func(t *testing.T) {
-		t.Helper()
-		got := input.Validate()
-		if err == "" {
-			if got != nil {
-				t.Error("unexpected error:", got)
-			}
-			return
-		}
 
-		if got == nil {
-			t.Errorf("expected error, but got nil")
-			return
-		}
+	err := v.Validate()
+	if err == nil {
+		t.Fatal("Expected validate to return an error, but it didn't.")
+	}
 
-		CompareError(t, err, got)
-	})
+	if got := err.Error(); got != msg {
+		t.Errorf("Expected error to be %q, but got %q.", msg, got)
+	}
+
+	ve, ok := core.ValidationErrorFromError(err)
+	if !ok {
+		t.Fatalf("Expected error to be a validation error, but it was a(n) %T.", err)
+	}
+
+	for name, msg := range fieldErrors {
+		got, ok := ve.Fields[name]
+		if !ok {
+			t.Fatalf("Expected field errors to include %s, but they didn't.", name)
+		}
+		if got != msg {
+			t.Errorf("Expected field error to be %q, but got %q.", msg, got)
+		}
+	}
 }
 
 func CompareError(t *testing.T, want string, got error) bool {

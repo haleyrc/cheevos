@@ -78,4 +78,4 @@ func TestValidationErrorReturnsAnErrorWithFieldErrors(t *testing.T) {
 
 type testModel string
 
-func (tm testModel) Name() string { return string(tm) }
+func (tm testModel) Model() string { return string(tm) }

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/haleyrc/cheevos/auth"
+	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
@@ -15,25 +16,17 @@ func TestNormalizingAUserNormalizesUsername(t *testing.T) {
 	}
 }
 
-func TestValidatingAUser(t *testing.T) {
-	testcases := map[string]struct {
-		input auth.User
-		err   string
-	}{
-		"returns an error for a missing id": {
-			input: auth.User{ID: "", Username: "username"},
-			err:   "id is blank",
-		},
-		"returns an error for a missing username": {
-			input: auth.User{ID: "id", Username: ""},
-			err:   "username is blank",
-		},
-		"returns nil for a valid user": {
-			input: auth.User{ID: "id", Username: "username"},
-			err:   "",
-		},
+func TestUserValidationReturnsNilForAValidUser(t *testing.T) {
+	u := fake.User()
+	if err := u.Validate(); err != nil {
+		t.Errorf("Expected validate to return nil, but got %v.", err)
 	}
-	for name, tc := range testcases {
-		testutil.RunValidationTests(t, name, &tc.input, tc.err)
-	}
+}
+
+func TestUserValidationReturnsAnErrorForAnInvalidUser(t *testing.T) {
+	var u auth.User
+	testutil.RunValidationTests(t, &u, "validation failed: User is invalid", map[string]string{
+		"ID":       "ID can't be blank.",
+		"Username": "Username can't be blank.",
+	})
 }

@@ -1,8 +1,7 @@
 package cheevos
 
 import (
-	"fmt"
-
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/time"
 )
 
@@ -14,18 +13,22 @@ type Award struct {
 	Awarded time.Time
 }
 
+func (a *Award) Model() string { return "Award" }
+
 func (a *Award) Validate() error {
+	ve := core.NewValidationError(a)
+
 	if a.CheevoID == "" {
-		return fmt.Errorf("invalid: cheevo id is blank")
+		ve.Add("CheevoID", "Cheevo ID can't be blank.")
 	}
 
 	if a.UserID == "" {
-		return fmt.Errorf("invalid: user id is blank")
+		ve.Add("UserID", "User ID can't be blank.")
 	}
 
 	if a.Awarded.IsZero() {
-		return fmt.Errorf("invalid: awarded is blank")
+		ve.Add("Awarded", "Awarded time can't be blank.")
 	}
 
-	return nil
+	return ve.Error()
 }

@@ -1,8 +1,7 @@
 package roster
 
 import (
-	"fmt"
-
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/time"
 )
 
@@ -14,18 +13,22 @@ type Membership struct {
 	Joined time.Time
 }
 
+func (m *Membership) Model() string { return "Membership" }
+
 func (m *Membership) Validate() error {
+	ve := core.NewValidationError(m)
+
 	if m.OrganizationID == "" {
-		return fmt.Errorf("invalid: organization id is blank")
+		ve.Add("OrganizationID", "Organization ID can't be blank.")
 	}
 
 	if m.UserID == "" {
-		return fmt.Errorf("invalid: user id is blank")
+		ve.Add("UserID", "User ID can't be blank.")
 	}
 
 	if m.Joined.IsZero() {
-		return fmt.Errorf("invalid: joined is blank")
+		ve.Add("Joined", "Joined time can't be blank.")
 	}
 
-	return nil
+	return ve.Error()
 }

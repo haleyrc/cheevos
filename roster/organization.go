@@ -1,8 +1,7 @@
 package roster
 
 import (
-	"fmt"
-
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/stringutil"
 )
 
@@ -21,6 +20,8 @@ type Organization struct {
 	OwnerID string
 }
 
+func (o *Organization) Model() string { return "Organization" }
+
 func (o *Organization) Normalize() {
 	o.Name = stringutil.MakeSafe(o.Name)
 }
@@ -28,17 +29,19 @@ func (o *Organization) Normalize() {
 func (o *Organization) Validate() error {
 	o.Normalize()
 
+	ve := core.NewValidationError(o)
+
 	if o.ID == "" {
-		return fmt.Errorf("invalid: id is blank")
+		ve.Add("ID", "ID can't be blank.")
 	}
 
 	if o.Name == "" {
-		return fmt.Errorf("invalid: name is blank")
+		ve.Add("Name", "Name can't be blank.")
 	}
 
 	if o.OwnerID == "" {
-		return fmt.Errorf("invalid: owner id is blank")
+		ve.Add("OwnerID", "Owner ID can't be blank.")
 	}
 
-	return nil
+	return ve.Error()
 }

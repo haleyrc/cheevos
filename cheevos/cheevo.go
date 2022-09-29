@@ -1,8 +1,7 @@
 package cheevos
 
 import (
-	"fmt"
-
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/stringutil"
 )
 
@@ -21,6 +20,8 @@ type Cheevo struct {
 	OrganizationID string
 }
 
+func (c *Cheevo) Model() string { return "Cheevo" }
+
 func (c *Cheevo) Normalize() {
 	c.Name = stringutil.MakeSafe(c.Name)
 	c.Description = stringutil.MakeSafe(c.Description)
@@ -29,21 +30,23 @@ func (c *Cheevo) Normalize() {
 func (c *Cheevo) Validate() error {
 	c.Normalize()
 
+	ve := core.NewValidationError(c)
+
 	if c.ID == "" {
-		return fmt.Errorf("invalid: id is blank")
+		ve.Add("ID", "ID can't be blank.")
 	}
 
 	if c.Name == "" {
-		return fmt.Errorf("invalid: name is blank")
+		ve.Add("Name", "Name can't be blank.")
 	}
 
 	if c.Description == "" {
-		return fmt.Errorf("invalid: description is blank")
+		ve.Add("Description", "Description can't be blank.")
 	}
 
 	if c.OrganizationID == "" {
-		return fmt.Errorf("invalid: organization id is blank")
+		ve.Add("OrganizationID", "Organization ID can't be blank.")
 	}
 
-	return nil
+	return ve.Error()
 }

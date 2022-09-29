@@ -4,7 +4,9 @@ import (
 	"testing"
 
 	"github.com/haleyrc/cheevos/cheevos"
+	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
+	"github.com/pborman/uuid"
 )
 
 func TestNormalizingACheevoNormalizesName(t *testing.T) {
@@ -23,33 +25,19 @@ func TestNormalizingACheevoNormalizesDescription(t *testing.T) {
 	}
 }
 
-func TestValidatingACheevo(t *testing.T) {
-	testcases := map[string]struct {
-		input cheevos.Cheevo
-		err   string
-	}{
-		"returns an error for a missing id": {
-			input: cheevos.Cheevo{ID: "", Name: "name", Description: "description", OrganizationID: "orgid"},
-			err:   "id is blank",
-		},
-		"returns an error for a missing name": {
-			input: cheevos.Cheevo{ID: "id", Name: "", Description: "description", OrganizationID: "orgid"},
-			err:   "name is blank",
-		},
-		"returns an error for a missing description": {
-			input: cheevos.Cheevo{ID: "id", Name: "name", Description: "", OrganizationID: "orgid"},
-			err:   "description is blank",
-		},
-		"return an error for a missing organization id": {
-			input: cheevos.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: ""},
-			err:   "organization id is blank",
-		},
-		"returns nil for a valid cheevo": {
-			input: cheevos.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: "orgid"},
-			err:   "",
-		},
+func TestCheevoValidationReturnsNilForAValidCheevo(t *testing.T) {
+	c := fake.Cheevo(uuid.New())
+	if err := c.Validate(); err != nil {
+		t.Errorf("Expected validate to return nil, but got %v.", err)
 	}
-	for name, tc := range testcases {
-		testutil.RunValidationTests(t, name, &tc.input, tc.err)
-	}
+}
+
+func TestCheevoValidationReturnsAnErrorForAnInvalidCheevo(t *testing.T) {
+	var c cheevos.Cheevo
+	testutil.RunValidationTests(t, &c, "validation failed: Cheevo is invalid", map[string]string{
+		"ID":             "ID can't be blank.",
+		"Name":           "Name can't be blank.",
+		"Description":    "Description can't be blank.",
+		"OrganizationID": "Organization ID can't be blank.",
+	})
 }

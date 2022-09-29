@@ -1,8 +1,7 @@
 package auth
 
 import (
-	"fmt"
-
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/stringutil"
 )
 
@@ -16,6 +15,8 @@ type User struct {
 	Username string
 }
 
+func (u *User) Model() string { return "User" }
+
 func (u *User) Normalize() {
 	u.Username = stringutil.MakeSafe(u.Username)
 }
@@ -23,13 +24,15 @@ func (u *User) Normalize() {
 func (u *User) Validate() error {
 	u.Normalize()
 
+	ve := core.NewValidationError(u)
+
 	if u.ID == "" {
-		return fmt.Errorf("invalid: id is blank")
+		ve.Add("ID", "ID can't be blank.")
 	}
 
 	if u.Username == "" {
-		return fmt.Errorf("invalid: username is blank")
+		ve.Add("Username", "Username can't be blank.")
 	}
 
-	return nil
+	return ve.Error()
 }

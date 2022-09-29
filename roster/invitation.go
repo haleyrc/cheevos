@@ -1,8 +1,7 @@
 package roster
 
 import (
-	"fmt"
-
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/stringutil"
 	"github.com/haleyrc/cheevos/lib/time"
 )
@@ -21,6 +20,8 @@ func (i *Invitation) Expired() bool {
 	return i.Expires.Before(time.Now())
 }
 
+func (i *Invitation) Model() string { return "Invitation" }
+
 func (i *Invitation) Normalize() {
 	i.Email = stringutil.MakeSafe(i.Email)
 }
@@ -28,21 +29,23 @@ func (i *Invitation) Normalize() {
 func (i *Invitation) Validate() error {
 	i.Normalize()
 
+	ve := core.NewValidationError(i)
+
 	if i.ID == "" {
-		return fmt.Errorf("invalid: id is blank")
+		ve.Add("ID", "ID can't be blank.")
 	}
 
 	if i.Email == "" {
-		return fmt.Errorf("invalid: email is blank")
+		ve.Add("Email", "Email can't be blank.")
 	}
 
 	if i.OrganizationID == "" {
-		return fmt.Errorf("invalid: organization id is blank")
+		ve.Add("OrganizationID", "Organization ID can't be blank.")
 	}
 
 	if i.Expires.IsZero() {
-		return fmt.Errorf("invalid: expires is blank")
+		ve.Add("Expires", "Expiration time can't be blank.")
 	}
 
-	return nil
+	return ve.Error()
 }

@@ -3,34 +3,25 @@ package cheevos_test
 import (
 	"testing"
 
+	"github.com/pborman/uuid"
+
 	"github.com/haleyrc/cheevos/cheevos"
+	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/cheevos/lib/time"
 )
 
-func TestValidatingAAward(t *testing.T) {
-	testcases := map[string]struct {
-		input cheevos.Award
-		err   string
-	}{
-		"returns an error for a missing cheevo id": {
-			input: cheevos.Award{CheevoID: "", UserID: "userid", Awarded: time.Now()},
-			err:   "cheevo id is blank",
-		},
-		"returns an error for a missing user id": {
-			input: cheevos.Award{CheevoID: "orgid", UserID: "", Awarded: time.Now()},
-			err:   "user id is blank",
-		},
-		"returns an error for a missing awarded time": {
-			input: cheevos.Award{CheevoID: "orgid", UserID: "userid", Awarded: time.Time{}},
-			err:   "awarded is blank",
-		},
-		"returns nil for a valid membership": {
-			input: cheevos.Award{CheevoID: "orgid", UserID: "userid", Awarded: time.Now()},
-			err:   "",
-		},
+func TestAwardValidationReturnsNilForAValidAward(t *testing.T) {
+	a := fake.Award(uuid.New(), uuid.New())
+	if err := a.Validate(); err != nil {
+		t.Errorf("Expected validate to return nil, but got %v.", err)
 	}
-	for name, tc := range testcases {
-		testutil.RunValidationTests(t, name, &tc.input, tc.err)
-	}
+}
+
+func TestAwardValidationReturnsAnErrorForAnInvalidAward(t *testing.T) {
+	var a cheevos.Award
+	testutil.RunValidationTests(t, &a, "validation failed: Award is invalid", map[string]string{
+		"CheevoID": "Cheevo ID can't be blank.",
+		"UserID":   "User ID can't be blank.",
+		"Awarded":  "Awarded time can't be blank.",
+	})
 }

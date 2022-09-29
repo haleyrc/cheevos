@@ -6,7 +6,15 @@ import (
 )
 
 type Model interface {
-	Name() string
+	Model() string
+}
+
+func ValidationErrorFromError(err error) (*ValidationError, bool) {
+	ve, ok := err.(validationError)
+	if !ok {
+		return nil, false
+	}
+	return ve.ValidationError, true
 }
 
 func NewValidationError(model Model) *ValidationError {
@@ -36,7 +44,7 @@ func (ve *ValidationError) Error() error {
 }
 
 func (ve *ValidationError) Message() string {
-	return fmt.Sprintf("%s is invalid.", ve.Model.Name())
+	return fmt.Sprintf("%s is invalid.", ve.Model.Model())
 }
 
 type validationError struct {
@@ -44,5 +52,5 @@ type validationError struct {
 }
 
 func (ve validationError) Error() string {
-	return fmt.Sprintf("validation failed: %s is invalid", ve.Model.Name())
+	return fmt.Sprintf("validation failed: %s is invalid", ve.Model.Model())
 }

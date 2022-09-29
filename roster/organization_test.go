@@ -3,8 +3,10 @@ package roster_test
 import (
 	"testing"
 
+	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
 	"github.com/haleyrc/cheevos/roster"
+	"github.com/pborman/uuid"
 )
 
 func TestNormalizingAnOrganizationNormalizesName(t *testing.T) {
@@ -15,29 +17,18 @@ func TestNormalizingAnOrganizationNormalizesName(t *testing.T) {
 	}
 }
 
-func TestValidatingAnOrganization(t *testing.T) {
-	testcases := map[string]struct {
-		input roster.Organization
-		err   string
-	}{
-		"returns an error for a missing id": {
-			input: roster.Organization{ID: "", Name: "name", OwnerID: "owner"},
-			err:   "id is blank",
-		},
-		"returns an error for a missing name": {
-			input: roster.Organization{ID: "id", Name: "", OwnerID: "owner"},
-			err:   "name is blank",
-		},
-		"returns an error for a missing owner id": {
-			input: roster.Organization{ID: "id", Name: "name", OwnerID: ""},
-			err:   "owner id is blank",
-		},
-		"returns nil for a valid organization": {
-			input: roster.Organization{ID: "id", Name: "name", OwnerID: "owner"},
-			err:   "",
-		},
+func TestOrganizationValidationReturnsNilForAValidOrganization(t *testing.T) {
+	o := fake.Organization(uuid.New())
+	if err := o.Validate(); err != nil {
+		t.Errorf("Expected validate to return nil, but got %v.", err)
 	}
-	for name, tc := range testcases {
-		testutil.RunValidationTests(t, name, &tc.input, tc.err)
-	}
+}
+
+func TestOrganizationValidationReturnsAnErrorForAnInvalidOrganization(t *testing.T) {
+	var o roster.Organization
+	testutil.RunValidationTests(t, &o, "validation failed: Organization is invalid", map[string]string{
+		"ID":      "ID can't be blank.",
+		"Name":    "Name can't be blank.",
+		"OwnerID": "Owner ID can't be blank.",
+	})
 }
