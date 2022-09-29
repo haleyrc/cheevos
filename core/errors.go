@@ -9,6 +9,11 @@ type Model interface {
 	Model() string
 }
 
+type ValidationError struct {
+	Model  Model
+	Fields map[string]string
+}
+
 func ValidationErrorFromError(err error) (*ValidationError, bool) {
 	ve, ok := err.(validationError)
 	if !ok {
@@ -22,11 +27,6 @@ func NewValidationError(model Model) *ValidationError {
 		Model:  model,
 		Fields: map[string]string{},
 	}
-}
-
-type ValidationError struct {
-	Model  Model
-	Fields map[string]string
 }
 
 func (ve *ValidationError) Add(fieldName, msg string) *ValidationError {
