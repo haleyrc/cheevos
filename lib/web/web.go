@@ -51,13 +51,16 @@ func handleError(w http.ResponseWriter, err error) {
 func handleData(w http.ResponseWriter, data interface{}) {
 	respondWithJSON(w, http.StatusOK, Response{Data: data})
 }
+
 func respondWithJSON(w http.ResponseWriter, code int, body interface{}) {
 	bytes, err := json.MarshalIndent(body, "", "  ")
 	if err != nil {
 		panic(err)
 	}
+
 	w.WriteHeader(code)
 	w.Header().Set("Content-Type", "application/json")
+
 	if _, err := w.Write(bytes); err != nil {
 		panic(err)
 	}
