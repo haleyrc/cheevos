@@ -10,6 +10,7 @@ import (
 func TestCoreErrorsAreCoded(t *testing.T) {
 	testcases := map[string]interface{}{
 		"authorization error": &core.AuthorizationError{},
+		"raw error":           &core.RawError{},
 		"validation error":    core.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
 	}
 	for name, tc := range testcases {
@@ -22,6 +23,7 @@ func TestCoreErrorsAreCoded(t *testing.T) {
 func TestCoreErrorsAreMessaged(t *testing.T) {
 	testcases := map[string]interface{}{
 		"authorization error": &core.AuthorizationError{},
+		"raw error":           &core.RawError{},
 		"validation error":    core.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
 	}
 	for name, tc := range testcases {

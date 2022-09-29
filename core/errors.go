@@ -35,6 +35,26 @@ func (ae *AuthorizationError) Message() string {
 	return msg
 }
 
+func NewRawError(code int, msg string) *RawError {
+	return &RawError{
+		code: code,
+		msg:  msg,
+	}
+}
+
+type RawError struct {
+	code int
+	msg  string
+}
+
+func (re *RawError) Code() int { return re.code }
+
+func (re *RawError) Error() string {
+	return fmt.Sprintf("error: %s", re.msg)
+}
+
+func (re *RawError) Message() string { return re.msg }
+
 type ValidationError struct {
 	Model  Model
 	Fields map[string]string

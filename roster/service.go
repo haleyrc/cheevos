@@ -3,9 +3,11 @@ package roster
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/pborman/uuid"
 
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/db"
 	"github.com/haleyrc/cheevos/lib/hash"
 	"github.com/haleyrc/cheevos/lib/random"
@@ -61,7 +63,7 @@ func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) e
 		}
 
 		if invitation.Expired() {
-			return fmt.Errorf("invitation is expired")
+			return core.NewRawError(http.StatusGone, "Your invitation has expired. Please contact your organization administrator for a new invitation.")
 		}
 
 		membership := &Membership{
