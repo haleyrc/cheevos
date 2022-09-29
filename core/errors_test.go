@@ -9,7 +9,8 @@ import (
 
 func TestCoreErrorsAreCoded(t *testing.T) {
 	testcases := map[string]interface{}{
-		"validation error": core.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
+		"authorization error": &core.AuthorizationError{},
+		"validation error":    core.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
 	}
 	for name, tc := range testcases {
 		if _, ok := tc.(web.Coded); !ok {
@@ -20,7 +21,8 @@ func TestCoreErrorsAreCoded(t *testing.T) {
 
 func TestCoreErrorsAreMessaged(t *testing.T) {
 	testcases := map[string]interface{}{
-		"validation error": core.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
+		"authorization error": &core.AuthorizationError{},
+		"validation error":    core.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
 	}
 	for name, tc := range testcases {
 		if _, ok := tc.(web.Messaged); !ok {

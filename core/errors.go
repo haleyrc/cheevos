@@ -9,6 +9,32 @@ type Model interface {
 	Model() string
 }
 
+func NewAuthorizationError(cause error, msg string) *AuthorizationError {
+	return &AuthorizationError{
+		cause: cause,
+		msg:   msg,
+	}
+}
+
+type AuthorizationError struct {
+	cause error
+	msg   string
+}
+
+func (ae *AuthorizationError) Code() int { return http.StatusForbidden }
+
+func (ae *AuthorizationError) Error() string {
+	return fmt.Sprintf("authorization failed: %v", ae.cause)
+}
+
+func (ae *AuthorizationError) Message() string {
+	msg := ae.msg
+	if msg == "" {
+		msg = "You are not permitted to perform that action."
+	}
+	return msg
+}
+
 type ValidationError struct {
 	Model  Model
 	Fields map[string]string
