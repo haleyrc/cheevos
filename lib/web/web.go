@@ -5,6 +5,12 @@ import (
 	"net/http"
 )
 
+const DefaultErrorMessage = "Unexpected error."
+
+type Messaged interface {
+	Message() string
+}
+
 type Coded interface {
 	Code() int
 }
@@ -41,10 +47,19 @@ func errorCode(err error) int {
 	return code
 }
 
+func errorMessage(err error) string {
+	msg := DefaultErrorMessage
+	if err, ok := err.(Messaged); ok {
+		msg = err.Message()
+	}
+	return msg
+}
+
 func handleError(w http.ResponseWriter, err error) {
 	code := errorCode(err)
+	message := errorMessage(err)
 	respondWithJSON(w, code, Response{
-		Error: &Error{Message: err.Error()},
+		Error: &Error{Message: message},
 	})
 }
 
