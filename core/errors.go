@@ -23,9 +23,7 @@ type AuthorizationError struct {
 
 func (ae *AuthorizationError) Code() int { return http.StatusForbidden }
 
-func (ae *AuthorizationError) Error() string {
-	return fmt.Sprintf("authorization failed: %v", ae.cause)
-}
+func (ae *AuthorizationError) Error() string { return fmt.Sprintf("not authorized: %v", ae.cause) }
 
 func (ae *AuthorizationError) Message() string {
 	msg := ae.msg
@@ -63,9 +61,7 @@ type RawError struct {
 
 func (re *RawError) Code() int { return re.code }
 
-func (re *RawError) Error() string {
-	return fmt.Sprintf("error: %s", re.msg)
-}
+func (re *RawError) Error() string { return fmt.Sprintf("error: %s", re.msg) }
 
 func (re *RawError) Message() string { return re.msg }
 
@@ -103,9 +99,7 @@ func (ve *ValidationError) Error() error {
 	return nil
 }
 
-func (ve *ValidationError) Message() string {
-	return fmt.Sprintf("%s is invalid.", ve.Model.Model())
-}
+func (ve *ValidationError) Message() string { return fmt.Sprintf("%s is invalid.", ve.Model.Model()) }
 
 type validationError struct {
 	*ValidationError
