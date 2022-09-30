@@ -30,7 +30,7 @@ func (rs *RosterServer) AcceptInvitation(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := rs.Roster.AcceptInvitation(ctx, currentUser, req.Code); err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	return AcceptInvitationResponse{}, nil
@@ -56,7 +56,7 @@ func (rs *RosterServer) CreateOrganization(w http.ResponseWriter, r *http.Reques
 
 	org, err := rs.Roster.CreateOrganization(ctx, req.Name, currentUser)
 	if err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	resp := CreateOrganizationResponse{
@@ -82,7 +82,7 @@ func (rs *RosterServer) DeclineInvitation(w http.ResponseWriter, r *http.Request
 	}
 
 	if err := rs.Roster.DeclineInvitation(ctx, req.Code); err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	return DeclineInvitationResponse{}, nil
@@ -107,12 +107,12 @@ func (rs *RosterServer) InviteUserToOrganization(w http.ResponseWriter, r *http.
 	}
 
 	if err := rs.Authz.CanInviteUsersToOrganization(ctx, currentUser, req.OrganizationID); err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	invitation, err := rs.Roster.InviteUserToOrganization(ctx, req.Email, req.OrganizationID)
 	if err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	resp := InviteUserToOrganizationResponse{
@@ -141,12 +141,12 @@ func (rs *RosterServer) RefreshInvitation(w http.ResponseWriter, r *http.Request
 	}
 
 	if err := rs.Authz.CanRefreshInvitation(ctx, currentUser, req.InvitationID); err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	invitation, err := rs.Roster.RefreshInvitation(ctx, req.InvitationID)
 	if err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	resp := RefreshInvitationResponse{

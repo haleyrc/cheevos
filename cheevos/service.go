@@ -6,6 +6,7 @@ import (
 
 	"github.com/pborman/uuid"
 
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/db"
 	"github.com/haleyrc/cheevos/lib/time"
 )
@@ -38,7 +39,7 @@ func (svc *Service) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID
 			Awarded:  time.Now(),
 		}
 		if err := award.Validate(); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 		return svc.Repo.CreateAward(ctx, tx, award)
 	})
@@ -62,7 +63,7 @@ func (svc *Service) CreateCheevo(ctx context.Context, name, description, orgID s
 			OrganizationID: orgID,
 		}
 		if err := cheevo.Validate(); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 		return svc.Repo.CreateCheevo(ctx, tx, &cheevo)
 	})

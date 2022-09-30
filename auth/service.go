@@ -6,6 +6,7 @@ import (
 
 	"github.com/pborman/uuid"
 
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/db"
 	"github.com/haleyrc/cheevos/lib/hash"
 )
@@ -46,7 +47,7 @@ func (svc *Service) SignUp(ctx context.Context, username, password string) (*Use
 			Username: username,
 		}
 		if err := user.Validate(); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 		return svc.Repo.CreateUser(ctx, tx, &user, hash.Generate(password))
 	})

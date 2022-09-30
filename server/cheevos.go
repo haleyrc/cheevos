@@ -34,11 +34,11 @@ func (cs *CheevosServer) AwardCheevo(w http.ResponseWriter, r *http.Request) (we
 	}
 
 	if err := cs.Authz.CanAwardCheevo(ctx, currentUser, req.RecipientID, req.CheevoID); err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	if err := cs.Cheevos.AwardCheevoToUser(ctx, req.RecipientID, req.CheevoID); err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	resp := AwardCheevoResponse(req)
@@ -68,12 +68,12 @@ func (cs *CheevosServer) CreateCheevo(w http.ResponseWriter, r *http.Request) (w
 	}
 
 	if err := cs.Authz.CanCreateCheevo(ctx, currentUser, req.OrganizationID); err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	cheevo, err := cs.Cheevos.CreateCheevo(ctx, req.Name, req.Description, req.OrganizationID)
 	if err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	resp := CreateCheevoResponse{
@@ -107,12 +107,12 @@ func (cs *CheevosServer) GetCheevo(w http.ResponseWriter, r *http.Request) (web.
 	}
 
 	if err := cs.Authz.CanGetCheevo(ctx, currentUser, req.CheevoID); err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	cheevo, err := cs.Cheevos.GetCheevo(ctx, req.CheevoID)
 	if err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	resp := GetCheevoResponse{

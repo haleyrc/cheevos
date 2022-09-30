@@ -59,7 +59,7 @@ func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) e
 
 		hashedCode := hash.Generate(code)
 		if err := svc.Repo.GetInvitationByCode(ctx, tx, &invitation, hashedCode); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 
 		if invitation.Expired() {
@@ -72,10 +72,10 @@ func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) e
 			Joined:         time.Now(),
 		}
 		if err := membership.Validate(); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 		if err := svc.Repo.CreateMembership(ctx, tx, membership); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 
 		return svc.Repo.DeleteInvitationByCode(ctx, tx, hashedCode)
@@ -100,7 +100,7 @@ func (svc *Service) CreateOrganization(ctx context.Context, name, ownerID string
 			OwnerID: ownerID,
 		}
 		if err := org.Validate(); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 
 		membership := &Membership{
@@ -109,11 +109,11 @@ func (svc *Service) CreateOrganization(ctx context.Context, name, ownerID string
 			Joined:         time.Now(),
 		}
 		if err := membership.Validate(); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 
 		if err := svc.Repo.CreateOrganization(ctx, tx, &org); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 
 		return svc.Repo.CreateMembership(ctx, tx, membership)
@@ -159,12 +159,12 @@ func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID s
 			Expires:        time.Now().Add(InvitationValidFor),
 		}
 		if err := invitation.Validate(); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 
 		code := random.String(CodeLength)
 		if err := svc.Repo.CreateInvitation(ctx, tx, &invitation, hash.Generate(code)); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 
 		return svc.Email.SendInvitation(ctx, invitation.Email, code)
@@ -193,14 +193,14 @@ func (svc *Service) RefreshInvitation(ctx context.Context, id string) (*Invitati
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		if err := svc.Repo.GetInvitation(ctx, tx, &invitation, id); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 
 		invitation.Expires = time.Now().Add(InvitationValidFor)
 
 		newCode := random.String(CodeLength)
 		if err := svc.Repo.SaveInvitation(ctx, tx, &invitation, hash.Generate(newCode)); err != nil {
-			return err
+			return core.WrapError(err)
 		}
 
 		return svc.Email.SendInvitation(ctx, invitation.Email, newCode)

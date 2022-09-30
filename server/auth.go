@@ -32,7 +32,7 @@ func (as *AuthServer) SignUp(w http.ResponseWriter, r *http.Request) (web.Data, 
 
 	user, err := as.Auth.SignUp(ctx, req.Username, req.Password)
 	if err != nil {
-		return nil, err
+		return nil, core.WrapError(err)
 	}
 
 	resp := SignUpResponse{
