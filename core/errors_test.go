@@ -1,6 +1,8 @@
 package core_test
 
 import (
+	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/haleyrc/cheevos/core"
@@ -13,6 +15,7 @@ func TestCoreErrorsAreCoded(t *testing.T) {
 		"bad request error":   &core.BadRequestError{},
 		"raw error":           &core.RawError{},
 		"validation error":    core.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
+		"wrapped errors":      core.WrapError(&core.RawError{}),
 	}
 	for name, tc := range testcases {
 		if _, ok := tc.(web.Coded); !ok {
@@ -27,6 +30,7 @@ func TestCoreErrorsAreMessaged(t *testing.T) {
 		"bad request error":   &core.BadRequestError{},
 		"raw error":           &core.RawError{},
 		"validation error":    core.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
+		"wrapped errors":      core.WrapError(&core.RawError{}),
 	}
 	for name, tc := range testcases {
 		if _, ok := tc.(web.Messaged); !ok {
@@ -79,6 +83,36 @@ func TestValidationErrorReturnsAnErrorWithFieldErrors(t *testing.T) {
 	err := ve.Error()
 	if err == nil {
 		t.Errorf("Expected to get an error, but got nil.")
+	}
+}
+
+func bareErrorMaker() error    { return fmt.Errorf("oops") }
+func wrappedErrorMaker() error { return core.WrapError(bareErrorMaker()) }
+
+func TestWrappedErrorsReportTheirCaller(t *testing.T) {
+	err := core.WrapError(wrappedErrorMaker())
+	got := err.Error()
+	want := "core_test.TestWrappedErrorsReportTheirCaller: core_test.wrappedErrorMaker: oops"
+	if got != want {
+		t.Errorf("Expected error to be %q, but got %q.", want, got)
+	}
+}
+
+func TestWrappedErrorsReportTheCodeOfTheirCause(t *testing.T) {
+	want := http.StatusTeapot
+	err := core.WrapError(core.NewRawError(want, "oops"))
+	got := core.ErrorCode(err)
+	if got != want {
+		t.Errorf("Expected code to be %d, but got %d.", want, got)
+	}
+}
+
+func TestWrappedErrorsReportTheMessageOfTheirCause(t *testing.T) {
+	want := "oops"
+	err := core.WrapError(core.NewRawError(http.StatusTeapot, want))
+	got := core.ErrorMessage(err)
+	if got != want {
+		t.Errorf("Expected message to be %q, but got %q.", want, got)
 	}
 }
 

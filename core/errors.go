@@ -3,10 +3,76 @@ package core
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
+	"runtime"
+
+	"github.com/pkg/errors"
 )
+
+type Coded interface {
+	Code() int
+}
+
+type Messaged interface {
+	Message() string
+}
 
 type Model interface {
 	Model() string
+}
+
+func ErrorCode(err error) int {
+	root := errors.Cause(err)
+	return errorCode(root)
+}
+
+func errorCode(err error) int {
+	if err, ok := err.(Coded); ok {
+		return err.Code()
+	}
+	return http.StatusInternalServerError
+}
+
+func ErrorMessage(err error) string {
+	root := errors.Cause(err)
+	return errorMessage(root)
+}
+
+func errorMessage(err error) string {
+	if err, ok := err.(Messaged); ok {
+		return err.Message()
+	}
+	return "Something went wrong."
+}
+
+type wrappedError struct {
+	file   string
+	lineno int
+	name   string
+	cause  error
+}
+
+func (we wrappedError) Code() int { return ErrorCode(we.cause) }
+
+func (we wrappedError) Error() string { return fmt.Sprintf("%s: %v", we.name, we.cause) }
+
+func (we wrappedError) Message() string { return ErrorMessage(we.cause) }
+
+func WrapError(err error) error {
+	pc, file, lineno, ok := runtime.Caller(1)
+
+	we := wrappedError{
+		file:   filepath.Base(file),
+		lineno: lineno,
+		cause:  err,
+	}
+
+	details := runtime.FuncForPC(pc)
+	if ok && details != nil {
+		we.name = filepath.Base(details.Name())
+	}
+
+	return we
 }
 
 func NewAuthorizationError(cause error, msg string) *AuthorizationError {
