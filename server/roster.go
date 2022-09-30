@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/json"
 	"github.com/haleyrc/cheevos/lib/time"
 	"github.com/haleyrc/cheevos/lib/web"
@@ -25,7 +26,7 @@ func (rs *RosterServer) AcceptInvitation(w http.ResponseWriter, r *http.Request)
 
 	var req AcceptInvitationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, err
+		return nil, core.NewBadRequestError(err)
 	}
 
 	if err := rs.Roster.AcceptInvitation(ctx, currentUser, req.Code); err != nil {
@@ -50,7 +51,7 @@ func (rs *RosterServer) CreateOrganization(w http.ResponseWriter, r *http.Reques
 
 	var req CreateOrganizationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, err
+		return nil, core.NewBadRequestError(err)
 	}
 
 	org, err := rs.Roster.CreateOrganization(ctx, req.Name, currentUser)
@@ -77,7 +78,7 @@ func (rs *RosterServer) DeclineInvitation(w http.ResponseWriter, r *http.Request
 
 	var req DeclineInvitationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, err
+		return nil, core.NewBadRequestError(err)
 	}
 
 	if err := rs.Roster.DeclineInvitation(ctx, req.Code); err != nil {
@@ -102,7 +103,7 @@ func (rs *RosterServer) InviteUserToOrganization(w http.ResponseWriter, r *http.
 
 	var req InviteUserToOrganizationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, err
+		return nil, core.NewBadRequestError(err)
 	}
 
 	if err := rs.Authz.CanInviteUsersToOrganization(ctx, currentUser, req.OrganizationID); err != nil {
@@ -136,7 +137,7 @@ func (rs *RosterServer) RefreshInvitation(w http.ResponseWriter, r *http.Request
 
 	var req RefreshInvitationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, err
+		return nil, core.NewBadRequestError(err)
 	}
 
 	if err := rs.Authz.CanRefreshInvitation(ctx, currentUser, req.InvitationID); err != nil {

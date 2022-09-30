@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/json"
 	"github.com/haleyrc/cheevos/lib/web"
 )
@@ -29,7 +30,7 @@ func (cs *CheevosServer) AwardCheevo(w http.ResponseWriter, r *http.Request) (we
 
 	var req AwardCheevoRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, err
+		return nil, core.NewBadRequestError(err)
 	}
 
 	if err := cs.Authz.CanAwardCheevo(ctx, currentUser, req.RecipientID, req.CheevoID); err != nil {
@@ -63,7 +64,7 @@ func (cs *CheevosServer) CreateCheevo(w http.ResponseWriter, r *http.Request) (w
 
 	var req CreateCheevoRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, err
+		return nil, core.NewBadRequestError(err)
 	}
 
 	if err := cs.Authz.CanCreateCheevo(ctx, currentUser, req.OrganizationID); err != nil {
@@ -102,7 +103,7 @@ func (cs *CheevosServer) GetCheevo(w http.ResponseWriter, r *http.Request) (web.
 
 	var req GetCheevoRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, err
+		return nil, core.NewBadRequestError(err)
 	}
 
 	if err := cs.Authz.CanGetCheevo(ctx, currentUser, req.CheevoID); err != nil {

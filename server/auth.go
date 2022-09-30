@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/haleyrc/cheevos/core"
 	"github.com/haleyrc/cheevos/lib/json"
 	"github.com/haleyrc/cheevos/lib/web"
 )
@@ -26,7 +27,7 @@ func (as *AuthServer) SignUp(w http.ResponseWriter, r *http.Request) (web.Data, 
 
 	var req SignUpRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, err
+		return nil, core.NewBadRequestError(err)
 	}
 
 	user, err := as.Auth.SignUp(ctx, req.Username, req.Password)
