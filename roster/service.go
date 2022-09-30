@@ -186,6 +186,7 @@ func (svc *Service) IsMember(ctx context.Context, orgID, userID string) error {
 	return nil
 }
 
+// RefreshInvitation updates an invitation with a new expiration time and code.
 // Refreshing an invitation will invalidate the initial invitation email (as
 // well as any other refresh emails).
 func (svc *Service) RefreshInvitation(ctx context.Context, id string) (*Invitation, error) {
