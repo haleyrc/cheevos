@@ -9,7 +9,7 @@ import (
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
-func TestCreateUserCreatesAUser(t *testing.T) {
+func TestInsertUserInsertsAUser(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		db      = testutil.TestDatabase(ctx, t)
@@ -18,7 +18,7 @@ func TestCreateUserCreatesAUser(t *testing.T) {
 		_, hash = fake.Password()
 	)
 
-	if err := repo.CreateUser(ctx, db, u, hash); err != nil {
+	if err := repo.InsertUser(ctx, db, u, hash); err != nil {
 		t.Fatal(err)
 	}
 }

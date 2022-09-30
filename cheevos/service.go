@@ -12,12 +12,12 @@ import (
 )
 
 type AwardsRepository interface {
-	CreateAward(ctx context.Context, tx db.Tx, award *Award) error
+	InsertAward(ctx context.Context, tx db.Tx, award *Award) error
 }
 
 type CheevosRepository interface {
-	CreateCheevo(ctx context.Context, tx db.Tx, cheevo *Cheevo) error
 	GetCheevo(ctx context.Context, tx db.Tx, cheevo *Cheevo, id string) error
+	InsertCheevo(ctx context.Context, tx db.Tx, cheevo *Cheevo) error
 }
 
 type Service struct {
@@ -41,7 +41,7 @@ func (svc *Service) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID
 		if err := award.Validate(); err != nil {
 			return core.WrapError(err)
 		}
-		return svc.Repo.CreateAward(ctx, tx, award)
+		return svc.Repo.InsertAward(ctx, tx, award)
 	})
 	if err != nil {
 		return fmt.Errorf("award cheevo to user failed: %w", err)
@@ -65,7 +65,7 @@ func (svc *Service) CreateCheevo(ctx context.Context, name, description, orgID s
 		if err := cheevo.Validate(); err != nil {
 			return core.WrapError(err)
 		}
-		return svc.Repo.CreateCheevo(ctx, tx, &cheevo)
+		return svc.Repo.InsertCheevo(ctx, tx, &cheevo)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("create cheevo failed: %w", err)

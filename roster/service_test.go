@@ -38,8 +38,8 @@ func TestAcceptingAnInvitationFailsIfTheInvitationIsExpired(t *testing.T) {
 		t.Errorf("Expected service to return an error, but it didn't.")
 	}
 
-	if repo.CreateMembershipCalled.Count != 0 {
-		t.Errorf("Expected repository not to receive CreateMembership, but it did.")
+	if repo.InsertMembershipCalled.Count != 0 {
+		t.Errorf("Expected repository not to receive InsertMembership, but it did.")
 	}
 	if repo.DeleteInvitationByCodeCalled.Count != 0 {
 		t.Errorf("Expected repository to not receive DeleteInvitationByCode, but it did.")
@@ -57,7 +57,7 @@ func TestAcceptingAnInvitationSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			CreateMembershipFn: func(_ context.Context, _ db.Tx, _ *roster.Membership) error { return nil },
+			InsertMembershipFn: func(_ context.Context, _ db.Tx, _ *roster.Membership) error { return nil },
 			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, inv *roster.Invitation, _ string) error {
 				inv.OrganizationID = orgID
 				inv.Expires = time.Now().Add(time.Hour)
@@ -87,19 +87,19 @@ func TestAcceptingAnInvitationSucceeds(t *testing.T) {
 		t.Errorf("Expected repository.GetInvitationByCode not to receive a plaintext code, but it did.")
 	}
 
-	if repo.CreateMembershipCalled.Count != 1 {
-		t.Errorf("Expected repository to receive CreateMembership, but it didn't.")
+	if repo.InsertMembershipCalled.Count != 1 {
+		t.Errorf("Expected repository to receive InsertMembership, but it didn't.")
 	}
-	if repo.CreateMembershipCalled.With.Membership.UserID != userID {
+	if repo.InsertMembershipCalled.With.Membership.UserID != userID {
 		t.Errorf(
-			"Expected repository.CreateMembership to receive user id %q, but got %q.",
-			userID, repo.CreateMembershipCalled.With.Membership.UserID,
+			"Expected repository.InsertMembership to receive user id %q, but got %q.",
+			userID, repo.InsertMembershipCalled.With.Membership.UserID,
 		)
 	}
-	if repo.CreateMembershipCalled.With.Membership.OrganizationID != orgID {
+	if repo.InsertMembershipCalled.With.Membership.OrganizationID != orgID {
 		t.Errorf(
-			"Expected repository.CreateMembership not to receive organization id %q, but got %q.",
-			orgID, repo.CreateMembershipCalled.With.Membership.OrganizationID,
+			"Expected repository.InsertMembership not to receive organization id %q, but got %q.",
+			orgID, repo.InsertMembershipCalled.With.Membership.OrganizationID,
 		)
 	}
 
@@ -148,7 +148,7 @@ func TestDecliningAnInvitationSucceeds(t *testing.T) {
 	}
 }
 
-func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *testing.T) {
+func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeUpdated(t *testing.T) {
 	var (
 		ctx = context.Background()
 
@@ -162,7 +162,7 @@ func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeSav
 		}
 
 		repo = &mock.Repository{
-			CreateInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error {
+			InsertInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error {
 				return fmt.Errorf("oops")
 			},
 		}
@@ -182,8 +182,8 @@ func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeSav
 		t.FailNow()
 	}
 
-	if repo.CreateInvitationCalled.Count != 1 {
-		t.Errorf("Expected repository to receive CreateInvitation, but it didn't.")
+	if repo.InsertInvitationCalled.Count != 1 {
+		t.Errorf("Expected repository to receive InsertInvitation, but it didn't.")
 	}
 	if emailer.SendInvitationCalled.Count != 0 {
 		t.Errorf("Expected mailer not to receive SendInvitation, but it did.")
@@ -205,7 +205,7 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 		}
 
 		repo = &mock.Repository{
-			CreateInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
+			InsertInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
 		}
 
 		svc = roster.Service{
@@ -220,25 +220,25 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if repo.CreateInvitationCalled.Count != 1 {
-		t.Errorf("Expected repository to receive CreateInvitation, but it didn't.")
+	if repo.InsertInvitationCalled.Count != 1 {
+		t.Errorf("Expected repository to receive InsertInvitation, but it didn't.")
 	}
-	if repo.CreateInvitationCalled.With.Invitation.Email != email {
+	if repo.InsertInvitationCalled.With.Invitation.Email != email {
 		t.Errorf(
-			"Expected repository.CreateInvitation to receive email %q, but got %q.",
-			email, repo.CreateInvitationCalled.With.Invitation.Email,
+			"Expected repository.InsertInvitation to receive email %q, but got %q.",
+			email, repo.InsertInvitationCalled.With.Invitation.Email,
 		)
 	}
-	if repo.CreateInvitationCalled.With.Invitation.OrganizationID != orgID {
+	if repo.InsertInvitationCalled.With.Invitation.OrganizationID != orgID {
 		t.Errorf(
-			"Expected repository.CreateInvitation to receive organization id %q, but got %q.",
-			orgID, repo.CreateInvitationCalled.With.Invitation.OrganizationID,
+			"Expected repository.InsertInvitation to receive organization id %q, but got %q.",
+			orgID, repo.InsertInvitationCalled.With.Invitation.OrganizationID,
 		)
 	}
-	if repo.CreateInvitationCalled.With.Invitation.Expires != expiration {
+	if repo.InsertInvitationCalled.With.Invitation.Expires != expiration {
 		t.Errorf(
-			"Expected repository.CreateInvitation to receive expiration %s, but got %s.",
-			expiration, repo.CreateInvitationCalled.With.Invitation.Expires,
+			"Expected repository.InsertInvitation to receive expiration %s, but got %s.",
+			expiration, repo.InsertInvitationCalled.With.Invitation.Expires,
 		)
 	}
 
@@ -266,7 +266,7 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 	}
 }
 
-func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *testing.T) {
+func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeUpdated(t *testing.T) {
 	var (
 		ctx = context.Background()
 
@@ -280,7 +280,7 @@ func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *t
 
 		repo = &mock.Repository{
 			GetInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
-			SaveInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error {
+			UpdateInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error {
 				return fmt.Errorf("oops")
 			},
 		}
@@ -303,7 +303,7 @@ func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeSaved(t *t
 	if repo.GetInvitationCalled.Count != 1 {
 		t.Errorf("Expected repository to receive GetInvitation, but it didn't.")
 	}
-	if repo.SaveInvitationCalled.Count != 1 {
+	if repo.UpdateInvitationCalled.Count != 1 {
 		t.Errorf("Expected repository to receive GetInvitation, but it didn't.")
 	}
 	if emailer.SendInvitationCalled.Count != 0 {
@@ -332,7 +332,7 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 				inv.OrganizationID = orgID
 				return nil
 			},
-			SaveInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
+			UpdateInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
 		}
 
 		svc = roster.Service{
@@ -354,23 +354,23 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 		t.Errorf("Expected repository.GetInvitation to receive an id, but it didn't.")
 	}
 
-	if repo.SaveInvitationCalled.Count != 1 {
-		t.Errorf("Expected repository to receive SaveInvitation, but it didn't.")
+	if repo.UpdateInvitationCalled.Count != 1 {
+		t.Errorf("Expected repository to receive UpdateInvitation, but it didn't.")
 	}
-	if repo.SaveInvitationCalled.With.Invitation.Email != email {
+	if repo.UpdateInvitationCalled.With.Invitation.Email != email {
 		t.Errorf(
-			"Expected repository.SaveInvitation to receive email %q, but got %q.",
-			email, repo.SaveInvitationCalled.With.Invitation.Email,
+			"Expected repository.UpdateInvitation to receive email %q, but got %q.",
+			email, repo.UpdateInvitationCalled.With.Invitation.Email,
 		)
 	}
-	if repo.SaveInvitationCalled.With.Invitation.OrganizationID != orgID {
+	if repo.UpdateInvitationCalled.With.Invitation.OrganizationID != orgID {
 		t.Errorf(
-			"Expected repository.SaveInvitation to receive organization id %q, but got %q.",
-			orgID, repo.SaveInvitationCalled.With.Invitation.OrganizationID,
+			"Expected repository.UpdateInvitation to receive organization id %q, but got %q.",
+			orgID, repo.UpdateInvitationCalled.With.Invitation.OrganizationID,
 		)
 	}
-	if repo.SaveInvitationCalled.With.Invitation.Expires == now {
-		t.Errorf("Expected repository.SaveInvitation to receive an updated expiration, but it didn't.")
+	if repo.UpdateInvitationCalled.With.Invitation.Expires == now {
+		t.Errorf("Expected repository.UpdateInvitation to receive an updated expiration, but it didn't.")
 	}
 
 	if emailer.SendInvitationCalled.Count != 1 {
@@ -400,8 +400,8 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			CreateMembershipFn:   func(_ context.Context, _ db.Tx, _ *roster.Membership) error { return nil },
-			CreateOrganizationFn: func(_ context.Context, _ db.Tx, _ *roster.Organization) error { return nil },
+			InsertMembershipFn:   func(_ context.Context, _ db.Tx, _ *roster.Membership) error { return nil },
+			InsertOrganizationFn: func(_ context.Context, _ db.Tx, _ *roster.Organization) error { return nil },
 		}
 
 		svc = roster.Service{
@@ -415,35 +415,35 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if repo.CreateOrganizationCalled.Count != 1 {
-		t.Errorf("Expected repository to receive CreateOrganization, but it didn't.")
+	if repo.InsertOrganizationCalled.Count != 1 {
+		t.Errorf("Expected repository to receive InsertOrganization, but it didn't.")
 	}
-	if repo.CreateOrganizationCalled.With.Organization.ID != org.ID {
+	if repo.InsertOrganizationCalled.With.Organization.ID != org.ID {
 		t.Errorf(
-			"Expected repository.CreateOrganization to receive id %q, but got %q.",
-			org.ID, repo.CreateOrganizationCalled.With.Organization.ID,
+			"Expected repository.InsertOrganization to receive id %q, but got %q.",
+			org.ID, repo.InsertOrganizationCalled.With.Organization.ID,
 		)
 	}
-	if repo.CreateOrganizationCalled.With.Organization.Name != name {
+	if repo.InsertOrganizationCalled.With.Organization.Name != name {
 		t.Errorf(
-			"Expected repository.CreateOrganization to receive name %q, but got %q.",
-			name, repo.CreateOrganizationCalled.With.Organization.Name,
+			"Expected repository.InsertOrganization to receive name %q, but got %q.",
+			name, repo.InsertOrganizationCalled.With.Organization.Name,
 		)
 	}
 
-	if repo.CreateMembershipCalled.Count != 1 {
-		t.Errorf("Expected repository to receive CreateMembership, but it didn't.")
+	if repo.InsertMembershipCalled.Count != 1 {
+		t.Errorf("Expected repository to receive InsertMembership, but it didn't.")
 	}
-	if repo.CreateMembershipCalled.With.Membership.OrganizationID != org.ID {
+	if repo.InsertMembershipCalled.With.Membership.OrganizationID != org.ID {
 		t.Errorf(
-			"Expected repository.CreateMembership to receive organization ID %q, but got %q.",
-			org.ID, repo.CreateMembershipCalled.With.Membership.OrganizationID,
+			"Expected repository.InsertMembership to receive organization ID %q, but got %q.",
+			org.ID, repo.InsertMembershipCalled.With.Membership.OrganizationID,
 		)
 	}
-	if repo.CreateMembershipCalled.With.Membership.UserID != ownerID {
+	if repo.InsertMembershipCalled.With.Membership.UserID != ownerID {
 		t.Errorf(
-			"Expected repository.CreateMembership to receive user ID %q, but got %q.",
-			ownerID, repo.CreateMembershipCalled.With.Membership.UserID,
+			"Expected repository.InsertMembership to receive user ID %q, but got %q.",
+			ownerID, repo.InsertMembershipCalled.With.Membership.UserID,
 		)
 	}
 

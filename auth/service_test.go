@@ -19,7 +19,7 @@ func TestSigningUpSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			CreateUserFn: func(_ context.Context, _ db.Tx, _ *auth.User, _ string) error { return nil },
+			InsertUserFn: func(_ context.Context, _ db.Tx, _ *auth.User, _ string) error { return nil },
 		}
 
 		svc = auth.Service{
@@ -33,23 +33,23 @@ func TestSigningUpSucceeds(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if repo.CreateUserCalled.Count != 1 {
-		t.Errorf("Expected repository to receive CreateUser, but it didn't.")
+	if repo.InsertUserCalled.Count != 1 {
+		t.Errorf("Expected repository to receive InsertUser, but it didn't.")
 	}
-	if repo.CreateUserCalled.With.User.ID != user.ID {
+	if repo.InsertUserCalled.With.User.ID != user.ID {
 		t.Errorf(
-			"Expected repository.CreateUser to receive id %q, but got %q.",
-			user.ID, repo.CreateUserCalled.With.User.ID,
+			"Expected repository.InsertUser to receive id %q, but got %q.",
+			user.ID, repo.InsertUserCalled.With.User.ID,
 		)
 	}
-	if repo.CreateUserCalled.With.User.Username != username {
+	if repo.InsertUserCalled.With.User.Username != username {
 		t.Errorf(
-			"Expected repository.CreateUser to receive username %q, but got %q.",
-			username, repo.CreateUserCalled.With.User.Username,
+			"Expected repository.InsertUser to receive username %q, but got %q.",
+			username, repo.InsertUserCalled.With.User.Username,
 		)
 	}
-	if repo.CreateUserCalled.With.PasswordHash == password {
-		t.Errorf("Expected repository.CreateUser not to receive a plaintext password, but it did.")
+	if repo.InsertUserCalled.With.PasswordHash == password {
+		t.Errorf("Expected repository.InsertUser not to receive a plaintext password, but it did.")
 	}
 
 	if user.ID == "" {

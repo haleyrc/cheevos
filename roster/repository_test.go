@@ -11,7 +11,7 @@ import (
 	"github.com/haleyrc/cheevos/roster"
 )
 
-func TestCreateInvitationCreateAnInvitation(t *testing.T) {
+func TestInsertInvitationInsertAnInvitation(t *testing.T) {
 	var (
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
@@ -28,14 +28,14 @@ func TestCreateInvitationCreateAnInvitation(t *testing.T) {
 		_, codeHash = fake.Password()
 	)
 
-	authRepo.CreateUser(ctx, db, user, pwHash)
-	rosterRepo.CreateOrganization(ctx, db, org)
-	if err := rosterRepo.CreateInvitation(ctx, db, invitation, codeHash); err != nil {
+	authRepo.InsertUser(ctx, db, user, pwHash)
+	rosterRepo.InsertOrganization(ctx, db, org)
+	if err := rosterRepo.InsertInvitation(ctx, db, invitation, codeHash); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestCreateMembershipCreatesAMembership(t *testing.T) {
+func TestInsertMembershipInsertsAMembership(t *testing.T) {
 	var (
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
@@ -51,14 +51,14 @@ func TestCreateMembershipCreatesAMembership(t *testing.T) {
 		member = fake.Membership(org.ID, user.ID)
 	)
 
-	authRepo.CreateUser(ctx, db, user, pwHash)
-	rosterRepo.CreateOrganization(ctx, db, org)
-	if err := rosterRepo.CreateMembership(ctx, db, member); err != nil {
+	authRepo.InsertUser(ctx, db, user, pwHash)
+	rosterRepo.InsertOrganization(ctx, db, org)
+	if err := rosterRepo.InsertMembership(ctx, db, member); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestCreateOrganizationSavesAOrganization(t *testing.T) {
+func TestInsertOrganizationUpdatesAOrganization(t *testing.T) {
 	var (
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
@@ -72,9 +72,9 @@ func TestCreateOrganizationSavesAOrganization(t *testing.T) {
 		org = fake.Organization(user.ID)
 	)
 
-	authRepo.CreateUser(ctx, db, user, pwHash)
+	authRepo.InsertUser(ctx, db, user, pwHash)
 
-	if err := rosterRepo.CreateOrganization(ctx, db, org); err != nil {
+	if err := rosterRepo.InsertOrganization(ctx, db, org); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -96,9 +96,9 @@ func TestDeleteInvitationByCodeDeleteAnInvitation(t *testing.T) {
 		_, codeHash = fake.Password()
 	)
 
-	authRepo.CreateUser(ctx, db, user, pwHash)
-	rosterRepo.CreateOrganization(ctx, db, org)
-	rosterRepo.CreateInvitation(ctx, db, invitation, codeHash)
+	authRepo.InsertUser(ctx, db, user, pwHash)
+	rosterRepo.InsertOrganization(ctx, db, org)
+	rosterRepo.InsertInvitation(ctx, db, invitation, codeHash)
 
 	if err := rosterRepo.DeleteInvitationByCode(ctx, db, codeHash); err != nil {
 		t.Fatal(err)
@@ -122,9 +122,9 @@ func TestGetInvitationByCodeReturnsAnInvitation(t *testing.T) {
 		_, codeHash = fake.Password()
 	)
 
-	authRepo.CreateUser(ctx, db, user, pwHash)
-	rosterRepo.CreateOrganization(ctx, db, org)
-	rosterRepo.CreateInvitation(ctx, db, invitation, codeHash)
+	authRepo.InsertUser(ctx, db, user, pwHash)
+	rosterRepo.InsertOrganization(ctx, db, org)
+	rosterRepo.InsertInvitation(ctx, db, invitation, codeHash)
 
 	var got roster.Invitation
 	if err := rosterRepo.GetInvitationByCode(ctx, db, &got, codeHash); err != nil {
@@ -142,7 +142,7 @@ func TestGetInvitationByCodeReturnsAnInvitation(t *testing.T) {
 	}
 }
 
-func TestSaveInvitationSavesAnInvitation(t *testing.T) {
+func TestUpdateInvitationUpdatesAnInvitation(t *testing.T) {
 	var (
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
@@ -160,13 +160,13 @@ func TestSaveInvitationSavesAnInvitation(t *testing.T) {
 		_, newCodeHash = fake.Password()
 	)
 
-	authRepo.CreateUser(ctx, db, user, pwHash)
-	rosterRepo.CreateOrganization(ctx, db, org)
-	rosterRepo.CreateInvitation(ctx, db, invitation, codeHash)
+	authRepo.InsertUser(ctx, db, user, pwHash)
+	rosterRepo.InsertOrganization(ctx, db, org)
+	rosterRepo.InsertInvitation(ctx, db, invitation, codeHash)
 
 	invitation.Expires = time.Now().Add(time.Hour)
 
-	if err := rosterRepo.SaveInvitation(ctx, db, invitation, newCodeHash); err != nil {
+	if err := rosterRepo.UpdateInvitation(ctx, db, invitation, newCodeHash); err != nil {
 		t.Fatal(err)
 	}
 

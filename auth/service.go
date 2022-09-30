@@ -12,8 +12,8 @@ import (
 )
 
 type UsersRepository interface {
-	CreateUser(ctx context.Context, tx db.Tx, u *User, hashedPassword string) error
 	GetUser(ctx context.Context, tx db.Tx, u *User, id string) error
+	InsertUser(ctx context.Context, tx db.Tx, u *User, hashedPassword string) error
 }
 
 type Service struct {
@@ -49,7 +49,7 @@ func (svc *Service) SignUp(ctx context.Context, username, password string) (*Use
 		if err := user.Validate(); err != nil {
 			return core.WrapError(err)
 		}
-		return svc.Repo.CreateUser(ctx, tx, &user, hash.Generate(password))
+		return svc.Repo.InsertUser(ctx, tx, &user, hash.Generate(password))
 	})
 	if err != nil {
 		return nil, fmt.Errorf("sign up failed: %w", err)

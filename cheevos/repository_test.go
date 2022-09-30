@@ -11,7 +11,7 @@ import (
 	"github.com/haleyrc/cheevos/roster"
 )
 
-func TestCreateAwardCreatesAnAward(t *testing.T) {
+func TestInsertAwardInsertsAnAward(t *testing.T) {
 	var (
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
@@ -31,17 +31,17 @@ func TestCreateAwardCreatesAnAward(t *testing.T) {
 		award = fake.Award(cheevo.ID, recipient.ID)
 	)
 
-	authRepo.CreateUser(ctx, db, awarder, hash)
-	authRepo.CreateUser(ctx, db, recipient, hash)
-	rosterRepo.CreateOrganization(ctx, db, org)
-	cheevosRepo.CreateCheevo(ctx, db, cheevo)
+	authRepo.InsertUser(ctx, db, awarder, hash)
+	authRepo.InsertUser(ctx, db, recipient, hash)
+	rosterRepo.InsertOrganization(ctx, db, org)
+	cheevosRepo.InsertCheevo(ctx, db, cheevo)
 
-	if err := cheevosRepo.CreateAward(ctx, db, award); err != nil {
+	if err := cheevosRepo.InsertAward(ctx, db, award); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestCreateCheevoCreatesACheevo(t *testing.T) {
+func TestInsertCheevoInsertsACheevo(t *testing.T) {
 	var (
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
@@ -59,11 +59,11 @@ func TestCreateCheevoCreatesACheevo(t *testing.T) {
 		cheevo = fake.Cheevo(org.ID)
 	)
 
-	authRepo.CreateUser(ctx, db, awarder, hash)
-	authRepo.CreateUser(ctx, db, recipient, hash)
-	rosterRepo.CreateOrganization(ctx, db, org)
+	authRepo.InsertUser(ctx, db, awarder, hash)
+	authRepo.InsertUser(ctx, db, recipient, hash)
+	rosterRepo.InsertOrganization(ctx, db, org)
 
-	if err := cheevosRepo.CreateCheevo(ctx, db, cheevo); err != nil {
+	if err := cheevosRepo.InsertCheevo(ctx, db, cheevo); err != nil {
 		t.Fatal(err)
 	}
 }

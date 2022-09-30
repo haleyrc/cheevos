@@ -23,7 +23,7 @@ func TestAwardingACheevoSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			CreateAwardFn: func(_ context.Context, _ db.Tx, _ *cheevos.Award) error { return nil },
+			InsertAwardFn: func(_ context.Context, _ db.Tx, _ *cheevos.Award) error { return nil },
 		}
 
 		svc = cheevos.Service{
@@ -36,25 +36,25 @@ func TestAwardingACheevoSucceeds(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if repo.CreateAwardCalled.Count != 1 {
-		t.Errorf("Expected repository to receive CreateAward, but it didn't.")
+	if repo.InsertAwardCalled.Count != 1 {
+		t.Errorf("Expected repository to receive InsertAward, but it didn't.")
 	}
-	if repo.CreateAwardCalled.With.Award.CheevoID != cheevoID {
+	if repo.InsertAwardCalled.With.Award.CheevoID != cheevoID {
 		t.Errorf(
-			"Expected repository.CreateAward to receive cheevo ID %q, but got %q.",
-			cheevoID, repo.CreateAwardCalled.With.Award.CheevoID,
+			"Expected repository.InsertAward to receive cheevo ID %q, but got %q.",
+			cheevoID, repo.InsertAwardCalled.With.Award.CheevoID,
 		)
 	}
-	if repo.CreateAwardCalled.With.Award.UserID != userID {
+	if repo.InsertAwardCalled.With.Award.UserID != userID {
 		t.Errorf(
-			"Expected repository.CreateAward to receive user ID %q, but got %q.",
-			userID, repo.CreateAwardCalled.With.Award.UserID,
+			"Expected repository.InsertAward to receive user ID %q, but got %q.",
+			userID, repo.InsertAwardCalled.With.Award.UserID,
 		)
 	}
-	if repo.CreateAwardCalled.With.Award.Awarded != now {
+	if repo.InsertAwardCalled.With.Award.Awarded != now {
 		t.Errorf(
-			"Expected repository.CreateAward to receive awarded %s, but got %s.",
-			now, repo.CreateAwardCalled.With.Award.Awarded,
+			"Expected repository.InsertAward to receive awarded %s, but got %s.",
+			now, repo.InsertAwardCalled.With.Award.Awarded,
 		)
 	}
 }
@@ -70,7 +70,7 @@ func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			CreateCheevoFn: func(_ context.Context, _ db.Tx, _ *cheevos.Cheevo) error { return nil },
+			InsertCheevoFn: func(_ context.Context, _ db.Tx, _ *cheevos.Cheevo) error { return nil },
 		}
 
 		svc = cheevos.Service{
@@ -84,25 +84,25 @@ func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if repo.CreateCheevoCalled.Count != 1 {
-		t.Errorf("Expected repository to receive CreateCheevo, but it didn't.")
+	if repo.InsertCheevoCalled.Count != 1 {
+		t.Errorf("Expected repository to receive InsertCheevo, but it didn't.")
 	}
-	if repo.CreateCheevoCalled.With.Cheevo.ID != cheevo.ID {
+	if repo.InsertCheevoCalled.With.Cheevo.ID != cheevo.ID {
 		t.Errorf(
-			"Expected repository.CreateCheevo to receive id %q, but got %q.",
-			cheevo.ID, repo.CreateCheevoCalled.With.Cheevo.ID,
+			"Expected repository.InsertCheevo to receive id %q, but got %q.",
+			cheevo.ID, repo.InsertCheevoCalled.With.Cheevo.ID,
 		)
 	}
-	if repo.CreateCheevoCalled.With.Cheevo.Name != name {
+	if repo.InsertCheevoCalled.With.Cheevo.Name != name {
 		t.Errorf(
-			"Expected repository.CreateCheevo to receive name %q, but got %q.",
-			name, repo.CreateCheevoCalled.With.Cheevo.Name,
+			"Expected repository.InsertCheevo to receive name %q, but got %q.",
+			name, repo.InsertCheevoCalled.With.Cheevo.Name,
 		)
 	}
-	if repo.CreateCheevoCalled.With.Cheevo.Description != description {
+	if repo.InsertCheevoCalled.With.Cheevo.Description != description {
 		t.Errorf(
-			"Expected repository.CreateCheevo to receive description %q, but got %q.",
-			description, repo.CreateCheevoCalled.With.Cheevo.Description,
+			"Expected repository.InsertCheevo to receive description %q, but got %q.",
+			description, repo.InsertCheevoCalled.With.Cheevo.Description,
 		)
 	}
 

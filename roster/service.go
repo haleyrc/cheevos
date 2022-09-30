@@ -27,20 +27,20 @@ type Emailer interface {
 }
 
 type InvitationsRepository interface {
-	CreateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
 	DeleteInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) error
 	GetInvitation(ctx context.Context, tx db.Tx, i *Invitation, id string) error
 	GetInvitationByCode(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
-	SaveInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
+	InsertInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
+	UpdateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
 }
 
 type MembershipsRepository interface {
-	CreateMembership(ctx context.Context, tx db.Tx, m *Membership) error
 	GetMembership(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error
+	InsertMembership(ctx context.Context, tx db.Tx, m *Membership) error
 }
 
 type OrganizationsRepository interface {
-	CreateOrganization(ctx context.Context, tx db.Tx, org *Organization) error
+	InsertOrganization(ctx context.Context, tx db.Tx, org *Organization) error
 }
 
 type Service struct {
@@ -74,7 +74,7 @@ func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) e
 		if err := membership.Validate(); err != nil {
 			return core.WrapError(err)
 		}
-		if err := svc.Repo.CreateMembership(ctx, tx, membership); err != nil {
+		if err := svc.Repo.InsertMembership(ctx, tx, membership); err != nil {
 			return core.WrapError(err)
 		}
 
@@ -112,11 +112,11 @@ func (svc *Service) CreateOrganization(ctx context.Context, name, ownerID string
 			return core.WrapError(err)
 		}
 
-		if err := svc.Repo.CreateOrganization(ctx, tx, &org); err != nil {
+		if err := svc.Repo.InsertOrganization(ctx, tx, &org); err != nil {
 			return core.WrapError(err)
 		}
 
-		return svc.Repo.CreateMembership(ctx, tx, membership)
+		return svc.Repo.InsertMembership(ctx, tx, membership)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("create organization failed: %w", err)
@@ -163,7 +163,7 @@ func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID s
 		}
 
 		code := random.String(CodeLength)
-		if err := svc.Repo.CreateInvitation(ctx, tx, &invitation, hash.Generate(code)); err != nil {
+		if err := svc.Repo.InsertInvitation(ctx, tx, &invitation, hash.Generate(code)); err != nil {
 			return core.WrapError(err)
 		}
 
@@ -199,7 +199,7 @@ func (svc *Service) RefreshInvitation(ctx context.Context, id string) (*Invitati
 		invitation.Expires = time.Now().Add(InvitationValidFor)
 
 		newCode := random.String(CodeLength)
-		if err := svc.Repo.SaveInvitation(ctx, tx, &invitation, hash.Generate(newCode)); err != nil {
+		if err := svc.Repo.UpdateInvitation(ctx, tx, &invitation, hash.Generate(newCode)); err != nil {
 			return core.WrapError(err)
 		}
 
