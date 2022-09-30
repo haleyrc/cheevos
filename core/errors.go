@@ -35,6 +35,20 @@ func (ae *AuthorizationError) Message() string {
 	return msg
 }
 
+func NewBadRequestError(err error) *BadRequestError {
+	return &BadRequestError{cause: err}
+}
+
+type BadRequestError struct {
+	cause error
+}
+
+func (bre *BadRequestError) Code() int { return http.StatusBadRequest }
+
+func (bre *BadRequestError) Error() string { return fmt.Sprintf("bad request: %v", bre.cause) }
+
+func (bre *BadRequestError) Message() string { return "There was a problem with your request." }
+
 func NewRawError(code int, msg string) *RawError {
 	return &RawError{
 		code: code,
