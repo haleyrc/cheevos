@@ -1,12 +1,11 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"path/filepath"
 	"runtime"
-
-	"github.com/pkg/errors"
 )
 
 type Coded interface {
@@ -22,7 +21,7 @@ type Model interface {
 }
 
 func ErrorCode(err error) int {
-	root := errors.Cause(err)
+	root := errors.Unwrap(err)
 	return errorCode(root)
 }
 
@@ -34,7 +33,10 @@ func errorCode(err error) int {
 }
 
 func ErrorMessage(err error) string {
-	root := errors.Cause(err)
+	root := errors.Unwrap(err)
+	if root == nil {
+		root = err
+	}
 	return errorMessage(root)
 }
 
@@ -57,6 +59,8 @@ func (we wrappedError) Code() int { return ErrorCode(we.cause) }
 func (we wrappedError) Error() string { return fmt.Sprintf("%s: %v", we.name, we.cause) }
 
 func (we wrappedError) Message() string { return ErrorMessage(we.cause) }
+
+func (we wrappedError) Unwrap() error { return we.cause }
 
 func WrapError(err error) error {
 	pc, file, lineno, ok := runtime.Caller(1)
