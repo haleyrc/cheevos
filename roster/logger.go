@@ -6,16 +6,17 @@ import (
 	"github.com/haleyrc/cheevos/lib/logger"
 )
 
+type loggable interface {
+	AcceptInvitation(ctx context.Context, userID, code string) error
+	CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error)
+	DeclineInvitation(ctx context.Context, code string) error
+	InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error)
+	RefreshInvitation(ctx context.Context, id string) (*Invitation, error)
+}
+
 type Logger struct {
 	Logger  logger.Logger
-	Service interface {
-		AcceptInvitation(ctx context.Context, userID, code string) error
-		AddMemberToOrganization(ctx context.Context, userID, orgID string) error
-		CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error)
-		DeclineInvitation(ctx context.Context, code string) error
-		InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error)
-		RefreshInvitation(ctx context.Context, code string) error
-	}
+	Service loggable
 }
 
 func (l *Logger) AcceptInvitation(ctx context.Context, userID, code string) error {
@@ -32,25 +33,6 @@ func (l *Logger) AcceptInvitation(ctx context.Context, userID, code string) erro
 	l.Logger.Log(ctx, "accepted invitation", logger.Fields{
 		"Code": code,
 		"User": userID,
-	})
-
-	return nil
-}
-
-func (l *Logger) AddMemberToOrganization(ctx context.Context, userID, orgID string) error {
-	l.Logger.Debug(ctx, "adding member to organization", logger.Fields{
-		"Organization": orgID,
-		"User":         userID,
-	})
-
-	if err := l.Service.AddMemberToOrganization(ctx, userID, orgID); err != nil {
-		l.Logger.Error(ctx, "add member to organization failed", err)
-		return err
-	}
-
-	l.Logger.Log(ctx, "added member to organization", logger.Fields{
-		"Organization": orgID,
-		"User":         userID,
 	})
 
 	return nil
@@ -111,19 +93,20 @@ func (l *Logger) InviteUserToOrganization(ctx context.Context, email, orgID stri
 	return invitation, nil
 }
 
-func (l *Logger) RefreshInvitation(ctx context.Context, code string) error {
+func (l *Logger) RefreshInvitation(ctx context.Context, id string) (*Invitation, error) {
 	l.Logger.Debug(ctx, "refreshing invitation", logger.Fields{
-		"Code": code,
+		"ID": id,
 	})
 
-	if err := l.Service.RefreshInvitation(ctx, code); err != nil {
+	invitation, err := l.Service.RefreshInvitation(ctx, id)
+	if err != nil {
 		l.Logger.Error(ctx, "refresh invitation failed", err)
-		return err
+		return nil, err
 	}
 
 	l.Logger.Log(ctx, "refreshed invitation", logger.Fields{
-		"Code": code,
+		"Invitation": invitation,
 	})
 
-	return nil
+	return invitation, nil
 }
