@@ -11,6 +11,7 @@ type Logger struct {
 	Service interface {
 		AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error
 		CreateCheevo(ctx context.Context, name, description, orgID string) (*Cheevo, error)
+		GetCheevo(ctx context.Context, id string) (*Cheevo, error)
 	}
 }
 
@@ -47,6 +48,22 @@ func (l *Logger) CreateCheevo(ctx context.Context, name, description, orgID stri
 	}
 
 	l.Logger.Log(ctx, "cheevo created", logger.Fields{
+		"Cheevo": cheevo,
+	})
+
+	return cheevo, nil
+}
+
+func (l *Logger) GetCheevo(ctx context.Context, id string) (*Cheevo, error) {
+	l.Logger.Debug(ctx, "getting cheevo", logger.Fields{"ID": id})
+
+	cheevo, err := l.Service.GetCheevo(ctx, id)
+	if err != nil {
+		l.Logger.Error(ctx, "get cheevo failed", err)
+		return nil, err
+	}
+
+	l.Logger.Log(ctx, "got cheevo", logger.Fields{
 		"Cheevo": cheevo,
 	})
 
