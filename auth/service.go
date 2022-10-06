@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/pborman/uuid"
 
@@ -49,11 +50,32 @@ func (svc *Service) SignUp(ctx context.Context, username, password string) (*Use
 		if err := user.Validate(); err != nil {
 			return core.WrapError(err)
 		}
+
+		password = normalizePassword(password)
+		if err := validatePassword(&user, password); err != nil {
+			return core.WrapError(err)
+		}
+
 		return svc.Repo.InsertUser(ctx, tx, &user, hash.Generate(password))
 	})
 	if err != nil {
-		return nil, fmt.Errorf("sign up failed: %w", err)
+		return nil, core.WrapError(err)
 	}
 
 	return &user, nil
+}
+
+func normalizePassword(password string) string {
+	return strings.TrimSpace(password)
+}
+
+// The User parameter here is required so we can construct our validation error
+// correctly, but this feels like a pretty gnarly way of doing things.
+func validatePassword(u *User, password string) error {
+	if len(password) < 8 {
+		return core.NewValidationError(u).
+			Add("Password", "Password must be eighth (8) or more characters.").
+			Error()
+	}
+	return nil
 }
