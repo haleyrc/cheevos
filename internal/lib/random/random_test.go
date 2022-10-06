@@ -3,7 +3,7 @@ package random_test
 import (
 	"testing"
 
-	"github.com/haleyrc/cheevos/lib/random"
+	"github.com/haleyrc/cheevos/internal/lib/random"
 )
 
 func TestStringReturnsRandomStrings(t *testing.T) {

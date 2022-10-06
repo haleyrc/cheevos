@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/haleyrc/cheevos/core"
+	"github.com/haleyrc/cheevos/internal/core"
 )
 
 const DefaultErrorMessage = "Unexpected error."

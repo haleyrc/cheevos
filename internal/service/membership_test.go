@@ -3,10 +3,11 @@ package service_test
 import (
 	"testing"
 
-	"github.com/haleyrc/cheevos/internal/fake"
-	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/cheevos/roster"
 	"github.com/pborman/uuid"
+
+	"github.com/haleyrc/cheevos/internal/fake"
+	"github.com/haleyrc/cheevos/internal/service"
+	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
 func TestMembershipValidationReturnsNilForAValidMembership(t *testing.T) {
@@ -17,7 +18,7 @@ func TestMembershipValidationReturnsNilForAValidMembership(t *testing.T) {
 }
 
 func TestMembershipValidationReturnsAnErrorForAnInvalidMembership(t *testing.T) {
-	var m roster.Membership
+	var m service.Membership
 	testutil.RunValidationTests(t, &m, "validation failed: Membership is invalid", map[string]string{
 		"OrganizationID": "Organization ID can't be blank.",
 		"UserID":         "User ID can't be blank.",

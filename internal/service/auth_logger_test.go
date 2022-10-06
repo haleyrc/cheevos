@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/haleyrc/cheevos/auth"
 	"github.com/haleyrc/cheevos/internal/mock"
+	"github.com/haleyrc/cheevos/internal/service"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
 func TestLoggerLogsAnErrorFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &auth.Logger{
+	cl := &service.AuthLogger{
 		Service: &mock.AuthService{
-			SignUpFn: func(_ context.Context, _, _ string) (*auth.User, error) {
+			SignUpFn: func(_ context.Context, _, _ string) (*service.User, error) {
 				return nil, fmt.Errorf("oops")
 			},
 		},
@@ -32,10 +32,10 @@ func TestLoggerLogsAnErrorFromSignUp(t *testing.T) {
 func TestLoggerLogsTheResponseFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &auth.Logger{
+	cl := &service.AuthLogger{
 		Service: &mock.AuthService{
-			SignUpFn: func(_ context.Context, _, _ string) (*auth.User, error) {
-				return &auth.User{ID: "id", Username: "username"}, nil
+			SignUpFn: func(_ context.Context, _, _ string) (*service.User, error) {
+				return &service.User{ID: "id", Username: "username"}, nil
 			},
 		},
 		Logger: logger,

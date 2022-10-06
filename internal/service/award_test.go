@@ -5,8 +5,8 @@ import (
 
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos/cheevos"
 	"github.com/haleyrc/cheevos/internal/fake"
+	"github.com/haleyrc/cheevos/internal/service"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
@@ -18,7 +18,7 @@ func TestAwardValidationReturnsNilForAValidAward(t *testing.T) {
 }
 
 func TestAwardValidationReturnsAnErrorForAnInvalidAward(t *testing.T) {
-	var a cheevos.Award
+	var a service.Award
 	testutil.RunValidationTests(t, &a, "validation failed: Award is invalid", map[string]string{
 		"CheevoID": "Cheevo ID can't be blank.",
 		"UserID":   "User ID can't be blank.",

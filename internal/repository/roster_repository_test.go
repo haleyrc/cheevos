@@ -4,20 +4,22 @@ import (
 	"context"
 	"testing"
 
-	"github.com/haleyrc/cheevos/auth"
 	"github.com/haleyrc/cheevos/internal/fake"
+	"github.com/haleyrc/cheevos/internal/lib/time"
+	"github.com/haleyrc/cheevos/internal/repository"
+	"github.com/haleyrc/cheevos/internal/service"
 	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/cheevos/lib/time"
-	"github.com/haleyrc/cheevos/roster"
 )
+
+var _ service.RosterRepository = &repository.RosterRepository{}
 
 func TestInsertInvitationInsertAnInvitation(t *testing.T) {
 	var (
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
 
-		rosterRepo = &roster.Repository{}
-		authRepo   = &auth.Repository{}
+		rosterRepo = &repository.RosterRepository{}
+		authRepo   = &repository.AuthRepository{}
 
 		user      = fake.User()
 		_, pwHash = fake.Password()
@@ -40,8 +42,8 @@ func TestInsertMembershipInsertsAMembership(t *testing.T) {
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
 
-		rosterRepo = &roster.Repository{}
-		authRepo   = &auth.Repository{}
+		rosterRepo = &repository.RosterRepository{}
+		authRepo   = &repository.AuthRepository{}
 
 		user      = fake.User()
 		_, pwHash = fake.Password()
@@ -63,8 +65,8 @@ func TestInsertOrganizationUpdatesAOrganization(t *testing.T) {
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
 
-		rosterRepo = &roster.Repository{}
-		authRepo   = &auth.Repository{}
+		rosterRepo = &repository.RosterRepository{}
+		authRepo   = &repository.AuthRepository{}
 
 		user      = fake.User()
 		_, pwHash = fake.Password()
@@ -84,8 +86,8 @@ func TestDeleteInvitationByCodeDeleteAnInvitation(t *testing.T) {
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
 
-		rosterRepo = &roster.Repository{}
-		authRepo   = &auth.Repository{}
+		rosterRepo = &repository.RosterRepository{}
+		authRepo   = &repository.AuthRepository{}
 
 		user      = fake.User()
 		_, pwHash = fake.Password()
@@ -110,8 +112,8 @@ func TestGetInvitationByCodeReturnsAnInvitation(t *testing.T) {
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
 
-		rosterRepo = &roster.Repository{}
-		authRepo   = &auth.Repository{}
+		rosterRepo = &repository.RosterRepository{}
+		authRepo   = &repository.AuthRepository{}
 
 		user      = fake.User()
 		_, pwHash = fake.Password()
@@ -126,7 +128,7 @@ func TestGetInvitationByCodeReturnsAnInvitation(t *testing.T) {
 	rosterRepo.InsertOrganization(ctx, db, org)
 	rosterRepo.InsertInvitation(ctx, db, invitation, codeHash)
 
-	var got roster.Invitation
+	var got service.Invitation
 	if err := rosterRepo.GetInvitationByCode(ctx, db, &got, codeHash); err != nil {
 		t.Fatal(err)
 	}
@@ -147,8 +149,8 @@ func TestUpdateInvitationUpdatesAnInvitation(t *testing.T) {
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
 
-		rosterRepo = &roster.Repository{}
-		authRepo   = &auth.Repository{}
+		rosterRepo = &repository.RosterRepository{}
+		authRepo   = &repository.AuthRepository{}
 
 		user      = fake.User()
 		_, pwHash = fake.Password()
@@ -170,11 +172,11 @@ func TestUpdateInvitationUpdatesAnInvitation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := rosterRepo.GetInvitationByCode(ctx, db, &roster.Invitation{}, codeHash); err == nil {
+	if err := rosterRepo.GetInvitationByCode(ctx, db, &service.Invitation{}, codeHash); err == nil {
 		t.Errorf("Expected to not find an invitation with the old code, but did.")
 	}
 
-	var got roster.Invitation
+	var got service.Invitation
 	if err := rosterRepo.GetInvitationByCode(ctx, db, &got, newCodeHash); err != nil {
 		t.Fatal(err)
 	}

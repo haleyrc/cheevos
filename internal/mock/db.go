@@ -3,7 +3,7 @@ package mock
 import (
 	"context"
 
-	"github.com/haleyrc/cheevos/lib/db"
+	"github.com/haleyrc/cheevos/internal/lib/db"
 )
 
 type Database struct{}

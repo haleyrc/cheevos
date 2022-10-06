@@ -3,13 +3,13 @@ package fake
 import (
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos/auth"
-	"github.com/haleyrc/cheevos/lib/hash"
-	"github.com/haleyrc/cheevos/lib/random"
+	"github.com/haleyrc/cheevos/internal/lib/hash"
+	"github.com/haleyrc/cheevos/internal/lib/random"
+	"github.com/haleyrc/cheevos/internal/service"
 )
 
-func User() *auth.User {
-	return &auth.User{
+func User() *service.User {
+	return &service.User{
 		ID:       uuid.New(),
 		Username: uniqify("TestUser"),
 	}

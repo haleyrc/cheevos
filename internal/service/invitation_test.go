@@ -3,14 +3,15 @@ package service_test
 import (
 	"testing"
 
-	"github.com/haleyrc/cheevos/internal/fake"
-	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/cheevos/roster"
 	"github.com/pborman/uuid"
+
+	"github.com/haleyrc/cheevos/internal/fake"
+	"github.com/haleyrc/cheevos/internal/service"
+	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
 func TestNormalizingAnInvitationNormalizesEmail(t *testing.T) {
-	subject := roster.Invitation{Email: testutil.UnsafeString}
+	subject := service.Invitation{Email: testutil.UnsafeString}
 	subject.Normalize()
 	if subject.Email != testutil.SafeString {
 		t.Errorf("Expected invitation email to be normalized, but it wasn't.")
@@ -25,7 +26,7 @@ func TestInvitationValidationReturnsNilForAValidInvitation(t *testing.T) {
 }
 
 func TestInvitationValidationReturnsAnErrorForAnInvalidInvitation(t *testing.T) {
-	var i roster.Invitation
+	var i service.Invitation
 	testutil.RunValidationTests(t, &i, "validation failed: Invitation is invalid", map[string]string{
 		"ID":             "ID can't be blank.",
 		"Email":          "Email can't be blank.",

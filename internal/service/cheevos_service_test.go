@@ -6,10 +6,10 @@ import (
 
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos/cheevos"
+	"github.com/haleyrc/cheevos/internal/lib/db"
+	"github.com/haleyrc/cheevos/internal/lib/time"
 	"github.com/haleyrc/cheevos/internal/mock"
-	"github.com/haleyrc/cheevos/lib/db"
-	"github.com/haleyrc/cheevos/lib/time"
+	"github.com/haleyrc/cheevos/internal/service"
 )
 
 func TestAwardingACheevoSucceeds(t *testing.T) {
@@ -23,10 +23,10 @@ func TestAwardingACheevoSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertAwardFn: func(_ context.Context, _ db.Tx, _ *cheevos.Award) error { return nil },
+			InsertAwardFn: func(_ context.Context, _ db.Tx, _ *service.Award) error { return nil },
 		}
 
-		svc = cheevos.Service{
+		svc = service.CheevosService{
 			DB:   mockDB,
 			Repo: repo,
 		}
@@ -70,10 +70,10 @@ func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertCheevoFn: func(_ context.Context, _ db.Tx, _ *cheevos.Cheevo) error { return nil },
+			InsertCheevoFn: func(_ context.Context, _ db.Tx, _ *service.Cheevo) error { return nil },
 		}
 
-		svc = cheevos.Service{
+		svc = service.CheevosService{
 			DB:   mockDB,
 			Repo: repo,
 		}

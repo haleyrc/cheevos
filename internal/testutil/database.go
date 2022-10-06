@@ -9,7 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
-	mydb "github.com/haleyrc/cheevos/lib/db"
+	mydb "github.com/haleyrc/cheevos/internal/lib/db"
 )
 
 var db *Database

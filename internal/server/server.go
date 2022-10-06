@@ -3,9 +3,7 @@ package server
 import (
 	"context"
 
-	"github.com/haleyrc/cheevos/auth"
-	"github.com/haleyrc/cheevos/cheevos"
-	"github.com/haleyrc/cheevos/roster"
+	"github.com/haleyrc/cheevos/internal/service"
 )
 
 type AuthorizationService interface {
@@ -17,19 +15,19 @@ type AuthorizationService interface {
 }
 
 type AuthenticationService interface {
-	SignUp(ctx context.Context, username, password string) (*auth.User, error)
+	SignUp(ctx context.Context, username, password string) (*service.User, error)
 }
 
 type CheevosService interface {
 	AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error
-	CreateCheevo(ctx context.Context, name, description, orgID string) (*cheevos.Cheevo, error)
-	GetCheevo(ctx context.Context, id string) (*cheevos.Cheevo, error)
+	CreateCheevo(ctx context.Context, name, description, orgID string) (*service.Cheevo, error)
+	GetCheevo(ctx context.Context, id string) (*service.Cheevo, error)
 }
 
 type RosterService interface {
 	AcceptInvitation(ctx context.Context, userID, code string) error
-	CreateOrganization(ctx context.Context, name, ownerID string) (*roster.Organization, error)
+	CreateOrganization(ctx context.Context, name, ownerID string) (*service.Organization, error)
 	DeclineInvitation(ctx context.Context, code string) error
-	InviteUserToOrganization(ctx context.Context, email, orgID string) (*roster.Invitation, error)
-	RefreshInvitation(ctx context.Context, invitationID string) (*roster.Invitation, error)
+	InviteUserToOrganization(ctx context.Context, email, orgID string) (*service.Invitation, error)
+	RefreshInvitation(ctx context.Context, invitationID string) (*service.Invitation, error)
 }

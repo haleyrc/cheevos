@@ -33,7 +33,7 @@ func TestHandleErrorReturnsTheExpectedMessage(t *testing.T) {
 		input error
 		want  string
 	}{
-		"when the error isn't messaged": {input: fmt.Errorf("oops"), want: "Unexpected error."},
+		"when the error isn't messaged": {input: fmt.Errorf("oops"), want: "Something went wrong."},
 		"when the error is messaged":    {input: messagedError("hello"), want: "hello"},
 	}
 	for name, tc := range testcases {

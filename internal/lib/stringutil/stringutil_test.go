@@ -3,7 +3,7 @@ package stringutil_test
 import (
 	"testing"
 
-	"github.com/haleyrc/cheevos/lib/stringutil"
+	"github.com/haleyrc/cheevos/internal/lib/stringutil"
 )
 
 func TestMakeSafe(t *testing.T) {

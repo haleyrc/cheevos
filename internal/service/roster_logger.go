@@ -3,23 +3,21 @@ package service
 import (
 	"context"
 
-	"github.com/haleyrc/cheevos/lib/logger"
+	"github.com/haleyrc/cheevos/internal/lib/logger"
 )
 
-type loggable interface {
-	AcceptInvitation(ctx context.Context, userID, code string) error
-	CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error)
-	DeclineInvitation(ctx context.Context, code string) error
-	InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error)
-	RefreshInvitation(ctx context.Context, id string) (*Invitation, error)
-}
-
-type Logger struct {
+type RosterLogger struct {
 	Logger  logger.Logger
-	Service loggable
+	Service interface {
+		AcceptInvitation(ctx context.Context, userID, code string) error
+		CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error)
+		DeclineInvitation(ctx context.Context, code string) error
+		InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error)
+		RefreshInvitation(ctx context.Context, id string) (*Invitation, error)
+	}
 }
 
-func (l *Logger) AcceptInvitation(ctx context.Context, userID, code string) error {
+func (l *RosterLogger) AcceptInvitation(ctx context.Context, userID, code string) error {
 	l.Logger.Debug(ctx, "accepting invitation", logger.Fields{
 		"Code": code,
 		"User": userID,
@@ -38,7 +36,7 @@ func (l *Logger) AcceptInvitation(ctx context.Context, userID, code string) erro
 	return nil
 }
 
-func (l *Logger) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
+func (l *RosterLogger) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
 	l.Logger.Debug(ctx, "creating organization", logger.Fields{
 		"Name":  name,
 		"Owner": ownerID,
@@ -57,7 +55,7 @@ func (l *Logger) CreateOrganization(ctx context.Context, name, ownerID string) (
 	return org, nil
 }
 
-func (l *Logger) DeclineInvitation(ctx context.Context, code string) error {
+func (l *RosterLogger) DeclineInvitation(ctx context.Context, code string) error {
 	l.Logger.Debug(ctx, "declining invitation", logger.Fields{
 		"Code": code,
 	})
@@ -74,7 +72,7 @@ func (l *Logger) DeclineInvitation(ctx context.Context, code string) error {
 	return nil
 }
 
-func (l *Logger) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
+func (l *RosterLogger) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
 	l.Logger.Debug(ctx, "inviting user to organization", logger.Fields{
 		"Email":        email,
 		"Organization": orgID,
@@ -93,7 +91,7 @@ func (l *Logger) InviteUserToOrganization(ctx context.Context, email, orgID stri
 	return invitation, nil
 }
 
-func (l *Logger) RefreshInvitation(ctx context.Context, id string) (*Invitation, error) {
+func (l *RosterLogger) RefreshInvitation(ctx context.Context, id string) (*Invitation, error) {
 	l.Logger.Debug(ctx, "refreshing invitation", logger.Fields{
 		"ID": id,
 	})

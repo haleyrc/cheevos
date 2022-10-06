@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/haleyrc/cheevos/core"
-	"github.com/haleyrc/cheevos/lib/web"
+	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/cheevos/internal/lib/web"
 )
 
 func TestCoreErrorsAreCoded(t *testing.T) {

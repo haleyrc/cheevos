@@ -4,21 +4,22 @@ import (
 	"context"
 	"testing"
 
-	"github.com/haleyrc/cheevos/auth"
-	"github.com/haleyrc/cheevos/cheevos"
 	"github.com/haleyrc/cheevos/internal/fake"
+	"github.com/haleyrc/cheevos/internal/repository"
+	"github.com/haleyrc/cheevos/internal/service"
 	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/cheevos/roster"
 )
+
+var _ service.CheevosRepository = &repository.CheevosRepository{}
 
 func TestInsertAwardInsertsAnAward(t *testing.T) {
 	var (
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
 
-		authRepo    = &auth.Repository{}
-		rosterRepo  = &roster.Repository{}
-		cheevosRepo = &cheevos.Repository{}
+		authRepo    = &repository.AuthRepository{}
+		rosterRepo  = &repository.RosterRepository{}
+		cheevosRepo = &repository.CheevosRepository{}
 
 		awarder   = fake.User()
 		recipient = fake.User()
@@ -46,9 +47,9 @@ func TestInsertCheevoInsertsACheevo(t *testing.T) {
 		ctx = context.Background()
 		db  = testutil.TestDatabase(ctx, t)
 
-		authRepo    = &auth.Repository{}
-		rosterRepo  = &roster.Repository{}
-		cheevosRepo = &cheevos.Repository{}
+		authRepo    = &repository.AuthRepository{}
+		rosterRepo  = &repository.RosterRepository{}
+		cheevosRepo = &repository.CheevosRepository{}
 
 		awarder   = fake.User()
 		recipient = fake.User()

@@ -3,14 +3,15 @@ package service_test
 import (
 	"testing"
 
-	"github.com/haleyrc/cheevos/cheevos"
-	"github.com/haleyrc/cheevos/internal/fake"
-	"github.com/haleyrc/cheevos/internal/testutil"
 	"github.com/pborman/uuid"
+
+	"github.com/haleyrc/cheevos/internal/fake"
+	"github.com/haleyrc/cheevos/internal/service"
+	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
 func TestNormalizingACheevoNormalizesName(t *testing.T) {
-	subject := cheevos.Cheevo{Name: testutil.UnsafeString}
+	subject := service.Cheevo{Name: testutil.UnsafeString}
 	subject.Normalize()
 	if subject.Name != testutil.SafeString {
 		t.Errorf("Expected cheevo name to be normalized, but it wasn't.")
@@ -18,7 +19,7 @@ func TestNormalizingACheevoNormalizesName(t *testing.T) {
 }
 
 func TestNormalizingACheevoNormalizesDescription(t *testing.T) {
-	subject := cheevos.Cheevo{Description: testutil.UnsafeString}
+	subject := service.Cheevo{Description: testutil.UnsafeString}
 	subject.Normalize()
 	if subject.Description != testutil.SafeString {
 		t.Errorf("Expected cheevo description to be normalized, but it wasn't.")
@@ -33,7 +34,7 @@ func TestCheevoValidationReturnsNilForAValidCheevo(t *testing.T) {
 }
 
 func TestCheevoValidationReturnsAnErrorForAnInvalidCheevo(t *testing.T) {
-	var c cheevos.Cheevo
+	var c service.Cheevo
 	testutil.RunValidationTests(t, &c, "validation failed: Cheevo is invalid", map[string]string{
 		"ID":             "ID can't be blank.",
 		"Name":           "Name can't be blank.",

@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/haleyrc/cheevos/core"
-	"github.com/haleyrc/cheevos/lib/stringutil"
+	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/cheevos/internal/lib/stringutil"
 )
 
 // User represents a single user of the system. A user can be a member of many

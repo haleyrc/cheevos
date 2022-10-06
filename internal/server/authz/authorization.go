@@ -3,17 +3,16 @@ package authz
 import (
 	"context"
 
-	"github.com/haleyrc/cheevos/cheevos"
-	"github.com/haleyrc/cheevos/core"
-	"github.com/haleyrc/cheevos/roster"
+	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/cheevos/internal/service"
 )
 
 type CheevosService interface {
-	GetCheevo(ctx context.Context, id string) (*cheevos.Cheevo, error)
+	GetCheevo(ctx context.Context, id string) (*service.Cheevo, error)
 }
 
 type RosterService interface {
-	GetInvitation(ctx context.Context, id string) (*roster.Invitation, error)
+	GetInvitation(ctx context.Context, id string) (*service.Invitation, error)
 	IsMember(ctx context.Context, orgID, userID string) error
 }
 

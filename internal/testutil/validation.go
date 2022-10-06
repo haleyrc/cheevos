@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/haleyrc/cheevos/core"
+	"github.com/haleyrc/cheevos/internal/core"
 )
 
 type Validator interface{ Validate() error }

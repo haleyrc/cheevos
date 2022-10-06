@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/haleyrc/cheevos/cheevos"
 	"github.com/haleyrc/cheevos/internal/mock"
+	"github.com/haleyrc/cheevos/internal/service"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
 func TestLoggerLogsAnErrorFromAwardCheevoToUser(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	al := &cheevos.Logger{
+	al := &service.CheevosLogger{
 		Service: &mock.CheevosService{
 			AwardCheevoToUserFn: func(_ context.Context, _, _ string) error { return fmt.Errorf("oops") },
 		},
@@ -30,7 +30,7 @@ func TestLoggerLogsAnErrorFromAwardCheevoToUser(t *testing.T) {
 func TestLoggerLogsTheResponseFromFromAwardCheevoToUser(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	al := &cheevos.Logger{
+	al := &service.CheevosLogger{
 		Service: &mock.CheevosService{
 			AwardCheevoToUserFn: func(_ context.Context, _, _ string) error { return nil },
 		},
@@ -47,9 +47,9 @@ func TestLoggerLogsTheResponseFromFromAwardCheevoToUser(t *testing.T) {
 func TestLoggerLogsAnErrorFromCreateCheevo(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &cheevos.Logger{
+	cl := &service.CheevosLogger{
 		Service: &mock.CheevosService{
-			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*cheevos.Cheevo, error) {
+			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*service.Cheevo, error) {
 				return nil, fmt.Errorf("oops")
 			},
 		},
@@ -66,10 +66,10 @@ func TestLoggerLogsAnErrorFromCreateCheevo(t *testing.T) {
 func TestLoggerLogsTheResponseFromCreateCheevo(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &cheevos.Logger{
+	cl := &service.CheevosLogger{
 		Service: &mock.CheevosService{
-			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*cheevos.Cheevo, error) {
-				return &cheevos.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: "orgid"}, nil
+			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*service.Cheevo, error) {
+				return &service.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: "orgid"}, nil
 			},
 		},
 		Logger: logger,

@@ -3,10 +3,10 @@ package server
 import (
 	"net/http"
 
-	"github.com/haleyrc/cheevos/core"
-	"github.com/haleyrc/cheevos/lib/json"
-	"github.com/haleyrc/cheevos/lib/time"
-	"github.com/haleyrc/cheevos/lib/web"
+	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/cheevos/internal/lib/json"
+	"github.com/haleyrc/cheevos/internal/lib/time"
+	"github.com/haleyrc/cheevos/internal/lib/web"
 )
 
 type RosterServer struct {

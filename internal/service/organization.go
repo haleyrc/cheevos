@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/haleyrc/cheevos/core"
-	"github.com/haleyrc/cheevos/lib/stringutil"
+	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/cheevos/internal/lib/stringutil"
 )
 
 // Organization represents a group of users belonging to a related parent

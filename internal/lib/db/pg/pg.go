@@ -7,7 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
-	"github.com/haleyrc/cheevos/lib/db"
+	"github.com/haleyrc/cheevos/internal/lib/db"
 )
 
 func Connect(ctx context.Context, path string) (*Database, error) {

@@ -3,17 +3,17 @@ package service
 import (
 	"context"
 
-	"github.com/haleyrc/cheevos/lib/logger"
+	"github.com/haleyrc/cheevos/internal/lib/logger"
 )
 
-type Logger struct {
+type AuthLogger struct {
 	Logger  logger.Logger
 	Service interface {
 		SignUp(ctx context.Context, username, password string) (*User, error)
 	}
 }
 
-func (l *Logger) SignUp(ctx context.Context, username, password string) (*User, error) {
+func (l *AuthLogger) SignUp(ctx context.Context, username, password string) (*User, error) {
 	l.Logger.Debug(ctx, "signing up user", logger.Fields{
 		"Username": username,
 	})

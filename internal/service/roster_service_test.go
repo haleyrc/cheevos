@@ -7,11 +7,11 @@ import (
 
 	"github.com/pborman/uuid"
 
+	"github.com/haleyrc/cheevos/internal/lib/db"
+	"github.com/haleyrc/cheevos/internal/lib/time"
 	"github.com/haleyrc/cheevos/internal/mock"
+	"github.com/haleyrc/cheevos/internal/service"
 	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/cheevos/lib/db"
-	"github.com/haleyrc/cheevos/lib/time"
-	"github.com/haleyrc/cheevos/roster"
 )
 
 func TestAcceptingAnInvitationFailsIfTheInvitationIsExpired(t *testing.T) {
@@ -24,10 +24,10 @@ func TestAcceptingAnInvitationFailsIfTheInvitationIsExpired(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
+			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, _ *service.Invitation, _ string) error { return nil },
 		}
 
-		svc = roster.Service{
+		svc = service.RosterService{
 			DB:   mockDB,
 			Repo: repo,
 		}
@@ -57,8 +57,8 @@ func TestAcceptingAnInvitationSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertMembershipFn: func(_ context.Context, _ db.Tx, _ *roster.Membership) error { return nil },
-			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, inv *roster.Invitation, _ string) error {
+			InsertMembershipFn: func(_ context.Context, _ db.Tx, _ *service.Membership) error { return nil },
+			GetInvitationByCodeFn: func(_ context.Context, _ db.Tx, inv *service.Invitation, _ string) error {
 				inv.OrganizationID = orgID
 				inv.Expires = time.Now().Add(time.Hour)
 				return nil
@@ -66,7 +66,7 @@ func TestAcceptingAnInvitationSucceeds(t *testing.T) {
 			DeleteInvitationByCodeFn: func(_ context.Context, _ db.Tx, _ string) error { return nil },
 		}
 
-		svc = roster.Service{
+		svc = service.RosterService{
 			DB:   mockDB,
 			Repo: repo,
 		}
@@ -126,7 +126,7 @@ func TestDecliningAnInvitationSucceeds(t *testing.T) {
 			DeleteInvitationByCodeFn: func(_ context.Context, _ db.Tx, _ string) error { return nil },
 		}
 
-		svc = roster.Service{
+		svc = service.RosterService{
 			DB:   mockDB,
 			Repo: repo,
 		}
@@ -162,12 +162,12 @@ func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeUpd
 		}
 
 		repo = &mock.Repository{
-			InsertInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error {
+			InsertInvitationFn: func(_ context.Context, _ db.Tx, _ *service.Invitation, _ string) error {
 				return fmt.Errorf("oops")
 			},
 		}
 
-		svc = roster.Service{
+		svc = service.RosterService{
 			DB:    mockDB,
 			Email: emailer,
 			Repo:  repo,
@@ -196,7 +196,7 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 
 		email      = "test@example.com"
 		orgID      = uuid.New()
-		expiration = time.Now().Add(roster.InvitationValidFor)
+		expiration = time.Now().Add(service.InvitationValidFor)
 
 		mockDB = &mock.Database{}
 
@@ -205,10 +205,10 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 		}
 
 		repo = &mock.Repository{
-			InsertInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
+			InsertInvitationFn: func(_ context.Context, _ db.Tx, _ *service.Invitation, _ string) error { return nil },
 		}
 
-		svc = roster.Service{
+		svc = service.RosterService{
 			DB:    mockDB,
 			Email: emailer,
 			Repo:  repo,
@@ -279,13 +279,13 @@ func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeUpdated(t 
 		}
 
 		repo = &mock.Repository{
-			GetInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
-			UpdateInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error {
+			GetInvitationFn: func(_ context.Context, _ db.Tx, _ *service.Invitation, _ string) error { return nil },
+			UpdateInvitationFn: func(_ context.Context, _ db.Tx, _ *service.Invitation, _ string) error {
 				return fmt.Errorf("oops")
 			},
 		}
 
-		svc = roster.Service{
+		svc = service.RosterService{
 			DB:    mockDB,
 			Email: emailer,
 			Repo:  repo,
@@ -327,15 +327,15 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 		}
 
 		repo = &mock.Repository{
-			GetInvitationFn: func(_ context.Context, _ db.Tx, inv *roster.Invitation, _ string) error {
+			GetInvitationFn: func(_ context.Context, _ db.Tx, inv *service.Invitation, _ string) error {
 				inv.Email = email
 				inv.OrganizationID = orgID
 				return nil
 			},
-			UpdateInvitationFn: func(_ context.Context, _ db.Tx, _ *roster.Invitation, _ string) error { return nil },
+			UpdateInvitationFn: func(_ context.Context, _ db.Tx, _ *service.Invitation, _ string) error { return nil },
 		}
 
-		svc = roster.Service{
+		svc = service.RosterService{
 			DB:    mockDB,
 			Email: emailer,
 			Repo:  repo,
@@ -400,11 +400,11 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertMembershipFn:   func(_ context.Context, _ db.Tx, _ *roster.Membership) error { return nil },
-			InsertOrganizationFn: func(_ context.Context, _ db.Tx, _ *roster.Organization) error { return nil },
+			InsertMembershipFn:   func(_ context.Context, _ db.Tx, _ *service.Membership) error { return nil },
+			InsertOrganizationFn: func(_ context.Context, _ db.Tx, _ *service.Organization) error { return nil },
 		}
 
-		svc = roster.Service{
+		svc = service.RosterService{
 			DB:   mockDB,
 			Repo: repo,
 		}

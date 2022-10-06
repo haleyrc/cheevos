@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/haleyrc/cheevos/internal/lib/time"
 	"github.com/haleyrc/cheevos/internal/mock"
+	"github.com/haleyrc/cheevos/internal/service"
 	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/cheevos/lib/time"
-	"github.com/haleyrc/cheevos/roster"
 )
 
 func TestLoggerLogsAnErrorFromAcceptInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	il := &roster.Logger{
+	il := &service.RosterLogger{
 		Service: &mock.RosterService{
 			AcceptInvitationFn: func(_ context.Context, _, _ string) error { return fmt.Errorf("oops") },
 		},
@@ -31,7 +31,7 @@ func TestLoggerLogsAnErrorFromAcceptInvitation(t *testing.T) {
 func TestLoggerLogsTheResponseFromAcceptInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	il := &roster.Logger{
+	il := &service.RosterLogger{
 		Service: &mock.RosterService{
 			AcceptInvitationFn: func(_ context.Context, _, _ string) error { return nil },
 		},
@@ -48,7 +48,7 @@ func TestLoggerLogsTheResponseFromAcceptInvitation(t *testing.T) {
 func TestLoggerLogsAnErrorFromDeclineInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	il := &roster.Logger{
+	il := &service.RosterLogger{
 		Service: &mock.RosterService{
 			DeclineInvitationFn: func(_ context.Context, _ string) error { return fmt.Errorf("oops") },
 		},
@@ -65,7 +65,7 @@ func TestLoggerLogsAnErrorFromDeclineInvitation(t *testing.T) {
 func TestLoggerLogsTheResponseFromDeclineInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	il := &roster.Logger{
+	il := &service.RosterLogger{
 		Service: &mock.RosterService{
 			DeclineInvitationFn: func(_ context.Context, _ string) error { return nil },
 		},
@@ -82,9 +82,9 @@ func TestLoggerLogsTheResponseFromDeclineInvitation(t *testing.T) {
 func TestLoggerLogsAnErrorFromInviteUserToOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	il := &roster.Logger{
+	il := &service.RosterLogger{
 		Service: &mock.RosterService{
-			InviteUserToOrganizationFn: func(_ context.Context, _, _ string) (*roster.Invitation, error) { return nil, fmt.Errorf("oops") },
+			InviteUserToOrganizationFn: func(_ context.Context, _, _ string) (*service.Invitation, error) { return nil, fmt.Errorf("oops") },
 		},
 		Logger: logger,
 	}
@@ -99,16 +99,16 @@ func TestLoggerLogsAnErrorFromInviteUserToOrganization(t *testing.T) {
 func TestLoggerLogsTheResponseFromInviteUserToOrganization(t *testing.T) {
 	ctx := context.Background()
 	logger := testutil.NewTestLogger()
-	inv := &roster.Invitation{
+	inv := &service.Invitation{
 		ID:             "id",
 		Email:          "email",
 		OrganizationID: "orgid",
 		Expires:        time.Now(),
 	}
 
-	il := &roster.Logger{
+	il := &service.RosterLogger{
 		Service: &mock.RosterService{
-			InviteUserToOrganizationFn: func(_ context.Context, _, _ string) (*roster.Invitation, error) { return inv, nil },
+			InviteUserToOrganizationFn: func(_ context.Context, _, _ string) (*service.Invitation, error) { return inv, nil },
 		},
 		Logger: logger,
 	}
@@ -123,16 +123,16 @@ func TestLoggerLogsTheResponseFromInviteUserToOrganization(t *testing.T) {
 func TestLoggerLogsAnErrorFromRefreshInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	il := &roster.Logger{
+	il := &service.RosterLogger{
 		Service: &mock.RosterService{
-			RefreshInvitationFn: func(_ context.Context, _ string) error { return fmt.Errorf("oops") },
+			RefreshInvitationFn: func(_ context.Context, _ string) (*service.Invitation, error) { return nil, fmt.Errorf("oops") },
 		},
 		Logger: logger,
 	}
-	il.RefreshInvitation(context.Background(), "code")
+	il.RefreshInvitation(context.Background(), "id")
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Code":"code"},"Message":"refreshing invitation"}`,
+		`{"Fields":{"ID":"id"},"Message":"refreshing invitation"}`,
 		`{"Fields":{"Error":"oops"},"Message":"refresh invitation failed"}`,
 	)
 }
@@ -140,60 +140,28 @@ func TestLoggerLogsAnErrorFromRefreshInvitation(t *testing.T) {
 func TestLoggerLogsTheResponseFromRefreshInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	il := &roster.Logger{
+	il := &service.RosterLogger{
 		Service: &mock.RosterService{
-			RefreshInvitationFn: func(_ context.Context, _ string) error { return nil },
+			RefreshInvitationFn: func(_ context.Context, _ string) (*service.Invitation, error) {
+				return &service.Invitation{ID: "id", Email: "email", OrganizationID: "orgid", Expires: time.Now()}, nil
+			},
 		},
 		Logger: logger,
 	}
-	il.RefreshInvitation(context.Background(), "code")
+	il.RefreshInvitation(context.Background(), "id")
 
 	logger.ShouldLog(t,
-		`{"Fields":{"Code":"code"},"Message":"refreshing invitation"}`,
-		`{"Fields":{"Code":"code"},"Message":"refreshed invitation"}`,
-	)
-}
-
-func TestLoggerLogsAnErrorFromAddMemberToOrganization(t *testing.T) {
-	logger := testutil.NewTestLogger()
-
-	ml := &roster.Logger{
-		Service: &mock.RosterService{
-			AddMemberToOrganizationFn: func(ctx context.Context, userID, orgID string) error { return fmt.Errorf("oops") },
-		},
-		Logger: logger,
-	}
-	ml.AddMemberToOrganization(context.Background(), "userid", "orgid")
-
-	logger.ShouldLog(t,
-		`{"Fields":{"Organization":"orgid","User":"userid"},"Message":"adding member to organization"}`,
-		`{"Fields":{"Error":"oops"},"Message":"add member to organization failed"}`,
-	)
-}
-
-func TestLoggerLogsTheResponseFromAddMemberToOrganization(t *testing.T) {
-	logger := testutil.NewTestLogger()
-
-	ml := &roster.Logger{
-		Service: &mock.RosterService{
-			AddMemberToOrganizationFn: func(ctx context.Context, userID, orgID string) error { return nil },
-		},
-		Logger: logger,
-	}
-	ml.AddMemberToOrganization(context.Background(), "userid", "orgid")
-
-	logger.ShouldLog(t,
-		`{"Fields":{"Organization":"orgid","User":"userid"},"Message":"adding member to organization"}`,
-		`{"Fields":{"Organization":"orgid","User":"userid"},"Message":"added member to organization"}`,
+		`{"Fields":{"ID":"id"},"Message":"refreshing invitation"}`,
+		`{"Fields":{"Invitation":{"ID":"id","Email":"email","OrganizationID":"orgid","Expires":"2022-09-16T15:02:04Z"}},"Message":"refreshed invitation"}`,
 	)
 }
 
 func TestLoggerLogsAnErrorFromCreateOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	ol := &roster.Logger{
+	ol := &service.RosterLogger{
 		Service: &mock.RosterService{
-			CreateOrganizationFn: func(_ context.Context, name, ownerID string) (*roster.Organization, error) {
+			CreateOrganizationFn: func(_ context.Context, name, ownerID string) (*service.Organization, error) {
 				return nil, fmt.Errorf("oops")
 			},
 		},
@@ -210,10 +178,10 @@ func TestLoggerLogsAnErrorFromCreateOrganization(t *testing.T) {
 func TestLoggerLogsTheResponseFromCreateOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	ol := &roster.Logger{
+	ol := &service.RosterLogger{
 		Service: &mock.RosterService{
-			CreateOrganizationFn: func(_ context.Context, name, ownerID string) (*roster.Organization, error) {
-				return &roster.Organization{ID: "id", Name: "name", OwnerID: "ownerid"}, nil
+			CreateOrganizationFn: func(_ context.Context, name, ownerID string) (*service.Organization, error) {
+				return &service.Organization{ID: "id", Name: "name", OwnerID: "ownerid"}, nil
 			},
 		},
 		Logger: logger,

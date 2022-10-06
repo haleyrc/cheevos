@@ -7,11 +7,11 @@ import (
 
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos/core"
-	"github.com/haleyrc/cheevos/lib/db"
-	"github.com/haleyrc/cheevos/lib/hash"
-	"github.com/haleyrc/cheevos/lib/random"
-	"github.com/haleyrc/cheevos/lib/time"
+	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/cheevos/internal/lib/db"
+	"github.com/haleyrc/cheevos/internal/lib/hash"
+	"github.com/haleyrc/cheevos/internal/lib/random"
+	"github.com/haleyrc/cheevos/internal/lib/time"
 )
 
 var (
@@ -26,34 +26,24 @@ type Emailer interface {
 	SendInvitation(ctx context.Context, email, code string) error
 }
 
-type InvitationsRepository interface {
+type RosterRepository interface {
 	DeleteInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) error
 	GetInvitation(ctx context.Context, tx db.Tx, i *Invitation, id string) error
 	GetInvitationByCode(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
 	InsertInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
 	UpdateInvitation(ctx context.Context, tx db.Tx, i *Invitation, hashedCode string) error
-}
-
-type MembershipsRepository interface {
 	GetMembership(ctx context.Context, tx db.Tx, m *Membership, orgID, userID string) error
 	InsertMembership(ctx context.Context, tx db.Tx, m *Membership) error
-}
-
-type OrganizationsRepository interface {
 	InsertOrganization(ctx context.Context, tx db.Tx, org *Organization) error
 }
 
-type Service struct {
+type RosterService struct {
 	DB    db.Database
 	Email Emailer
-	Repo  interface {
-		InvitationsRepository
-		MembershipsRepository
-		OrganizationsRepository
-	}
+	Repo  RosterRepository
 }
 
-func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) error {
+func (svc *RosterService) AcceptInvitation(ctx context.Context, userID, code string) error {
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		var invitation Invitation
 
@@ -90,7 +80,7 @@ func (svc *Service) AcceptInvitation(ctx context.Context, userID, code string) e
 // CreateOrganization creates a new organization and persists it to the
 // database. It returns a response containing the new organization if
 // successful.
-func (svc *Service) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
+func (svc *RosterService) CreateOrganization(ctx context.Context, name, ownerID string) (*Organization, error) {
 	var org Organization
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
@@ -125,7 +115,7 @@ func (svc *Service) CreateOrganization(ctx context.Context, name, ownerID string
 	return &org, nil
 }
 
-func (svc *Service) DeclineInvitation(ctx context.Context, code string) error {
+func (svc *RosterService) DeclineInvitation(ctx context.Context, code string) error {
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		return svc.Repo.DeleteInvitationByCode(ctx, tx, hash.Generate(code))
 	})
@@ -135,7 +125,7 @@ func (svc *Service) DeclineInvitation(ctx context.Context, code string) error {
 	return nil
 }
 
-func (svc *Service) GetInvitation(ctx context.Context, id string) (*Invitation, error) {
+func (svc *RosterService) GetInvitation(ctx context.Context, id string) (*Invitation, error) {
 	var invitation Invitation
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
@@ -148,7 +138,7 @@ func (svc *Service) GetInvitation(ctx context.Context, id string) (*Invitation, 
 	return &invitation, nil
 }
 
-func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
+func (svc *RosterService) InviteUserToOrganization(ctx context.Context, email, orgID string) (*Invitation, error) {
 	var invitation Invitation
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
@@ -176,7 +166,7 @@ func (svc *Service) InviteUserToOrganization(ctx context.Context, email, orgID s
 	return &invitation, nil
 }
 
-func (svc *Service) IsMember(ctx context.Context, orgID, userID string) error {
+func (svc *RosterService) IsMember(ctx context.Context, orgID, userID string) error {
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		return svc.Repo.GetMembership(ctx, tx, &Membership{}, orgID, userID)
 	})
@@ -189,7 +179,7 @@ func (svc *Service) IsMember(ctx context.Context, orgID, userID string) error {
 // RefreshInvitation updates an invitation with a new expiration time and code.
 // Refreshing an invitation will invalidate the initial invitation email (as
 // well as any other refresh emails).
-func (svc *Service) RefreshInvitation(ctx context.Context, id string) (*Invitation, error) {
+func (svc *RosterService) RefreshInvitation(ctx context.Context, id string) (*Invitation, error) {
 	var invitation Invitation
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {

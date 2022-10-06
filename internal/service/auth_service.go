@@ -7,24 +7,22 @@ import (
 
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos/core"
-	"github.com/haleyrc/cheevos/lib/db"
-	"github.com/haleyrc/cheevos/lib/hash"
+	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/cheevos/internal/lib/db"
+	"github.com/haleyrc/cheevos/internal/lib/hash"
 )
 
-type UsersRepository interface {
+type AuthRepository interface {
 	GetUser(ctx context.Context, tx db.Tx, u *User, id string) error
 	InsertUser(ctx context.Context, tx db.Tx, u *User, hashedPassword string) error
 }
 
-type Service struct {
+type AuthService struct {
 	DB   db.Database
-	Repo interface {
-		UsersRepository
-	}
+	Repo AuthRepository
 }
 
-func (svc *Service) GetUser(ctx context.Context, id string) (*User, error) {
+func (svc *AuthService) GetUser(ctx context.Context, id string) (*User, error) {
 	var user User
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
@@ -39,7 +37,7 @@ func (svc *Service) GetUser(ctx context.Context, id string) (*User, error) {
 
 // SignUp creates a new user and persists it to the database. It returns a
 // response containing the new organization if successful.
-func (svc *Service) SignUp(ctx context.Context, username, password string) (*User, error) {
+func (svc *AuthService) SignUp(ctx context.Context, username, password string) (*User, error) {
 	var user User
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {

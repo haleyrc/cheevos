@@ -3,14 +3,15 @@ package service_test
 import (
 	"testing"
 
-	"github.com/haleyrc/cheevos/internal/fake"
-	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/cheevos/roster"
 	"github.com/pborman/uuid"
+
+	"github.com/haleyrc/cheevos/internal/fake"
+	"github.com/haleyrc/cheevos/internal/service"
+	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
 func TestNormalizingAnOrganizationNormalizesName(t *testing.T) {
-	subject := roster.Organization{Name: testutil.UnsafeString}
+	subject := service.Organization{Name: testutil.UnsafeString}
 	subject.Normalize()
 	if subject.Name != testutil.SafeString {
 		t.Errorf("Expected organization name to be normalized, but it wasn't.")
@@ -25,7 +26,7 @@ func TestOrganizationValidationReturnsNilForAValidOrganization(t *testing.T) {
 }
 
 func TestOrganizationValidationReturnsAnErrorForAnInvalidOrganization(t *testing.T) {
-	var o roster.Organization
+	var o service.Organization
 	testutil.RunValidationTests(t, &o, "validation failed: Organization is invalid", map[string]string{
 		"ID":      "ID can't be blank.",
 		"Name":    "Name can't be blank.",

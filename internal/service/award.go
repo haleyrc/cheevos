@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/haleyrc/cheevos/core"
-	"github.com/haleyrc/cheevos/lib/time"
+	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/cheevos/internal/lib/time"
 )
 
 type Award struct {
