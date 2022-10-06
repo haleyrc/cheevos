@@ -19,3 +19,11 @@ build:
 test:
 	echo Running tests...
 	@go test ./...
+
+.PHONY: build-server
+build-server:
+	go build -o bin/server ./cmd/server
+
+.PHONY: server
+server: build-server
+	./bin/server
