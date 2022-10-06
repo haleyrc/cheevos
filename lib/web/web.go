@@ -3,6 +3,8 @@ package web
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/haleyrc/cheevos/core"
 )
 
 const DefaultErrorMessage = "Unexpected error."
@@ -47,19 +49,10 @@ func errorCode(err error) int {
 	return code
 }
 
-func errorMessage(err error) string {
-	msg := DefaultErrorMessage
-	if err, ok := err.(Messaged); ok {
-		msg = err.Message()
-	}
-	return msg
-}
-
 func handleError(w http.ResponseWriter, err error) {
 	code := errorCode(err)
-	message := errorMessage(err)
 	respondWithJSON(w, code, Response{
-		Error: &Error{Message: message},
+		Error: &Error{Message: core.ErrorMessage(err)},
 	})
 }
 
