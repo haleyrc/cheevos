@@ -3,19 +3,18 @@ package service
 import (
 	"context"
 
+	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/lib/logger"
 )
 
-type CheevosLogger struct {
+var _ cheevos.CheevosService = &cheevosLogger{}
+
+type cheevosLogger struct {
 	Logger  logger.Logger
-	Service interface {
-		AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error
-		CreateCheevo(ctx context.Context, name, description, orgID string) (*Cheevo, error)
-		GetCheevo(ctx context.Context, id string) (*Cheevo, error)
-	}
+	Service cheevos.CheevosService
 }
 
-func (l *CheevosLogger) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error {
+func (l *cheevosLogger) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error {
 	l.Logger.Debug(ctx, "awarding cheevo to user", logger.Fields{
 		"Cheevo": cheevoID,
 		"User":   recipientID,
@@ -34,7 +33,7 @@ func (l *CheevosLogger) AwardCheevoToUser(ctx context.Context, recipientID, chee
 	return nil
 }
 
-func (l *CheevosLogger) CreateCheevo(ctx context.Context, name, description, orgID string) (*Cheevo, error) {
+func (l *cheevosLogger) CreateCheevo(ctx context.Context, name, description, orgID string) (*cheevos.Cheevo, error) {
 	l.Logger.Debug(ctx, "creating cheevo", logger.Fields{
 		"Name":         name,
 		"Description":  description,
@@ -54,7 +53,7 @@ func (l *CheevosLogger) CreateCheevo(ctx context.Context, name, description, org
 	return cheevo, nil
 }
 
-func (l *CheevosLogger) GetCheevo(ctx context.Context, id string) (*Cheevo, error) {
+func (l *cheevosLogger) GetCheevo(ctx context.Context, id string) (*cheevos.Cheevo, error) {
 	l.Logger.Debug(ctx, "getting cheevo", logger.Fields{"ID": id})
 
 	cheevo, err := l.Service.GetCheevo(ctx, id)

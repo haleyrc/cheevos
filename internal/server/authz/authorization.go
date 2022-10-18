@@ -3,22 +3,13 @@ package authz
 import (
 	"context"
 
+	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/core"
-	"github.com/haleyrc/cheevos/internal/service"
 )
 
-type CheevosService interface {
-	GetCheevo(ctx context.Context, id string) (*service.Cheevo, error)
-}
-
-type RosterService interface {
-	GetInvitation(ctx context.Context, id string) (*service.Invitation, error)
-	IsMember(ctx context.Context, orgID, userID string) error
-}
-
 type Service struct {
-	Cheevos CheevosService
-	Roster  RosterService
+	Cheevos cheevos.CheevosService
+	Roster  cheevos.RosterService
 }
 
 func (svc *Service) CanAwardCheevo(ctx context.Context, fromUserID, toUserID, cheevoID string) error {

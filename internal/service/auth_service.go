@@ -7,23 +7,37 @@ import (
 
 	"github.com/pborman/uuid"
 
+	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/core"
 	"github.com/haleyrc/cheevos/internal/lib/db"
 	"github.com/haleyrc/cheevos/internal/lib/hash"
+	"github.com/haleyrc/cheevos/internal/lib/logger"
 )
 
+var _ cheevos.AuthService = &authService{}
+
 type AuthRepository interface {
-	GetUser(ctx context.Context, tx db.Tx, u *User, id string) error
-	InsertUser(ctx context.Context, tx db.Tx, u *User, hashedPassword string) error
+	GetUser(ctx context.Context, tx db.Tx, u *cheevos.User, id string) error
+	InsertUser(ctx context.Context, tx db.Tx, u *cheevos.User, hashedPassword string) error
 }
 
-type AuthService struct {
+func NewAuthService(db db.Database, logger logger.Logger, repo AuthRepository) cheevos.AuthService {
+	return &authLogger{
+		Logger: logger,
+		Service: &authService{
+			DB:   db,
+			Repo: repo,
+		},
+	}
+}
+
+type authService struct {
 	DB   db.Database
 	Repo AuthRepository
 }
 
-func (svc *AuthService) GetUser(ctx context.Context, id string) (*User, error) {
-	var user User
+func (svc *authService) GetUser(ctx context.Context, id string) (*cheevos.User, error) {
+	var user cheevos.User
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		return svc.Repo.GetUser(ctx, tx, &user, id)
@@ -37,11 +51,11 @@ func (svc *AuthService) GetUser(ctx context.Context, id string) (*User, error) {
 
 // SignUp creates a new user and persists it to the database. It returns a
 // response containing the new organization if successful.
-func (svc *AuthService) SignUp(ctx context.Context, username, password string) (*User, error) {
-	var user User
+func (svc *authService) SignUp(ctx context.Context, username, password string) (*cheevos.User, error) {
+	var user cheevos.User
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
-		user = User{
+		user = cheevos.User{
 			ID:       uuid.New(),
 			Username: username,
 		}
@@ -69,7 +83,7 @@ func normalizePassword(password string) string {
 
 // The User parameter here is required so we can construct our validation error
 // correctly, but this feels like a pretty gnarly way of doing things.
-func validatePassword(u *User, password string) error {
+func validatePassword(u *cheevos.User, password string) error {
 	if len(password) < 8 {
 		return core.NewValidationError(u).
 			Add("Password", "Password must be eighth (8) or more characters.").

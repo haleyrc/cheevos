@@ -1,13 +1,12 @@
 package fake
 
 import (
+	"github.com/haleyrc/cheevos"
 	"github.com/pborman/uuid"
-
-	"github.com/haleyrc/cheevos/internal/service"
 )
 
-func Organization(ownerID string) *service.Organization {
-	return &service.Organization{
+func Organization(ownerID string) *cheevos.Organization {
+	return &cheevos.Organization{
 		ID:      uuid.New(),
 		Name:    uniqify("TestOrg"),
 		OwnerID: ownerID,

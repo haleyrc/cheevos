@@ -3,16 +3,20 @@ package mock
 import (
 	"context"
 
-	"github.com/haleyrc/cheevos/internal/server"
-	"github.com/haleyrc/cheevos/internal/service"
+	"github.com/haleyrc/cheevos"
 )
 
-var _ server.AuthenticationService = &AuthService{}
+var _ cheevos.AuthService = &AuthService{}
 
 type AuthService struct {
-	SignUpFn func(ctx context.Context, username, password string) (*service.User, error)
+	GetUserFn func(ctx context.Context, id string) (*cheevos.User, error)
+	SignUpFn  func(ctx context.Context, username, password string) (*cheevos.User, error)
 }
 
-func (as *AuthService) SignUp(ctx context.Context, username, password string) (*service.User, error) {
+func (as *AuthService) GetUser(ctx context.Context, id string) (*cheevos.User, error) {
+	return as.GetUserFn(ctx, id)
+}
+
+func (as *AuthService) SignUp(ctx context.Context, username, password string) (*cheevos.User, error) {
 	return as.SignUpFn(ctx, username, password)
 }

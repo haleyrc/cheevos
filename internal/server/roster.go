@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/core"
 	"github.com/haleyrc/cheevos/internal/lib/json"
 	"github.com/haleyrc/cheevos/internal/lib/time"
@@ -11,7 +12,7 @@ import (
 
 type RosterServer struct {
 	Authz  AuthorizationService
-	Roster RosterService
+	Roster cheevos.RosterService
 }
 
 type AcceptInvitationRequest struct {

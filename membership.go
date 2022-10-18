@@ -1,4 +1,4 @@
-package service
+package cheevos
 
 import (
 	"github.com/haleyrc/cheevos/internal/core"

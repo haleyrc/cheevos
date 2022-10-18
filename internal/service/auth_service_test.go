@@ -1,12 +1,12 @@
-package service_test
+package service
 
 import (
 	"context"
 	"testing"
 
+	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/lib/db"
 	"github.com/haleyrc/cheevos/internal/mock"
-	"github.com/haleyrc/cheevos/internal/service"
 )
 
 func TestSigningUpSucceeds(t *testing.T) {
@@ -19,10 +19,10 @@ func TestSigningUpSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertUserFn: func(_ context.Context, _ db.Tx, _ *service.User, _ string) error { return nil },
+			InsertUserFn: func(_ context.Context, _ db.Tx, _ *cheevos.User, _ string) error { return nil },
 		}
 
-		svc = service.AuthService{
+		svc = &authService{
 			DB:   mockDB,
 			Repo: repo,
 		}

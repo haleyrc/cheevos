@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/lib/time"
 	"github.com/haleyrc/cheevos/internal/repository"
@@ -128,7 +129,7 @@ func TestGetInvitationByCodeReturnsAnInvitation(t *testing.T) {
 	rosterRepo.InsertOrganization(ctx, db, org)
 	rosterRepo.InsertInvitation(ctx, db, invitation, codeHash)
 
-	var got service.Invitation
+	var got cheevos.Invitation
 	if err := rosterRepo.GetInvitationByCode(ctx, db, &got, codeHash); err != nil {
 		t.Fatal(err)
 	}
@@ -172,11 +173,11 @@ func TestUpdateInvitationUpdatesAnInvitation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := rosterRepo.GetInvitationByCode(ctx, db, &service.Invitation{}, codeHash); err == nil {
+	if err := rosterRepo.GetInvitationByCode(ctx, db, &cheevos.Invitation{}, codeHash); err == nil {
 		t.Errorf("Expected to not find an invitation with the old code, but did.")
 	}
 
-	var got service.Invitation
+	var got cheevos.Invitation
 	if err := rosterRepo.GetInvitationByCode(ctx, db, &got, newCodeHash); err != nil {
 		t.Fatal(err)
 	}

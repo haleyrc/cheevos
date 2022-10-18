@@ -3,12 +3,12 @@ package fake
 import (
 	"github.com/pborman/uuid"
 
+	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/lib/time"
-	"github.com/haleyrc/cheevos/internal/service"
 )
 
-func Invitation(orgID string) *service.Invitation {
-	return &service.Invitation{
+func Invitation(orgID string) *cheevos.Invitation {
+	return &cheevos.Invitation{
 		ID:             uuid.New(),
 		Email:          email(),
 		OrganizationID: orgID,

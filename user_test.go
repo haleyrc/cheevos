@@ -1,15 +1,15 @@
-package service_test
+package cheevos_test
 
 import (
 	"testing"
 
+	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/fake"
-	"github.com/haleyrc/cheevos/internal/service"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
 func TestNormalizingAUserNormalizesUsername(t *testing.T) {
-	subject := service.User{Username: testutil.UnsafeString}
+	subject := cheevos.User{Username: testutil.UnsafeString}
 	subject.Normalize()
 	if subject.Username != testutil.SafeString {
 		t.Errorf("Expected user username to be normalized, but it wasn't.")
@@ -24,7 +24,7 @@ func TestUserValidationReturnsNilForAValidUser(t *testing.T) {
 }
 
 func TestUserValidationReturnsAnErrorForAnInvalidUser(t *testing.T) {
-	var u service.User
+	var u cheevos.User
 	testutil.RunValidationTests(t, &u, "validation failed: User is invalid", map[string]string{
 		"ID":       "ID can't be blank.",
 		"Username": "Username can't be blank.",
