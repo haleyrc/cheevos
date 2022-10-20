@@ -8,20 +8,20 @@ import (
 	"github.com/haleyrc/pkg/errors"
 	"github.com/haleyrc/pkg/hash"
 	"github.com/haleyrc/pkg/logger"
+	"github.com/haleyrc/pkg/pg"
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/lib/db"
 )
 
 var _ cheevos.AuthService = &authService{}
 
 type AuthRepository interface {
-	GetUser(ctx context.Context, tx db.Tx, u *cheevos.User, id string) error
-	InsertUser(ctx context.Context, tx db.Tx, u *cheevos.User, hashedPassword string) error
+	GetUser(ctx context.Context, tx pg.Tx, u *cheevos.User, id string) error
+	InsertUser(ctx context.Context, tx pg.Tx, u *cheevos.User, hashedPassword string) error
 }
 
-func NewAuthService(db db.Database, logger logger.Logger, repo AuthRepository) cheevos.AuthService {
+func NewAuthService(db Database, logger logger.Logger, repo AuthRepository) cheevos.AuthService {
 	return &authLogger{
 		Logger: logger,
 		Service: &authService{
@@ -32,14 +32,14 @@ func NewAuthService(db db.Database, logger logger.Logger, repo AuthRepository) c
 }
 
 type authService struct {
-	DB   db.Database
+	DB   Database
 	Repo AuthRepository
 }
 
 func (svc *authService) GetUser(ctx context.Context, id string) (*cheevos.User, error) {
 	var user cheevos.User
 
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		return svc.Repo.GetUser(ctx, tx, &user, id)
 	})
 	if err != nil {
@@ -54,7 +54,7 @@ func (svc *authService) GetUser(ctx context.Context, id string) (*cheevos.User, 
 func (svc *authService) SignUp(ctx context.Context, username, password string) (*cheevos.User, error) {
 	var user cheevos.User
 
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		user = cheevos.User{
 			ID:       uuid.New(),
 			Username: username,

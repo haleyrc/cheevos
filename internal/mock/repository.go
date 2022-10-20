@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/haleyrc/pkg/pg"
+
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/lib/db"
 )
 
 type DeleteInvitationByCodeArgs struct {
@@ -65,86 +66,86 @@ type UpdateInvitationArgs struct {
 }
 
 type Repository struct {
-	DeleteInvitationByCodeFn     func(ctx context.Context, tx db.Tx, code string) error
+	DeleteInvitationByCodeFn     func(ctx context.Context, tx pg.Tx, code string) error
 	DeleteInvitationByCodeCalled struct {
 		Count int
 		With  DeleteInvitationByCodeArgs
 	}
 
-	GetCheevoFn     func(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo, id string) error
+	GetCheevoFn     func(ctx context.Context, tx pg.Tx, cheevo *cheevos.Cheevo, id string) error
 	GetCheevoCalled struct {
 		Count int
 		With  GetCheevoArgs
 	}
 
-	GetInvitationFn     func(ctx context.Context, tx db.Tx, i *cheevos.Invitation, id string) error
+	GetInvitationFn     func(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, id string) error
 	GetInvitationCalled struct {
 		Count int
 		With  GetInvitationArgs
 	}
 
-	GetInvitationByCodeFn     func(ctx context.Context, tx db.Tx, i *cheevos.Invitation, code string) error
+	GetInvitationByCodeFn     func(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, code string) error
 	GetInvitationByCodeCalled struct {
 		Count int
 		With  GetInvitationByCodeArgs
 	}
 
-	GetMembershipFn     func(ctx context.Context, tx db.Tx, m *cheevos.Membership, orgID, userID string) error
+	GetMembershipFn     func(ctx context.Context, tx pg.Tx, m *cheevos.Membership, orgID, userID string) error
 	GetMembershipCalled struct {
 		Count int
 		With  GetMembershipArgs
 	}
 
-	GetUserFn     func(ctx context.Context, tx db.Tx, u *cheevos.User, id string) error
+	GetUserFn     func(ctx context.Context, tx pg.Tx, u *cheevos.User, id string) error
 	GetUserCalled struct {
 		Count int
 		With  GetUserArgs
 	}
 
-	InsertAwardFn     func(ctx context.Context, tx db.Tx, a *cheevos.Award) error
+	InsertAwardFn     func(ctx context.Context, tx pg.Tx, a *cheevos.Award) error
 	InsertAwardCalled struct {
 		Count int
 		With  InsertAwardArgs
 	}
 
-	InsertCheevoFn     func(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo) error
+	InsertCheevoFn     func(ctx context.Context, tx pg.Tx, cheevo *cheevos.Cheevo) error
 	InsertCheevoCalled struct {
 		Count int
 		With  InsertCheevoArgs
 	}
 
-	InsertInvitationFn     func(ctx context.Context, tx db.Tx, i *cheevos.Invitation, hashedCode string) error
+	InsertInvitationFn     func(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, hashedCode string) error
 	InsertInvitationCalled struct {
 		Count int
 		With  InsertInvitationArgs
 	}
 
-	InsertMembershipFn     func(ctx context.Context, tx db.Tx, m *cheevos.Membership) error
+	InsertMembershipFn     func(ctx context.Context, tx pg.Tx, m *cheevos.Membership) error
 	InsertMembershipCalled struct {
 		Count int
 		With  InsertMembershipArgs
 	}
 
-	InsertOrganizationFn     func(ctx context.Context, tx db.Tx, org *cheevos.Organization) error
+	InsertOrganizationFn     func(ctx context.Context, tx pg.Tx, org *cheevos.Organization) error
 	InsertOrganizationCalled struct {
 		Count int
 		With  InsertOrganizationArgs
 	}
 
-	InsertUserFn     func(ctx context.Context, tx db.Tx, u *cheevos.User, hashedPassword string) error
+	InsertUserFn     func(ctx context.Context, tx pg.Tx, u *cheevos.User, hashedPassword string) error
 	InsertUserCalled struct {
 		Count int
 		With  InsertUserArgs
 	}
 
-	UpdateInvitationFn     func(ctx context.Context, tx db.Tx, i *cheevos.Invitation, hashedCode string) error
+	UpdateInvitationFn     func(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, hashedCode string) error
 	UpdateInvitationCalled struct {
 		Count int
 		With  UpdateInvitationArgs
 	}
 }
 
-func (repo *Repository) InsertAward(ctx context.Context, tx db.Tx, a *cheevos.Award) error {
+func (repo *Repository) InsertAward(ctx context.Context, tx pg.Tx, a *cheevos.Award) error {
 	if repo.InsertAwardFn == nil {
 		return mockMethodNotDefined("InsertAward")
 	}
@@ -153,7 +154,7 @@ func (repo *Repository) InsertAward(ctx context.Context, tx db.Tx, a *cheevos.Aw
 	return repo.InsertAwardFn(ctx, tx, a)
 }
 
-func (repo *Repository) InsertCheevo(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo) error {
+func (repo *Repository) InsertCheevo(ctx context.Context, tx pg.Tx, cheevo *cheevos.Cheevo) error {
 	if repo.InsertCheevoFn == nil {
 		return mockMethodNotDefined("InsertCheevo")
 	}
@@ -162,7 +163,7 @@ func (repo *Repository) InsertCheevo(ctx context.Context, tx db.Tx, cheevo *chee
 	return repo.InsertCheevoFn(ctx, tx, cheevo)
 }
 
-func (repo *Repository) InsertInvitation(ctx context.Context, tx db.Tx, i *cheevos.Invitation, hashedCode string) error {
+func (repo *Repository) InsertInvitation(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, hashedCode string) error {
 	if repo.InsertInvitationFn == nil {
 		return mockMethodNotDefined("InsertInvitation")
 	}
@@ -171,7 +172,7 @@ func (repo *Repository) InsertInvitation(ctx context.Context, tx db.Tx, i *cheev
 	return repo.InsertInvitationFn(ctx, tx, i, hashedCode)
 }
 
-func (repo *Repository) InsertMembership(ctx context.Context, tx db.Tx, m *cheevos.Membership) error {
+func (repo *Repository) InsertMembership(ctx context.Context, tx pg.Tx, m *cheevos.Membership) error {
 	if repo.InsertMembershipFn == nil {
 		return mockMethodNotDefined("InsertMembership")
 	}
@@ -180,7 +181,7 @@ func (repo *Repository) InsertMembership(ctx context.Context, tx db.Tx, m *cheev
 	return repo.InsertMembershipFn(ctx, tx, m)
 }
 
-func (repo *Repository) InsertOrganization(ctx context.Context, tx db.Tx, org *cheevos.Organization) error {
+func (repo *Repository) InsertOrganization(ctx context.Context, tx pg.Tx, org *cheevos.Organization) error {
 	if repo.InsertOrganizationFn == nil {
 		return mockMethodNotDefined("InsertOrganization")
 	}
@@ -189,7 +190,7 @@ func (repo *Repository) InsertOrganization(ctx context.Context, tx db.Tx, org *c
 	return repo.InsertOrganizationFn(ctx, tx, org)
 }
 
-func (repo *Repository) InsertUser(ctx context.Context, tx db.Tx, u *cheevos.User, hashedPassword string) error {
+func (repo *Repository) InsertUser(ctx context.Context, tx pg.Tx, u *cheevos.User, hashedPassword string) error {
 	if repo.InsertUserFn == nil {
 		return mockMethodNotDefined("InsertUser")
 	}
@@ -198,7 +199,7 @@ func (repo *Repository) InsertUser(ctx context.Context, tx db.Tx, u *cheevos.Use
 	return repo.InsertUserFn(ctx, tx, u, hashedPassword)
 }
 
-func (repo *Repository) DeleteInvitationByCode(ctx context.Context, tx db.Tx, code string) error {
+func (repo *Repository) DeleteInvitationByCode(ctx context.Context, tx pg.Tx, code string) error {
 	if repo.DeleteInvitationByCodeFn == nil {
 		return mockMethodNotDefined("DeleteInvitationByCode")
 	}
@@ -207,7 +208,7 @@ func (repo *Repository) DeleteInvitationByCode(ctx context.Context, tx db.Tx, co
 	return repo.DeleteInvitationByCodeFn(ctx, tx, code)
 }
 
-func (repo *Repository) GetCheevo(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo, id string) error {
+func (repo *Repository) GetCheevo(ctx context.Context, tx pg.Tx, cheevo *cheevos.Cheevo, id string) error {
 	if repo.GetCheevoFn == nil {
 		return mockMethodNotDefined("GetCheevo")
 	}
@@ -216,7 +217,7 @@ func (repo *Repository) GetCheevo(ctx context.Context, tx db.Tx, cheevo *cheevos
 	return repo.GetCheevoFn(ctx, tx, cheevo, id)
 }
 
-func (repo *Repository) GetInvitation(ctx context.Context, tx db.Tx, i *cheevos.Invitation, id string) error {
+func (repo *Repository) GetInvitation(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, id string) error {
 	if repo.GetInvitationFn == nil {
 		return mockMethodNotDefined("GetInvitation")
 	}
@@ -225,7 +226,7 @@ func (repo *Repository) GetInvitation(ctx context.Context, tx db.Tx, i *cheevos.
 	return repo.GetInvitationFn(ctx, tx, i, id)
 }
 
-func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, i *cheevos.Invitation, code string) error {
+func (repo *Repository) GetInvitationByCode(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, code string) error {
 	if repo.GetInvitationByCodeFn == nil {
 		return mockMethodNotDefined("GetInvitationByCode")
 	}
@@ -234,7 +235,7 @@ func (repo *Repository) GetInvitationByCode(ctx context.Context, tx db.Tx, i *ch
 	return repo.GetInvitationByCodeFn(ctx, tx, i, code)
 }
 
-func (repo *Repository) GetMembership(ctx context.Context, tx db.Tx, m *cheevos.Membership, orgID, userID string) error {
+func (repo *Repository) GetMembership(ctx context.Context, tx pg.Tx, m *cheevos.Membership, orgID, userID string) error {
 	if repo.GetMembershipFn == nil {
 		return mockMethodNotDefined("GetMembership")
 	}
@@ -243,7 +244,7 @@ func (repo *Repository) GetMembership(ctx context.Context, tx db.Tx, m *cheevos.
 	return repo.GetMembershipFn(ctx, tx, m, orgID, userID)
 }
 
-func (repo *Repository) GetUser(ctx context.Context, tx db.Tx, u *cheevos.User, id string) error {
+func (repo *Repository) GetUser(ctx context.Context, tx pg.Tx, u *cheevos.User, id string) error {
 	if repo.GetUserFn == nil {
 		return mockMethodNotDefined("GetUser")
 	}
@@ -252,7 +253,7 @@ func (repo *Repository) GetUser(ctx context.Context, tx db.Tx, u *cheevos.User, 
 	return repo.GetUserFn(ctx, tx, u, id)
 }
 
-func (repo *Repository) UpdateInvitation(ctx context.Context, tx db.Tx, i *cheevos.Invitation, hashedCode string) error {
+func (repo *Repository) UpdateInvitation(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, hashedCode string) error {
 	if repo.UpdateInvitationFn == nil {
 		return mockMethodNotDefined("UpdateInvitation")
 	}

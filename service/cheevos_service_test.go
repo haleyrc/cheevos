@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/haleyrc/pkg/pg"
 	"github.com/haleyrc/pkg/time"
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/lib/db"
 	"github.com/haleyrc/cheevos/internal/mock"
 )
 
@@ -23,7 +23,7 @@ func TestAwardingACheevoSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertAwardFn: func(_ context.Context, _ db.Tx, _ *cheevos.Award) error { return nil },
+			InsertAwardFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Award) error { return nil },
 		}
 
 		svc = &cheevosService{
@@ -70,7 +70,7 @@ func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertCheevoFn: func(_ context.Context, _ db.Tx, _ *cheevos.Cheevo) error { return nil },
+			InsertCheevoFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Cheevo) error { return nil },
 		}
 
 		svc = &cheevosService{

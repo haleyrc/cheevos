@@ -6,10 +6,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/haleyrc/pkg/pg"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-
-	mydb "github.com/haleyrc/cheevos/internal/lib/db"
 )
 
 var db *Database
@@ -44,7 +43,7 @@ func (db *Database) Exec(ctx context.Context, query string, args ...interface{})
 	return err
 }
 
-func (db *Database) QueryRow(ctx context.Context, query string, args ...interface{}) mydb.Row {
+func (db *Database) QueryRow(ctx context.Context, query string, args ...interface{}) pg.Row {
 	row := db.db.QueryRowContext(ctx, query, args...)
 	return row
 }

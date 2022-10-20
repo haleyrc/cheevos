@@ -6,22 +6,22 @@ import (
 
 	"github.com/haleyrc/pkg/errors"
 	"github.com/haleyrc/pkg/logger"
+	"github.com/haleyrc/pkg/pg"
 	"github.com/haleyrc/pkg/time"
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/lib/db"
 )
 
 var _ cheevos.CheevosService = &cheevosService{}
 
 type CheevosRepository interface {
-	GetCheevo(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo, id string) error
-	InsertAward(ctx context.Context, tx db.Tx, award *cheevos.Award) error
-	InsertCheevo(ctx context.Context, tx db.Tx, cheevo *cheevos.Cheevo) error
+	GetCheevo(ctx context.Context, tx pg.Tx, cheevo *cheevos.Cheevo, id string) error
+	InsertAward(ctx context.Context, tx pg.Tx, award *cheevos.Award) error
+	InsertCheevo(ctx context.Context, tx pg.Tx, cheevo *cheevos.Cheevo) error
 }
 
-func NewCheevosService(db db.Database, logger logger.Logger, repo CheevosRepository) cheevos.CheevosService {
+func NewCheevosService(db Database, logger logger.Logger, repo CheevosRepository) cheevos.CheevosService {
 	return &cheevosLogger{
 		Logger: logger,
 		Service: &cheevosService{
@@ -32,7 +32,7 @@ func NewCheevosService(db db.Database, logger logger.Logger, repo CheevosReposit
 }
 
 type cheevosService struct {
-	DB   db.Database
+	DB   Database
 	Repo CheevosRepository
 }
 
@@ -40,7 +40,7 @@ type cheevosService struct {
 // event are bidirectional; a Cheevo "tracks" the number of Users that have
 // received it and Users "track" how many Cheevos they have received.
 func (svc *cheevosService) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error {
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		award := &cheevos.Award{
 			CheevoID: cheevoID,
 			UserID:   recipientID,
@@ -63,7 +63,7 @@ func (svc *cheevosService) AwardCheevoToUser(ctx context.Context, recipientID, c
 func (svc *cheevosService) CreateCheevo(ctx context.Context, name, description, orgID string) (*cheevos.Cheevo, error) {
 	var cheevo cheevos.Cheevo
 
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		cheevo = cheevos.Cheevo{
 			ID:             uuid.New(),
 			Name:           name,
@@ -85,7 +85,7 @@ func (svc *cheevosService) CreateCheevo(ctx context.Context, name, description, 
 func (svc *cheevosService) GetCheevo(ctx context.Context, id string) (*cheevos.Cheevo, error) {
 	var cheevo cheevos.Cheevo
 
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		return svc.Repo.GetCheevo(ctx, tx, &cheevo, id)
 	})
 	if err != nil {

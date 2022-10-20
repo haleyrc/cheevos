@@ -8,12 +8,12 @@ import (
 	"github.com/haleyrc/pkg/errors"
 	"github.com/haleyrc/pkg/hash"
 	"github.com/haleyrc/pkg/logger"
+	"github.com/haleyrc/pkg/pg"
 	"github.com/haleyrc/pkg/random"
 	"github.com/haleyrc/pkg/time"
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/lib/db"
 )
 
 var _ cheevos.RosterService = &rosterService{}
@@ -23,17 +23,17 @@ type Emailer interface {
 }
 
 type RosterRepository interface {
-	DeleteInvitationByCode(ctx context.Context, tx db.Tx, hashedCode string) error
-	GetInvitation(ctx context.Context, tx db.Tx, i *cheevos.Invitation, id string) error
-	GetInvitationByCode(ctx context.Context, tx db.Tx, i *cheevos.Invitation, hashedCode string) error
-	InsertInvitation(ctx context.Context, tx db.Tx, i *cheevos.Invitation, hashedCode string) error
-	UpdateInvitation(ctx context.Context, tx db.Tx, i *cheevos.Invitation, hashedCode string) error
-	GetMembership(ctx context.Context, tx db.Tx, m *cheevos.Membership, orgID, userID string) error
-	InsertMembership(ctx context.Context, tx db.Tx, m *cheevos.Membership) error
-	InsertOrganization(ctx context.Context, tx db.Tx, org *cheevos.Organization) error
+	DeleteInvitationByCode(ctx context.Context, tx pg.Tx, hashedCode string) error
+	GetInvitation(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, id string) error
+	GetInvitationByCode(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, hashedCode string) error
+	InsertInvitation(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, hashedCode string) error
+	UpdateInvitation(ctx context.Context, tx pg.Tx, i *cheevos.Invitation, hashedCode string) error
+	GetMembership(ctx context.Context, tx pg.Tx, m *cheevos.Membership, orgID, userID string) error
+	InsertMembership(ctx context.Context, tx pg.Tx, m *cheevos.Membership) error
+	InsertOrganization(ctx context.Context, tx pg.Tx, org *cheevos.Organization) error
 }
 
-func NewRosterService(db db.Database, email Emailer, logger logger.Logger, repo RosterRepository) cheevos.RosterService {
+func NewRosterService(db Database, email Emailer, logger logger.Logger, repo RosterRepository) cheevos.RosterService {
 	return &rosterLogger{
 		Logger: logger,
 		Service: &rosterService{
@@ -45,13 +45,13 @@ func NewRosterService(db db.Database, email Emailer, logger logger.Logger, repo 
 }
 
 type rosterService struct {
-	DB    db.Database
+	DB    Database
 	Email Emailer
 	Repo  RosterRepository
 }
 
 func (svc *rosterService) AcceptInvitation(ctx context.Context, userID, code string) error {
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		var invitation cheevos.Invitation
 
 		hashedCode := hash.Generate(code)
@@ -90,7 +90,7 @@ func (svc *rosterService) AcceptInvitation(ctx context.Context, userID, code str
 func (svc *rosterService) CreateOrganization(ctx context.Context, name, ownerID string) (*cheevos.Organization, error) {
 	var org cheevos.Organization
 
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		org = cheevos.Organization{
 			ID:      uuid.New(),
 			Name:    name,
@@ -123,7 +123,7 @@ func (svc *rosterService) CreateOrganization(ctx context.Context, name, ownerID 
 }
 
 func (svc *rosterService) DeclineInvitation(ctx context.Context, code string) error {
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		return svc.Repo.DeleteInvitationByCode(ctx, tx, hash.Generate(code))
 	})
 	if err != nil {
@@ -135,7 +135,7 @@ func (svc *rosterService) DeclineInvitation(ctx context.Context, code string) er
 func (svc *rosterService) GetInvitation(ctx context.Context, id string) (*cheevos.Invitation, error) {
 	var invitation cheevos.Invitation
 
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		return svc.Repo.GetInvitation(ctx, tx, &invitation, id)
 	})
 	if err != nil {
@@ -148,7 +148,7 @@ func (svc *rosterService) GetInvitation(ctx context.Context, id string) (*cheevo
 func (svc *rosterService) InviteUserToOrganization(ctx context.Context, email, orgID string) (*cheevos.Invitation, error) {
 	var invitation cheevos.Invitation
 
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		invitation = cheevos.Invitation{
 			ID:             uuid.New(),
 			Email:          email,
@@ -174,7 +174,7 @@ func (svc *rosterService) InviteUserToOrganization(ctx context.Context, email, o
 }
 
 func (svc *rosterService) IsMember(ctx context.Context, orgID, userID string) error {
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		return svc.Repo.GetMembership(ctx, tx, &cheevos.Membership{}, orgID, userID)
 	})
 	if err != nil {
@@ -189,7 +189,7 @@ func (svc *rosterService) IsMember(ctx context.Context, orgID, userID string) er
 func (svc *rosterService) RefreshInvitation(ctx context.Context, id string) (*cheevos.Invitation, error) {
 	var invitation cheevos.Invitation
 
-	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
+	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		if err := svc.Repo.GetInvitation(ctx, tx, &invitation, id); err != nil {
 			return errors.WrapError(err)
 		}
