@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 
+	"github.com/haleyrc/pkg/logger"
+
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/lib/logger"
 )
 
 var _ cheevos.AuthService = &authLogger{}

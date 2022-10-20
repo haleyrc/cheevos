@@ -3,9 +3,10 @@ package fake
 import (
 	"github.com/pborman/uuid"
 
+	"github.com/haleyrc/pkg/hash"
+	"github.com/haleyrc/pkg/random"
+
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/lib/hash"
-	"github.com/haleyrc/cheevos/internal/lib/random"
 )
 
 func User() *cheevos.User {

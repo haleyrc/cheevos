@@ -3,9 +3,10 @@ package server
 import (
 	"net/http"
 
+	"github.com/haleyrc/pkg/json"
+
 	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/core"
-	"github.com/haleyrc/cheevos/internal/lib/json"
 	"github.com/haleyrc/cheevos/internal/lib/web"
 )
 

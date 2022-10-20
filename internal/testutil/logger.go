@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/haleyrc/cheevos/internal/lib/logger"
+	"github.com/haleyrc/pkg/logger"
 )
 
 func NewTestLogger() *TestLogger {

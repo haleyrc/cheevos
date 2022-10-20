@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/haleyrc/pkg/hash"
+	"github.com/haleyrc/pkg/logger"
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/cheevos/internal/core"
 	"github.com/haleyrc/cheevos/internal/lib/db"
-	"github.com/haleyrc/cheevos/internal/lib/hash"
-	"github.com/haleyrc/cheevos/internal/lib/logger"
 )
 
 var _ cheevos.AuthService = &authService{}

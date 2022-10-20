@@ -1,8 +1,9 @@
 package cheevos
 
 import (
+	"github.com/haleyrc/pkg/time"
+
 	"github.com/haleyrc/cheevos/internal/core"
-	"github.com/haleyrc/cheevos/internal/lib/time"
 )
 
 type Membership struct {

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/haleyrc/cheevos/internal/lib/time"
+	"github.com/haleyrc/pkg/time"
 )
 
 func TestMain(m *testing.M) {

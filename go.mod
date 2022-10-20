@@ -3,6 +3,7 @@ module github.com/haleyrc/cheevos
 go 1.16
 
 require (
+	github.com/haleyrc/pkg v0.0.0-20221020193552-d50ec06ed5b5 // indirect
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.7
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect

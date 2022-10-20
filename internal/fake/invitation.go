@@ -3,8 +3,9 @@ package fake
 import (
 	"github.com/pborman/uuid"
 
+	"github.com/haleyrc/pkg/time"
+
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/lib/time"
 )
 
 func Invitation(orgID string) *cheevos.Invitation {

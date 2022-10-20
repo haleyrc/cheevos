@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/haleyrc/cheevos/internal/fake"
-	"github.com/haleyrc/cheevos/internal/repository"
-	"github.com/haleyrc/cheevos/internal/service"
 	"github.com/haleyrc/cheevos/internal/testutil"
+	"github.com/haleyrc/cheevos/repository"
+	"github.com/haleyrc/cheevos/service"
 )
 
 var _ service.CheevosRepository = &repository.CheevosRepository{}

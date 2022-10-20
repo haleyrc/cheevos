@@ -3,7 +3,7 @@ package cheevos
 import (
 	"context"
 
-	"github.com/haleyrc/cheevos/internal/lib/time"
+	"github.com/haleyrc/pkg/time"
 )
 
 var InvitationValidFor = time.Hour

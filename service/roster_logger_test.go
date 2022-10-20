@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/haleyrc/pkg/time"
+
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/lib/time"
 	"github.com/haleyrc/cheevos/internal/mock"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
