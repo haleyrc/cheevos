@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/haleyrc/pkg/errors"
 	"github.com/haleyrc/pkg/hash"
 	"github.com/haleyrc/pkg/logger"
 	"github.com/haleyrc/pkg/random"
@@ -12,7 +13,6 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/core"
 	"github.com/haleyrc/cheevos/internal/lib/db"
 )
 
@@ -56,11 +56,11 @@ func (svc *rosterService) AcceptInvitation(ctx context.Context, userID, code str
 
 		hashedCode := hash.Generate(code)
 		if err := svc.Repo.GetInvitationByCode(ctx, tx, &invitation, hashedCode); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		if invitation.Expired() {
-			return core.NewRawError(http.StatusGone, "Your invitation has expired. Please contact your organization administrator for a new invitation.")
+			return errors.NewRawError(http.StatusGone, "Your invitation has expired. Please contact your organization administrator for a new invitation.")
 		}
 
 		membership := &cheevos.Membership{
@@ -69,10 +69,10 @@ func (svc *rosterService) AcceptInvitation(ctx context.Context, userID, code str
 			Joined:         time.Now(),
 		}
 		if err := membership.Validate(); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 		if err := svc.Repo.InsertMembership(ctx, tx, membership); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		return svc.Repo.DeleteInvitationByCode(ctx, tx, hashedCode)
@@ -97,7 +97,7 @@ func (svc *rosterService) CreateOrganization(ctx context.Context, name, ownerID 
 			OwnerID: ownerID,
 		}
 		if err := org.Validate(); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		membership := &cheevos.Membership{
@@ -106,11 +106,11 @@ func (svc *rosterService) CreateOrganization(ctx context.Context, name, ownerID 
 			Joined:         time.Now(),
 		}
 		if err := membership.Validate(); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		if err := svc.Repo.InsertOrganization(ctx, tx, &org); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		return svc.Repo.InsertMembership(ctx, tx, membership)
@@ -156,12 +156,12 @@ func (svc *rosterService) InviteUserToOrganization(ctx context.Context, email, o
 			Expires:        time.Now().Add(cheevos.InvitationValidFor),
 		}
 		if err := invitation.Validate(); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		code := random.String(cheevos.InvitationCodeLength)
 		if err := svc.Repo.InsertInvitation(ctx, tx, &invitation, hash.Generate(code)); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		return svc.Email.SendInvitation(ctx, invitation.Email, code)
@@ -191,14 +191,14 @@ func (svc *rosterService) RefreshInvitation(ctx context.Context, id string) (*ch
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx db.Tx) error {
 		if err := svc.Repo.GetInvitation(ctx, tx, &invitation, id); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		invitation.Expires = time.Now().Add(cheevos.InvitationValidFor)
 
 		newCode := random.String(cheevos.InvitationCodeLength)
 		if err := svc.Repo.UpdateInvitation(ctx, tx, &invitation, hash.Generate(newCode)); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		return svc.Email.SendInvitation(ctx, invitation.Email, newCode)

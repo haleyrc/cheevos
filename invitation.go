@@ -3,7 +3,6 @@ package cheevos
 import (
 	"github.com/haleyrc/pkg/time"
 
-	"github.com/haleyrc/cheevos/internal/core"
 	"github.com/haleyrc/cheevos/internal/lib/stringutil"
 )
 
@@ -30,7 +29,7 @@ func (i *Invitation) Normalize() {
 func (i *Invitation) Validate() error {
 	i.Normalize()
 
-	ve := core.NewValidationError(i)
+	ve := NewValidationError(i)
 
 	if i.ID == "" {
 		ve.Add("ID", "ID can't be blank.")

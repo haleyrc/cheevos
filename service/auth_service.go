@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/haleyrc/pkg/errors"
 	"github.com/haleyrc/pkg/hash"
 	"github.com/haleyrc/pkg/logger"
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/core"
 	"github.com/haleyrc/cheevos/internal/lib/db"
 )
 
@@ -60,18 +60,18 @@ func (svc *authService) SignUp(ctx context.Context, username, password string) (
 			Username: username,
 		}
 		if err := user.Validate(); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		password = normalizePassword(password)
 		if err := validatePassword(&user, password); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 
 		return svc.Repo.InsertUser(ctx, tx, &user, hash.Generate(password))
 	})
 	if err != nil {
-		return nil, core.WrapError(err)
+		return nil, errors.WrapError(err)
 	}
 
 	return &user, nil
@@ -85,7 +85,7 @@ func normalizePassword(password string) string {
 // correctly, but this feels like a pretty gnarly way of doing things.
 func validatePassword(u *cheevos.User, password string) error {
 	if len(password) < 8 {
-		return core.NewValidationError(u).
+		return cheevos.NewValidationError(u).
 			Add("Password", "Password must be eighth (8) or more characters.").
 			Error()
 	}

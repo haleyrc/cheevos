@@ -2,8 +2,6 @@ package cheevos
 
 import (
 	"github.com/haleyrc/pkg/time"
-
-	"github.com/haleyrc/cheevos/internal/core"
 )
 
 type Membership struct {
@@ -17,7 +15,7 @@ type Membership struct {
 func (m *Membership) Model() string { return "Membership" }
 
 func (m *Membership) Validate() error {
-	ve := core.NewValidationError(m)
+	ve := NewValidationError(m)
 
 	if m.OrganizationID == "" {
 		ve.Add("OrganizationID", "Organization ID can't be blank.")

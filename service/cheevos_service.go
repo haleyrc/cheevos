@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/haleyrc/pkg/errors"
 	"github.com/haleyrc/pkg/logger"
 	"github.com/haleyrc/pkg/time"
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
-	"github.com/haleyrc/cheevos/internal/core"
 	"github.com/haleyrc/cheevos/internal/lib/db"
 )
 
@@ -47,7 +47,7 @@ func (svc *cheevosService) AwardCheevoToUser(ctx context.Context, recipientID, c
 			Awarded:  time.Now(),
 		}
 		if err := award.Validate(); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 		return svc.Repo.InsertAward(ctx, tx, award)
 	})
@@ -71,7 +71,7 @@ func (svc *cheevosService) CreateCheevo(ctx context.Context, name, description, 
 			OrganizationID: orgID,
 		}
 		if err := cheevo.Validate(); err != nil {
-			return core.WrapError(err)
+			return errors.WrapError(err)
 		}
 		return svc.Repo.InsertCheevo(ctx, tx, &cheevo)
 	})

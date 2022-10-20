@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/pkg/errors"
 )
 
 const DefaultErrorMessage = "Unexpected error."
@@ -52,7 +52,7 @@ func errorCode(err error) int {
 func handleError(w http.ResponseWriter, err error) {
 	code := errorCode(err)
 	respondWithJSON(w, code, Response{
-		Error: &Error{Message: core.ErrorMessage(err)},
+		Error: &Error{Message: errors.ErrorMessage(err)},
 	})
 }
 

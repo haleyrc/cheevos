@@ -1,8 +1,9 @@
 package fake
 
 import (
-	"github.com/haleyrc/cheevos"
 	"github.com/pborman/uuid"
+
+	"github.com/haleyrc/cheevos"
 )
 
 func Organization(ownerID string) *cheevos.Organization {

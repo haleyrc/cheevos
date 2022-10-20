@@ -1,7 +1,6 @@
 package cheevos
 
 import (
-	"github.com/haleyrc/cheevos/internal/core"
 	"github.com/haleyrc/cheevos/internal/lib/stringutil"
 )
 
@@ -30,7 +29,7 @@ func (c *Cheevo) Normalize() {
 func (c *Cheevo) Validate() error {
 	c.Normalize()
 
-	ve := core.NewValidationError(c)
+	ve := NewValidationError(c)
 
 	if c.ID == "" {
 		ve.Add("ID", "ID can't be blank.")

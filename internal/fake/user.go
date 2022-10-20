@@ -1,10 +1,9 @@
 package fake
 
 import (
-	"github.com/pborman/uuid"
-
 	"github.com/haleyrc/pkg/hash"
 	"github.com/haleyrc/pkg/random"
+	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
 )

@@ -1,9 +1,8 @@
 package fake
 
 import (
-	"github.com/pborman/uuid"
-
 	"github.com/haleyrc/pkg/time"
+	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos"
 )

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/haleyrc/cheevos/internal/core"
+	"github.com/haleyrc/cheevos"
 )
 
 type Validator interface{ Validate() error }
@@ -21,7 +21,7 @@ func RunValidationTests(t *testing.T, v Validator, msg string, fieldErrors map[s
 		t.Errorf("Expected error to be %q, but got %q.", msg, got)
 	}
 
-	ve, ok := core.ValidationErrorFromError(err)
+	ve, ok := cheevos.ValidationErrorFromError(err)
 	if !ok {
 		t.Fatalf("Expected error to be a validation error, but it was a(n) %T.", err)
 	}

@@ -2,8 +2,6 @@ package cheevos
 
 import (
 	"github.com/haleyrc/pkg/time"
-
-	"github.com/haleyrc/cheevos/internal/core"
 )
 
 type Award struct {
@@ -17,7 +15,7 @@ type Award struct {
 func (a *Award) Model() string { return "Award" }
 
 func (a *Award) Validate() error {
-	ve := core.NewValidationError(a)
+	ve := NewValidationError(a)
 
 	if a.CheevoID == "" {
 		ve.Add("CheevoID", "Cheevo ID can't be blank.")
