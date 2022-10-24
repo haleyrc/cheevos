@@ -5,14 +5,14 @@ import (
 
 	"github.com/haleyrc/pkg/logger"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 )
 
-var _ cheevos.CheevosService = &cheevosLogger{}
+var _ domain.CheevosService = &cheevosLogger{}
 
 type cheevosLogger struct {
 	Logger  logger.Logger
-	Service cheevos.CheevosService
+	Service domain.CheevosService
 }
 
 func (l *cheevosLogger) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error {
@@ -34,7 +34,7 @@ func (l *cheevosLogger) AwardCheevoToUser(ctx context.Context, recipientID, chee
 	return nil
 }
 
-func (l *cheevosLogger) CreateCheevo(ctx context.Context, name, description, orgID string) (*cheevos.Cheevo, error) {
+func (l *cheevosLogger) CreateCheevo(ctx context.Context, name, description, orgID string) (*domain.Cheevo, error) {
 	l.Logger.Debug(ctx, "creating cheevo", logger.Fields{
 		"Name":         name,
 		"Description":  description,
@@ -54,7 +54,7 @@ func (l *cheevosLogger) CreateCheevo(ctx context.Context, name, description, org
 	return cheevo, nil
 }
 
-func (l *cheevosLogger) GetCheevo(ctx context.Context, id string) (*cheevos.Cheevo, error) {
+func (l *cheevosLogger) GetCheevo(ctx context.Context, id string) (*domain.Cheevo, error) {
 	l.Logger.Debug(ctx, "getting cheevo", logger.Fields{"ID": id})
 
 	cheevo, err := l.Service.GetCheevo(ctx, id)

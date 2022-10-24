@@ -5,14 +5,14 @@ import (
 
 	"github.com/haleyrc/pkg/logger"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 )
 
-var _ cheevos.RosterService = &rosterLogger{}
+var _ domain.RosterService = &rosterLogger{}
 
 type rosterLogger struct {
 	Logger  logger.Logger
-	Service cheevos.RosterService
+	Service domain.RosterService
 }
 
 func (l *rosterLogger) AcceptInvitation(ctx context.Context, userID, code string) error {
@@ -34,7 +34,7 @@ func (l *rosterLogger) AcceptInvitation(ctx context.Context, userID, code string
 	return nil
 }
 
-func (l *rosterLogger) CreateOrganization(ctx context.Context, name, ownerID string) (*cheevos.Organization, error) {
+func (l *rosterLogger) CreateOrganization(ctx context.Context, name, ownerID string) (*domain.Organization, error) {
 	l.Logger.Debug(ctx, "creating organization", logger.Fields{
 		"Name":  name,
 		"Owner": ownerID,
@@ -70,7 +70,7 @@ func (l *rosterLogger) DeclineInvitation(ctx context.Context, code string) error
 	return nil
 }
 
-func (l *rosterLogger) GetInvitation(ctx context.Context, id string) (*cheevos.Invitation, error) {
+func (l *rosterLogger) GetInvitation(ctx context.Context, id string) (*domain.Invitation, error) {
 	l.Logger.Debug(ctx, "getting invitation", logger.Fields{"ID": id})
 
 	invitation, err := l.Service.GetInvitation(ctx, id)
@@ -86,7 +86,7 @@ func (l *rosterLogger) GetInvitation(ctx context.Context, id string) (*cheevos.I
 	return invitation, nil
 }
 
-func (l *rosterLogger) InviteUserToOrganization(ctx context.Context, email, orgID string) (*cheevos.Invitation, error) {
+func (l *rosterLogger) InviteUserToOrganization(ctx context.Context, email, orgID string) (*domain.Invitation, error) {
 	l.Logger.Debug(ctx, "inviting user to organization", logger.Fields{
 		"Email":        email,
 		"Organization": orgID,
@@ -124,7 +124,7 @@ func (l *rosterLogger) IsMember(ctx context.Context, orgID, userID string) error
 	return nil
 }
 
-func (l *rosterLogger) RefreshInvitation(ctx context.Context, id string) (*cheevos.Invitation, error) {
+func (l *rosterLogger) RefreshInvitation(ctx context.Context, id string) (*domain.Invitation, error) {
 	l.Logger.Debug(ctx, "refreshing invitation", logger.Fields{
 		"ID": id,
 	})

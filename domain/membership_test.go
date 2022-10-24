@@ -1,11 +1,11 @@
-package cheevos_test
+package domain_test
 
 import (
 	"testing"
 
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
@@ -18,7 +18,7 @@ func TestMembershipValidationReturnsNilForAValidMembership(t *testing.T) {
 }
 
 func TestMembershipValidationReturnsAnErrorForAnInvalidMembership(t *testing.T) {
-	var m cheevos.Membership
+	var m domain.Membership
 	testutil.RunValidationTests(t, &m, "validation failed: Membership is invalid", map[string]string{
 		"OrganizationID": "Organization ID can't be blank.",
 		"UserID":         "User ID can't be blank.",

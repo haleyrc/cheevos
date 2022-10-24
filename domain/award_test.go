@@ -1,11 +1,11 @@
-package cheevos_test
+package domain_test
 
 import (
 	"testing"
 
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
@@ -18,7 +18,7 @@ func TestAwardValidationReturnsNilForAValidAward(t *testing.T) {
 }
 
 func TestAwardValidationReturnsAnErrorForAnInvalidAward(t *testing.T) {
-	var a cheevos.Award
+	var a domain.Award
 	testutil.RunValidationTests(t, &a, "validation failed: Award is invalid", map[string]string{
 		"CheevoID": "Cheevo ID can't be blank.",
 		"UserID":   "User ID can't be blank.",

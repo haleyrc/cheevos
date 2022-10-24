@@ -1,18 +1,19 @@
-package cheevos_test
+package domain_test
 
 import (
 	"testing"
 
-	"github.com/haleyrc/cheevos"
 	"github.com/haleyrc/pkg/errors"
+
+	"github.com/haleyrc/cheevos/domain"
 )
 
 func TestAllErrorsAreCoded(t *testing.T) {
 	testcases := map[string]interface{}{
-		"authorization error": &cheevos.AuthorizationError{},
-		"bad request error":   &cheevos.BadRequestError{},
-		"raw error":           &cheevos.RawError{},
-		"validation error":    cheevos.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
+		"authorization error": &domain.AuthorizationError{},
+		"bad request error":   &domain.BadRequestError{},
+		"raw error":           &domain.RawError{},
+		"validation error":    domain.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
 	}
 	for name, tc := range testcases {
 		if _, ok := tc.(errors.Coder); !ok {
@@ -23,10 +24,10 @@ func TestAllErrorsAreCoded(t *testing.T) {
 
 func TestAllErrorsAreMessaged(t *testing.T) {
 	testcases := map[string]interface{}{
-		"authorization error": &cheevos.AuthorizationError{},
-		"bad request error":   &cheevos.BadRequestError{},
-		"raw error":           &cheevos.RawError{},
-		"validation error":    cheevos.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
+		"authorization error": &domain.AuthorizationError{},
+		"bad request error":   &domain.BadRequestError{},
+		"raw error":           &domain.RawError{},
+		"validation error":    domain.NewValidationError(testModel("Test")).Add("field", "msg").Error(),
 	}
 	for name, tc := range testcases {
 		if _, ok := tc.(errors.Messager); !ok {
@@ -41,7 +42,7 @@ func TestValidationErrorAddsFieldErrors(t *testing.T) {
 		"MyField2": "My Field 2 shouldn't be blank",
 	}
 
-	ve := cheevos.NewValidationError(testModel("Test"))
+	ve := domain.NewValidationError(testModel("Test"))
 
 	for name, msg := range fieldErrors {
 		ve.Add(name, msg)
@@ -60,21 +61,21 @@ func TestValidationErrorAddsFieldErrors(t *testing.T) {
 }
 
 func TestValidationErrorIsntAnError(t *testing.T) {
-	var i interface{} = &cheevos.ValidationError{}
+	var i interface{} = &domain.ValidationError{}
 	if err, ok := i.(error); ok {
 		t.Errorf("Expected raw validation error to not be an error, but got %v.", err)
 	}
 }
 
 func TestValidationErrorReturnsNilWithNoErrors(t *testing.T) {
-	err := cheevos.NewValidationError(testModel("Test")).Error()
+	err := domain.NewValidationError(testModel("Test")).Error()
 	if err != nil {
 		t.Errorf("Expected error to be nil, but got %v.", err)
 	}
 }
 
 func TestValidationErrorReturnsAnErrorWithFieldErrors(t *testing.T) {
-	ve := cheevos.NewValidationError(testModel("Test"))
+	ve := domain.NewValidationError(testModel("Test"))
 	ve.Add("MyField", "My Field shouldn't be blank")
 	err := ve.Error()
 	if err == nil {

@@ -7,13 +7,13 @@ import (
 	"github.com/haleyrc/pkg/json"
 	"github.com/haleyrc/pkg/time"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/lib/web"
 )
 
 type RosterServer struct {
 	Authz  AuthorizationService
-	Roster cheevos.RosterService
+	Roster domain.RosterService
 }
 
 type AcceptInvitationRequest struct {
@@ -28,7 +28,7 @@ func (rs *RosterServer) AcceptInvitation(w http.ResponseWriter, r *http.Request)
 
 	var req AcceptInvitationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, cheevos.NewBadRequestError(err)
+		return nil, domain.NewBadRequestError(err)
 	}
 
 	if err := rs.Roster.AcceptInvitation(ctx, currentUser, req.Code); err != nil {
@@ -53,7 +53,7 @@ func (rs *RosterServer) CreateOrganization(w http.ResponseWriter, r *http.Reques
 
 	var req CreateOrganizationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, cheevos.NewBadRequestError(err)
+		return nil, domain.NewBadRequestError(err)
 	}
 
 	org, err := rs.Roster.CreateOrganization(ctx, req.Name, currentUser)
@@ -80,7 +80,7 @@ func (rs *RosterServer) DeclineInvitation(w http.ResponseWriter, r *http.Request
 
 	var req DeclineInvitationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, cheevos.NewBadRequestError(err)
+		return nil, domain.NewBadRequestError(err)
 	}
 
 	if err := rs.Roster.DeclineInvitation(ctx, req.Code); err != nil {
@@ -105,7 +105,7 @@ func (rs *RosterServer) InviteUserToOrganization(w http.ResponseWriter, r *http.
 
 	var req InviteUserToOrganizationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, cheevos.NewBadRequestError(err)
+		return nil, domain.NewBadRequestError(err)
 	}
 
 	if err := rs.Authz.CanInviteUsersToOrganization(ctx, currentUser, req.OrganizationID); err != nil {
@@ -139,7 +139,7 @@ func (rs *RosterServer) RefreshInvitation(w http.ResponseWriter, r *http.Request
 
 	var req RefreshInvitationRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, cheevos.NewBadRequestError(err)
+		return nil, domain.NewBadRequestError(err)
 	}
 
 	if err := rs.Authz.CanRefreshInvitation(ctx, currentUser, req.InvitationID); err != nil {

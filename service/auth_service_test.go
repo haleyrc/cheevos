@@ -6,7 +6,7 @@ import (
 
 	"github.com/haleyrc/pkg/pg"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/mock"
 )
 
@@ -20,7 +20,7 @@ func TestSigningUpSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertUserFn: func(_ context.Context, _ pg.Tx, _ *cheevos.User, _ string) error { return nil },
+			InsertUserFn: func(_ context.Context, _ pg.Tx, _ *domain.User, _ string) error { return nil },
 		}
 
 		svc = &authService{

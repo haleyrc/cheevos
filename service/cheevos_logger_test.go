@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/mock"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
@@ -49,7 +49,7 @@ func TestLoggerLogsAnErrorFromCreateCheevo(t *testing.T) {
 
 	cl := &cheevosLogger{
 		Service: &mock.CheevosService{
-			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*cheevos.Cheevo, error) {
+			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*domain.Cheevo, error) {
 				return nil, fmt.Errorf("oops")
 			},
 		},
@@ -68,8 +68,8 @@ func TestLoggerLogsTheResponseFromCreateCheevo(t *testing.T) {
 
 	cl := &cheevosLogger{
 		Service: &mock.CheevosService{
-			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*cheevos.Cheevo, error) {
-				return &cheevos.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: "orgid"}, nil
+			CreateCheevoFn: func(_ context.Context, _, _, _ string) (*domain.Cheevo, error) {
+				return &domain.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: "orgid"}, nil
 			},
 		},
 		Logger: logger,

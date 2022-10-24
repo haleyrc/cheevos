@@ -5,11 +5,11 @@ import (
 	"github.com/haleyrc/pkg/random"
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 )
 
-func User() *cheevos.User {
-	return &cheevos.User{
+func User() *domain.User {
+	return &domain.User{
 		ID:       uuid.New(),
 		Username: uniqify("TestUser"),
 	}

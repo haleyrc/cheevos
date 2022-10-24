@@ -6,12 +6,12 @@ import (
 	"github.com/haleyrc/pkg/errors"
 	"github.com/haleyrc/pkg/json"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/lib/web"
 )
 
 type AuthServer struct {
-	Auth cheevos.AuthService
+	Auth domain.AuthService
 }
 
 type SignUpRequest struct {
@@ -29,7 +29,7 @@ func (as *AuthServer) SignUp(w http.ResponseWriter, r *http.Request) (web.Data, 
 
 	var req SignUpRequest
 	if err := json.Decode(&req, r.Body); err != nil {
-		return nil, cheevos.NewBadRequestError(err)
+		return nil, domain.NewBadRequestError(err)
 	}
 
 	user, err := as.Auth.SignUp(ctx, req.Username, req.Password)

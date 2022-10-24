@@ -5,12 +5,12 @@ import (
 
 	"github.com/haleyrc/pkg/errors"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 )
 
 type Service struct {
-	Cheevos cheevos.CheevosService
-	Roster  cheevos.RosterService
+	Cheevos domain.CheevosService
+	Roster  domain.RosterService
 }
 
 func (svc *Service) CanAwardCheevo(ctx context.Context, fromUserID, toUserID, cheevoID string) error {
@@ -20,11 +20,11 @@ func (svc *Service) CanAwardCheevo(ctx context.Context, fromUserID, toUserID, ch
 	}
 
 	if err := svc.Roster.IsMember(ctx, cheevo.OrganizationID, toUserID); err != nil {
-		return cheevos.NewAuthorizationError(err, "Recipient is not a member of that organization.")
+		return domain.NewAuthorizationError(err, "Recipient is not a member of that organization.")
 	}
 
 	if err := svc.Roster.IsMember(ctx, cheevo.OrganizationID, fromUserID); err != nil {
-		return cheevos.NewAuthorizationError(err, "You are not a member of that organization.")
+		return domain.NewAuthorizationError(err, "You are not a member of that organization.")
 	}
 
 	return nil
@@ -32,7 +32,7 @@ func (svc *Service) CanAwardCheevo(ctx context.Context, fromUserID, toUserID, ch
 
 func (svc *Service) CanCreateCheevo(ctx context.Context, userID, orgID string) error {
 	if err := svc.Roster.IsMember(ctx, orgID, userID); err != nil {
-		return cheevos.NewAuthorizationError(err, "You are not a member of that organization.")
+		return domain.NewAuthorizationError(err, "You are not a member of that organization.")
 	}
 	return nil
 }
@@ -44,7 +44,7 @@ func (svc *Service) CanGetCheevo(ctx context.Context, userID, cheevoID string) e
 	}
 
 	if err := svc.Roster.IsMember(ctx, cheevo.OrganizationID, userID); err != nil {
-		return cheevos.NewAuthorizationError(err, "You are not a member of that organization.")
+		return domain.NewAuthorizationError(err, "You are not a member of that organization.")
 	}
 
 	return nil
@@ -52,7 +52,7 @@ func (svc *Service) CanGetCheevo(ctx context.Context, userID, cheevoID string) e
 
 func (svc *Service) CanInviteUsersToOrganization(ctx context.Context, userID, orgID string) error {
 	if err := svc.Roster.IsMember(ctx, orgID, userID); err != nil {
-		return cheevos.NewAuthorizationError(err, "You are not a member of that organization.")
+		return domain.NewAuthorizationError(err, "You are not a member of that organization.")
 	}
 	return nil
 }
@@ -64,7 +64,7 @@ func (svc *Service) CanRefreshInvitation(ctx context.Context, userID, invitation
 	}
 
 	if err := svc.Roster.IsMember(ctx, invitation.OrganizationID, userID); err != nil {
-		return cheevos.NewAuthorizationError(err, "You are not a member of that organization.")
+		return domain.NewAuthorizationError(err, "You are not a member of that organization.")
 	}
 
 	return nil

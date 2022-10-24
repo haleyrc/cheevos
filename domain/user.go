@@ -1,4 +1,4 @@
-package cheevos
+package domain
 
 import (
 	"github.com/haleyrc/cheevos/internal/lib/stringutil"

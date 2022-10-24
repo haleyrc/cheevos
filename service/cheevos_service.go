@@ -10,18 +10,18 @@ import (
 	"github.com/haleyrc/pkg/time"
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 )
 
-var _ cheevos.CheevosService = &cheevosService{}
+var _ domain.CheevosService = &cheevosService{}
 
 type CheevosRepository interface {
-	GetCheevo(ctx context.Context, tx pg.Tx, cheevo *cheevos.Cheevo, id string) error
-	InsertAward(ctx context.Context, tx pg.Tx, award *cheevos.Award) error
-	InsertCheevo(ctx context.Context, tx pg.Tx, cheevo *cheevos.Cheevo) error
+	GetCheevo(ctx context.Context, tx pg.Tx, cheevo *domain.Cheevo, id string) error
+	InsertAward(ctx context.Context, tx pg.Tx, award *domain.Award) error
+	InsertCheevo(ctx context.Context, tx pg.Tx, cheevo *domain.Cheevo) error
 }
 
-func NewCheevosService(db Database, logger logger.Logger, repo CheevosRepository) cheevos.CheevosService {
+func NewCheevosService(db Database, logger logger.Logger, repo CheevosRepository) domain.CheevosService {
 	return &cheevosLogger{
 		Logger: logger,
 		Service: &cheevosService{
@@ -41,7 +41,7 @@ type cheevosService struct {
 // received it and Users "track" how many Cheevos they have received.
 func (svc *cheevosService) AwardCheevoToUser(ctx context.Context, recipientID, cheevoID string) error {
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
-		award := &cheevos.Award{
+		award := &domain.Award{
 			CheevoID: cheevoID,
 			UserID:   recipientID,
 			Awarded:  time.Now(),
@@ -60,11 +60,11 @@ func (svc *cheevosService) AwardCheevoToUser(ctx context.Context, recipientID, c
 
 // CreateCheevo creates a new cheevo and persists it to the database. It returns
 // a response containing the full cheevo if successful.
-func (svc *cheevosService) CreateCheevo(ctx context.Context, name, description, orgID string) (*cheevos.Cheevo, error) {
-	var cheevo cheevos.Cheevo
+func (svc *cheevosService) CreateCheevo(ctx context.Context, name, description, orgID string) (*domain.Cheevo, error) {
+	var cheevo domain.Cheevo
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
-		cheevo = cheevos.Cheevo{
+		cheevo = domain.Cheevo{
 			ID:             uuid.New(),
 			Name:           name,
 			Description:    description,
@@ -82,8 +82,8 @@ func (svc *cheevosService) CreateCheevo(ctx context.Context, name, description, 
 	return &cheevo, nil
 }
 
-func (svc *cheevosService) GetCheevo(ctx context.Context, id string) (*cheevos.Cheevo, error) {
-	var cheevo cheevos.Cheevo
+func (svc *cheevosService) GetCheevo(ctx context.Context, id string) (*domain.Cheevo, error) {
+	var cheevo domain.Cheevo
 
 	err := svc.DB.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		return svc.Repo.GetCheevo(ctx, tx, &cheevo, id)

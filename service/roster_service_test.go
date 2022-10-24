@@ -9,7 +9,7 @@ import (
 	"github.com/haleyrc/pkg/time"
 	"github.com/pborman/uuid"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/mock"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
@@ -24,7 +24,7 @@ func TestAcceptingAnInvitationFailsIfTheInvitationIsExpired(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			GetInvitationByCodeFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Invitation, _ string) error { return nil },
+			GetInvitationByCodeFn: func(_ context.Context, _ pg.Tx, _ *domain.Invitation, _ string) error { return nil },
 		}
 
 		svc = &rosterService{
@@ -57,8 +57,8 @@ func TestAcceptingAnInvitationSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertMembershipFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Membership) error { return nil },
-			GetInvitationByCodeFn: func(_ context.Context, _ pg.Tx, inv *cheevos.Invitation, _ string) error {
+			InsertMembershipFn: func(_ context.Context, _ pg.Tx, _ *domain.Membership) error { return nil },
+			GetInvitationByCodeFn: func(_ context.Context, _ pg.Tx, inv *domain.Invitation, _ string) error {
 				inv.OrganizationID = orgID
 				inv.Expires = time.Now().Add(time.Hour)
 				return nil
@@ -162,7 +162,7 @@ func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeUpd
 		}
 
 		repo = &mock.Repository{
-			InsertInvitationFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Invitation, _ string) error {
+			InsertInvitationFn: func(_ context.Context, _ pg.Tx, _ *domain.Invitation, _ string) error {
 				return fmt.Errorf("oops")
 			},
 		}
@@ -196,7 +196,7 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 
 		email      = "test@example.com"
 		orgID      = uuid.New()
-		expiration = time.Now().Add(cheevos.InvitationValidFor)
+		expiration = time.Now().Add(domain.InvitationValidFor)
 
 		mockDB = &mock.Database{}
 
@@ -205,7 +205,7 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 		}
 
 		repo = &mock.Repository{
-			InsertInvitationFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Invitation, _ string) error { return nil },
+			InsertInvitationFn: func(_ context.Context, _ pg.Tx, _ *domain.Invitation, _ string) error { return nil },
 		}
 
 		svc = &rosterService{
@@ -279,8 +279,8 @@ func TestRefreshingAnInvitationDoesNotSendAnEmailIfTheInvitationCantBeUpdated(t 
 		}
 
 		repo = &mock.Repository{
-			GetInvitationFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Invitation, _ string) error { return nil },
-			UpdateInvitationFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Invitation, _ string) error {
+			GetInvitationFn: func(_ context.Context, _ pg.Tx, _ *domain.Invitation, _ string) error { return nil },
+			UpdateInvitationFn: func(_ context.Context, _ pg.Tx, _ *domain.Invitation, _ string) error {
 				return fmt.Errorf("oops")
 			},
 		}
@@ -327,12 +327,12 @@ func TestRefreshingAnInvitationSucceeds(t *testing.T) {
 		}
 
 		repo = &mock.Repository{
-			GetInvitationFn: func(_ context.Context, _ pg.Tx, inv *cheevos.Invitation, _ string) error {
+			GetInvitationFn: func(_ context.Context, _ pg.Tx, inv *domain.Invitation, _ string) error {
 				inv.Email = email
 				inv.OrganizationID = orgID
 				return nil
 			},
-			UpdateInvitationFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Invitation, _ string) error { return nil },
+			UpdateInvitationFn: func(_ context.Context, _ pg.Tx, _ *domain.Invitation, _ string) error { return nil },
 		}
 
 		svc = &rosterService{
@@ -400,8 +400,8 @@ func TestCreatingAValidOrganizationWithSucceeds(t *testing.T) {
 		mockDB = &mock.Database{}
 
 		repo = &mock.Repository{
-			InsertMembershipFn:   func(_ context.Context, _ pg.Tx, _ *cheevos.Membership) error { return nil },
-			InsertOrganizationFn: func(_ context.Context, _ pg.Tx, _ *cheevos.Organization) error { return nil },
+			InsertMembershipFn:   func(_ context.Context, _ pg.Tx, _ *domain.Membership) error { return nil },
+			InsertOrganizationFn: func(_ context.Context, _ pg.Tx, _ *domain.Organization) error { return nil },
 		}
 
 		svc = &rosterService{

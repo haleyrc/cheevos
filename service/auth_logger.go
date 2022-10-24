@@ -5,17 +5,17 @@ import (
 
 	"github.com/haleyrc/pkg/logger"
 
-	"github.com/haleyrc/cheevos"
+	"github.com/haleyrc/cheevos/domain"
 )
 
-var _ cheevos.AuthService = &authLogger{}
+var _ domain.AuthService = &authLogger{}
 
 type authLogger struct {
 	Logger  logger.Logger
-	Service cheevos.AuthService
+	Service domain.AuthService
 }
 
-func (l *authLogger) GetUser(ctx context.Context, id string) (*cheevos.User, error) {
+func (l *authLogger) GetUser(ctx context.Context, id string) (*domain.User, error) {
 	l.Logger.Debug(ctx, "getting user", logger.Fields{"ID": id})
 
 	user, err := l.Service.GetUser(ctx, id)
@@ -29,7 +29,7 @@ func (l *authLogger) GetUser(ctx context.Context, id string) (*cheevos.User, err
 	return user, nil
 }
 
-func (l *authLogger) SignUp(ctx context.Context, username, password string) (*cheevos.User, error) {
+func (l *authLogger) SignUp(ctx context.Context, username, password string) (*domain.User, error) {
 	l.Logger.Debug(ctx, "signing up user", logger.Fields{
 		"Username": username,
 	})
