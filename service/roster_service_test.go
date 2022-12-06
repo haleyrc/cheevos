@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/haleyrc/pkg/pg"
@@ -148,6 +149,40 @@ func TestDecliningAnInvitationSucceeds(t *testing.T) {
 	}
 }
 
+func TestGettingAnInvitationSucceeds(t *testing.T) {
+	var (
+		ctx = context.Background()
+
+		id = uuid.New()
+
+		mockDB = &mock.Database{}
+
+		repo = &mock.Repository{
+			GetInvitationFn: func(_ context.Context, _ pg.Tx, _ *domain.Invitation, _ string) error { return nil },
+		}
+
+		svc = &rosterService{
+			DB:   mockDB,
+			Repo: repo,
+		}
+	)
+
+	_, err := svc.GetInvitation(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if repo.GetInvitationCalled.Count != 1 {
+		t.Errorf("Expected repository to receive GetInvitation, but it didn't.")
+	}
+	if repo.GetInvitationCalled.With.ID != id {
+		t.Errorf(
+			"Expected repository.GetInvitation to receive id %q, but got %q.",
+			id, repo.GetInvitationCalled.With.ID,
+		)
+	}
+}
+
 func TestInvitingAUserToAnOrganizationDoesNotSendAnEmailIfTheInvitationCantBeUpdated(t *testing.T) {
 	var (
 		ctx = context.Background()
@@ -263,6 +298,47 @@ func TestInvitingAUserToAnOrganizationSucceeds(t *testing.T) {
 	}
 	if invitation.Expires != expiration {
 		t.Errorf("Expiration should be %s, but got %s.", expiration, invitation.Expires)
+	}
+}
+
+func TestCheckingMembershipSucceeds(t *testing.T) {
+	var (
+		ctx = context.Background()
+
+		orgID  = uuid.New()
+		userID = uuid.New()
+
+		mockDB = &mock.Database{}
+
+		repo = &mock.Repository{
+			GetMembershipFn: func(_ context.Context, _ pg.Tx, _ *domain.Membership, _, _ string) error { return nil },
+		}
+
+		svc = &rosterService{
+			DB:   mockDB,
+			Repo: repo,
+		}
+	)
+
+	err := svc.IsMember(ctx, orgID, userID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if repo.GetMembershipCalled.Count != 1 {
+		t.Errorf("Expected repository to receive GetMembership, but it didn't.")
+	}
+	if repo.GetMembershipCalled.With.OrganizationID != orgID {
+		t.Errorf(
+			"Expected repository.GetMembership to receive organization id %q, but got %q.",
+			orgID, repo.GetMembershipCalled.With.OrganizationID,
+		)
+	}
+	if repo.GetMembershipCalled.With.UserID != userID {
+		t.Errorf(
+			"Expected repository.GetMembership to receive user id %q, but got %q.",
+			userID, repo.GetMembershipCalled.With.UserID,
+		)
 	}
 }
 

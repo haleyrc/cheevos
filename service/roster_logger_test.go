@@ -160,6 +160,40 @@ func TestLoggerLogsTheResponseFromInviteUserToOrganization(t *testing.T) {
 	)
 }
 
+func TestLoggerLogsAnErrorFromIsMember(t *testing.T) {
+	logger := testutil.NewTestLogger()
+
+	il := &rosterLogger{
+		Service: &mock.RosterService{
+			IsMemberFn: func(_ context.Context, _, _ string) error { return fmt.Errorf("oops") },
+		},
+		Logger: logger,
+	}
+	il.IsMember(context.Background(), "orgid", "userid")
+
+	logger.ShouldLog(t,
+		`{"Fields":{"Organization":"orgid","User":"userid"},"Message":"checking membership"}`,
+		`{"Fields":{"Error":"oops"},"Message":"checking membership failed"}`,
+	)
+}
+
+func TestLoggerLogsTheResponseFromIsMember(t *testing.T) {
+	logger := testutil.NewTestLogger()
+
+	il := &rosterLogger{
+		Service: &mock.RosterService{
+			IsMemberFn: func(_ context.Context, _, _ string) error { return nil },
+		},
+		Logger: logger,
+	}
+	il.IsMember(context.Background(), "orgid", "userid")
+
+	logger.ShouldLog(t,
+		`{"Fields":{"Organization":"orgid","User":"userid"},"Message":"checking membership"}`,
+		`{"Fields":{"Organization":"orgid","User":"userid"},"Message":"checking membership succeeded"}`,
+	)
+}
+
 func TestLoggerLogsAnErrorFromRefreshInvitation(t *testing.T) {
 	logger := testutil.NewTestLogger()
 

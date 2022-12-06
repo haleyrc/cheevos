@@ -116,3 +116,37 @@ func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 		t.Errorf("Description should be %q, but got %q.", description, cheevo.Description)
 	}
 }
+
+func TestGettingACheevoSucceeds(t *testing.T) {
+	var (
+		ctx = context.Background()
+
+		id = uuid.New()
+
+		mockDB = &mock.Database{}
+
+		repo = &mock.Repository{
+			GetCheevoFn: func(_ context.Context, _ pg.Tx, _ *domain.Cheevo, _ string) error { return nil },
+		}
+
+		svc = &cheevosService{
+			DB:   mockDB,
+			Repo: repo,
+		}
+	)
+
+	_, err := svc.GetCheevo(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if repo.GetCheevoCalled.Count != 1 {
+		t.Errorf("Expected repository to receive GetCheevo, but it didn't.")
+	}
+	if repo.GetCheevoCalled.With.ID != id {
+		t.Errorf(
+			"Expected repository.GetCheevo to receive id %q, but got %q.",
+			id, repo.GetCheevoCalled.With.ID,
+		)
+	}
+}
