@@ -6,6 +6,7 @@ import (
 	"github.com/haleyrc/pkg/logger"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/password"
 )
 
 var _ domain.AuthService = &authLogger{}
@@ -29,7 +30,7 @@ func (l *authLogger) GetUser(ctx context.Context, id string) (*domain.User, erro
 	return user, nil
 }
 
-func (l *authLogger) SignUp(ctx context.Context, username, password string) (*domain.User, error) {
+func (l *authLogger) SignUp(ctx context.Context, username string, password password.Password) (*domain.User, error) {
 	l.Logger.Debug(ctx, "signing up user", logger.Fields{
 		"Username": username,
 	})

@@ -7,6 +7,7 @@ import (
 
 	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/mock"
+	"github.com/haleyrc/cheevos/internal/password"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
@@ -54,13 +55,13 @@ func TestLoggerLogsAnErrorFromSignUp(t *testing.T) {
 
 	al := &authLogger{
 		Service: &mock.AuthService{
-			SignUpFn: func(_ context.Context, _, _ string) (*domain.User, error) {
+			SignUpFn: func(_ context.Context, _ string, _ password.Password) (*domain.User, error) {
 				return nil, fmt.Errorf("oops")
 			},
 		},
 		Logger: logger,
 	}
-	al.SignUp(context.Background(), "username", "password")
+	al.SignUp(context.Background(), "username", password.New("password"))
 
 	logger.ShouldLog(t,
 		`{"Fields":{"Username":"username"},"Message":"signing up user"}`,
@@ -73,13 +74,13 @@ func TestLoggerLogsTheResponseFromSignUp(t *testing.T) {
 
 	al := &authLogger{
 		Service: &mock.AuthService{
-			SignUpFn: func(_ context.Context, _, _ string) (*domain.User, error) {
+			SignUpFn: func(_ context.Context, _ string, _ password.Password) (*domain.User, error) {
 				return &domain.User{ID: "id", Username: "username"}, nil
 			},
 		},
 		Logger: logger,
 	}
-	al.SignUp(context.Background(), "username", "password")
+	al.SignUp(context.Background(), "username", password.New("password"))
 
 	logger.ShouldLog(t,
 		`{"Fields":{"Username":"username"},"Message":"signing up user"}`,

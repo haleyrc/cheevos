@@ -9,6 +9,7 @@ import (
 
 	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/mock"
+	"github.com/haleyrc/cheevos/internal/password"
 )
 
 func TestGettingAUserSucceeds(t *testing.T) {
@@ -50,7 +51,7 @@ func TestSigningUpSucceeds(t *testing.T) {
 		ctx = context.Background()
 
 		username = "username"
-		password = "password"
+		pw       = "password"
 
 		mockDB = &mock.Database{}
 
@@ -59,12 +60,13 @@ func TestSigningUpSucceeds(t *testing.T) {
 		}
 
 		svc = &authService{
-			DB:   mockDB,
-			Repo: repo,
+			DB:                mockDB,
+			Repo:              repo,
+			PasswordValidator: password.NewValidator(),
 		}
 	)
 
-	user, err := svc.SignUp(ctx, username, password)
+	user, err := svc.SignUp(ctx, username, password.New(pw))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +86,7 @@ func TestSigningUpSucceeds(t *testing.T) {
 			username, repo.InsertUserCalled.With.User.Username,
 		)
 	}
-	if repo.InsertUserCalled.With.PasswordHash == password {
+	if repo.InsertUserCalled.With.PasswordHash == pw {
 		t.Errorf("Expected repository.InsertUser not to receive a plaintext password, but it did.")
 	}
 

@@ -20,7 +20,7 @@ type Validator struct {
 	Validations []Validation
 }
 
-func (v *Validator) Validate(p Password) error {
+func (v Validator) Validate(p Password) error {
 	errors := []error{}
 	for _, validator := range v.Validations {
 		if err := validator(p); err != nil {

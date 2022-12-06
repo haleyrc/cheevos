@@ -8,6 +8,7 @@ import (
 
 	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/lib/web"
+	"github.com/haleyrc/cheevos/internal/password"
 )
 
 type AuthServer struct {
@@ -15,8 +16,8 @@ type AuthServer struct {
 }
 
 type SignUpRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string            `json:"username"`
+	Password password.Password `json:"password"`
 }
 
 type SignUpResponse struct {
