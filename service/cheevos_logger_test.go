@@ -81,3 +81,41 @@ func TestLoggerLogsTheResponseFromCreateCheevo(t *testing.T) {
 		`{"Fields":{"Cheevo":{"ID":"id","Name":"name","Description":"description","OrganizationID":"orgid"}},"Message":"cheevo created"}`,
 	)
 }
+
+func TestLoggerLogsAnErrorFromGetCheevo(t *testing.T) {
+	logger := testutil.NewTestLogger()
+
+	cl := cheevosLogger{
+		Service: &mock.CheevosService{
+			GetCheevoFn: func(_ context.Context, _ string) (*domain.Cheevo, error) {
+				return nil, fmt.Errorf("oops")
+			},
+		},
+		Logger: logger,
+	}
+	cl.GetCheevo(context.Background(), "id")
+
+	logger.ShouldLog(t,
+		`{"Fields":{"ID":"id"},"Message":"getting cheevo"}`,
+		`{"Fields":{"Error":"oops"},"Message":"get cheevo failed"}`,
+	)
+}
+
+func TestLoggerLogsTheReponseFromGetCheevo(t *testing.T) {
+	logger := testutil.NewTestLogger()
+
+	cl := cheevosLogger{
+		Service: &mock.CheevosService{
+			GetCheevoFn: func(_ context.Context, _ string) (*domain.Cheevo, error) {
+				return &domain.Cheevo{ID: "id", Name: "name", Description: "description", OrganizationID: "orgid"}, nil
+			},
+		},
+		Logger: logger,
+	}
+	cl.GetCheevo(context.Background(), "id")
+
+	logger.ShouldLog(t,
+		`{"Fields":{"ID":"id"},"Message":"getting cheevo"}`,
+		`{"Fields":{"Cheevo":{"ID":"id","Name":"name","Description":"description","OrganizationID":"orgid"}},"Message":"got cheevo"}`,
+	)
+}

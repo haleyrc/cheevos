@@ -1,5 +1,5 @@
 SELECT
-	email, organization_id, expires_at
+	id, email, organization_id, expires_at
 FROM
 	invitations
 WHERE

@@ -7,6 +7,7 @@ import (
 	"github.com/haleyrc/pkg/time"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/assert"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
 	"github.com/haleyrc/cheevos/repository"
@@ -37,6 +38,37 @@ func TestInsertInvitationInsertAnInvitation(t *testing.T) {
 	if err := rosterRepo.InsertInvitation(ctx, db, invitation, codeHash); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestGetMembershipGetsAMembership(t *testing.T) {
+	assert := assert.New(t)
+
+	var (
+		ctx = context.Background()
+		db  = testutil.TestDatabase(ctx, t)
+
+		rosterRepo = &repository.RosterRepository{}
+		authRepo   = &repository.AuthRepository{}
+
+		user      = fake.User()
+		_, pwHash = fake.Password()
+		org       = fake.Organization(user.ID)
+		want      = fake.Membership(org.ID, user.ID)
+	)
+
+	authRepo.InsertUser(ctx, db, user, pwHash)
+	rosterRepo.InsertOrganization(ctx, db, org)
+	rosterRepo.InsertMembership(ctx, db, want)
+
+	var got domain.Membership
+	if err := rosterRepo.GetMembership(ctx, db, &got, want.OrganizationID, want.UserID); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.String("organization id", got.OrganizationID).Equals(want.OrganizationID)
+	assert.String("user id", got.UserID).Equals(want.UserID)
+	assert.String("joined", got.Joined.String()).Equals(want.Joined.UTC().String())
+
 }
 
 func TestInsertMembershipInsertsAMembership(t *testing.T) {
@@ -107,6 +139,41 @@ func TestDeleteInvitationByCodeDeleteAnInvitation(t *testing.T) {
 	if err := rosterRepo.DeleteInvitationByCode(ctx, db, codeHash); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestGetInvitationGetsAnInvitation(t *testing.T) {
+	assert := assert.New(t)
+
+	var (
+		ctx = context.Background()
+		db  = testutil.TestDatabase(ctx, t)
+
+		rosterRepo = &repository.RosterRepository{}
+		authRepo   = &repository.AuthRepository{}
+
+		user      = fake.User()
+		_, pwHash = fake.Password()
+
+		org = fake.Organization(user.ID)
+
+		want        = fake.Invitation(org.ID)
+		_, codeHash = fake.Password()
+	)
+
+	authRepo.InsertUser(ctx, db, user, pwHash)
+	rosterRepo.InsertOrganization(ctx, db, org)
+	rosterRepo.InsertInvitation(ctx, db, want, codeHash)
+
+	var got domain.Invitation
+	if err := rosterRepo.GetInvitation(ctx, db, &got, want.ID); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.String("message", "hello").Equals("hello")
+	assert.String("id", got.ID).Equals(want.ID)
+	assert.String("email", got.Email).Equals(want.Email)
+	assert.String("organization id", got.OrganizationID).Equals(want.OrganizationID)
+	assert.String("expires", got.Expires.String()).Equals(want.Expires.UTC().String())
 }
 
 func TestGetInvitationByCodeReturnsAnInvitation(t *testing.T) {

@@ -80,6 +80,45 @@ func TestLoggerLogsTheResponseFromDeclineInvitation(t *testing.T) {
 	)
 }
 
+func TestLoggerLogsAnErrorFromGetInvitation(t *testing.T) {
+	logger := testutil.NewTestLogger()
+
+	rl := &rosterLogger{
+		Service: &mock.RosterService{
+			GetInvitationFn: func(_ context.Context, _ string) (*domain.Invitation, error) {
+				return nil, fmt.Errorf("oops")
+			},
+		},
+		Logger: logger,
+	}
+	rl.GetInvitation(context.Background(), "id")
+
+	logger.ShouldLog(t,
+		`{"Fields":{"ID":"id"},"Message":"getting invitation"}`,
+		`{"Fields":{"Error":"oops"},"Message":"get invitation failed"}`,
+	)
+
+}
+
+func TestLoggerLogsTheResponseFromGetInvitation(t *testing.T) {
+	logger := testutil.NewTestLogger()
+
+	rl := &rosterLogger{
+		Service: &mock.RosterService{
+			GetInvitationFn: func(_ context.Context, _ string) (*domain.Invitation, error) {
+				return &domain.Invitation{ID: "id", Email: "email", OrganizationID: "orgid", Expires: time.Now()}, nil
+			},
+		},
+		Logger: logger,
+	}
+	rl.GetInvitation(context.Background(), "id")
+
+	logger.ShouldLog(t,
+		`{"Fields":{"ID":"id"},"Message":"getting invitation"}`,
+		`{"Fields":{"Invitation":{"ID":"id","Email":"email","OrganizationID":"orgid","Expires":"2022-09-16T15:02:04Z"}},"Message":"got invitation"}`,
+	)
+}
+
 func TestLoggerLogsAnErrorFromInviteUserToOrganization(t *testing.T) {
 	logger := testutil.NewTestLogger()
 

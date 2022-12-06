@@ -19,7 +19,7 @@ func (repo *RosterRepository) DeleteInvitationByCode(ctx context.Context, tx pg.
 }
 
 func (repo *RosterRepository) GetInvitation(ctx context.Context, tx pg.Tx, i *domain.Invitation, id string) error {
-	if err := tx.QueryRow(ctx, GetInvitationQuery, id).Scan(&i.Email, &i.OrganizationID, &i.Expires); err != nil {
+	if err := tx.QueryRow(ctx, GetInvitationQuery, id).Scan(&i.ID, &i.Email, &i.OrganizationID, &i.Expires); err != nil {
 		return fmt.Errorf("get invitation failed: %w", err)
 	}
 	return nil

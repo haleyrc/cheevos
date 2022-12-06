@@ -10,10 +10,49 @@ import (
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
+func TestLoggerLogsAnErrorFromGetUser(t *testing.T) {
+	logger := testutil.NewTestLogger()
+
+	al := &authLogger{
+		Service: &mock.AuthService{
+			GetUserFn: func(_ context.Context, _ string) (*domain.User, error) {
+				return nil, fmt.Errorf("oops")
+			},
+		},
+		Logger: logger,
+	}
+	al.GetUser(context.Background(), "id")
+
+	logger.ShouldLog(t,
+		`{"Fields":{"ID":"id"},"Message":"getting user"}`,
+		`{"Fields":{"Error":"oops"},"Message":"get user failed"}`,
+	)
+}
+
+func TestLoggerLogsTheResponseFromGetUser(t *testing.T) {
+	logger := testutil.NewTestLogger()
+
+	al := &authLogger{
+		Service: &mock.AuthService{
+			GetUserFn: func(_ context.Context, _ string) (*domain.User, error) {
+				return &domain.User{ID: "id", Username: "username"}, nil
+			},
+		},
+		Logger: logger,
+	}
+	al.GetUser(context.Background(), "id")
+
+	logger.ShouldLog(t,
+		`{"Fields":{"ID":"id"},"Message":"getting user"}`,
+		`{"Fields":{"User":{"ID":"id","Username":"username"}},"Message":"got user"}`,
+	)
+
+}
+
 func TestLoggerLogsAnErrorFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &authLogger{
+	al := &authLogger{
 		Service: &mock.AuthService{
 			SignUpFn: func(_ context.Context, _, _ string) (*domain.User, error) {
 				return nil, fmt.Errorf("oops")
@@ -21,7 +60,7 @@ func TestLoggerLogsAnErrorFromSignUp(t *testing.T) {
 		},
 		Logger: logger,
 	}
-	cl.SignUp(context.Background(), "username", "password")
+	al.SignUp(context.Background(), "username", "password")
 
 	logger.ShouldLog(t,
 		`{"Fields":{"Username":"username"},"Message":"signing up user"}`,
@@ -32,7 +71,7 @@ func TestLoggerLogsAnErrorFromSignUp(t *testing.T) {
 func TestLoggerLogsTheResponseFromSignUp(t *testing.T) {
 	logger := testutil.NewTestLogger()
 
-	cl := &authLogger{
+	al := &authLogger{
 		Service: &mock.AuthService{
 			SignUpFn: func(_ context.Context, _, _ string) (*domain.User, error) {
 				return &domain.User{ID: "id", Username: "username"}, nil
@@ -40,7 +79,7 @@ func TestLoggerLogsTheResponseFromSignUp(t *testing.T) {
 		},
 		Logger: logger,
 	}
-	cl.SignUp(context.Background(), "username", "password")
+	al.SignUp(context.Background(), "username", "password")
 
 	logger.ShouldLog(t,
 		`{"Fields":{"Username":"username"},"Message":"signing up user"}`,

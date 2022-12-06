@@ -8,7 +8,22 @@ import (
 	"github.com/haleyrc/cheevos/domain"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
+	"github.com/haleyrc/pkg/time"
 )
+
+func TestAnInvitationWithAnExpiresInThePastIsExpired(t *testing.T) {
+	i := domain.Invitation{Expires: time.Now().Sub(time.Hour)}
+	if !i.Expired() {
+		t.Errorf("Expected invitation expiring at %s to be expired, but it wasn't.", i.Expires)
+	}
+}
+
+func TestAnInvitationWithAnExpiresInTheFutureIsNotExpired(t *testing.T) {
+	i := domain.Invitation{Expires: time.Now().Add(time.Hour)}
+	if i.Expired() {
+		t.Errorf("Expected invitation expiring at %s to not be expired, but it was.", i.Expires)
+	}
+}
 
 func TestNormalizingAnInvitationNormalizesEmail(t *testing.T) {
 	subject := domain.Invitation{Email: testutil.UnsafeString}
