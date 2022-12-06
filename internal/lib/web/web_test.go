@@ -3,7 +3,7 @@ package web
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -49,12 +49,13 @@ func TestHandleErrorReturnsTheExpectedMessage(t *testing.T) {
 }
 
 func parseErrorMessage(t *testing.T, w *httptest.ResponseRecorder) string {
+	t.Helper()
 	var resp struct {
 		Error struct {
 			Message string `json:"message"`
 		} `json:"error"`
 	}
-	body, err := ioutil.ReadAll(w.Body)
+	body, err := io.ReadAll(w.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
