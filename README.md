@@ -18,22 +18,3 @@ Users can be members of multiple organizations and collect cheevos from all
 of them, but the cheevos are tied to their status as members of that
 organization. If they are removed from the organization in the future, the
 cheevos they received from the organization are also removed.
-
-## TODO
-
-- [X] Refactor validation runner and compareError
-- [X] Move membership to new service
-- [X] Move awards to new service
-- [X] Move password hash out of model
-- [X] Implement an actual random string function
-- [X] Combine mock repositories into one
-- [X] Fix package stutter
-- [X] Add invitation logger
-- [X] Add award logger
-- [X] Add membership logger
-- [ ] Replace raw errors with error types
-- [X] Handlers
-- [X] Database
-- [ ] Consistent variable naming after context merge
-- [ ] Alphabetize methods
-- [ ] Refactor creating test users and orgs in repo tests
