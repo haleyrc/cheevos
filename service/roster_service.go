@@ -9,7 +9,6 @@ import (
 	"github.com/haleyrc/pkg/hash"
 	"github.com/haleyrc/pkg/logger"
 	"github.com/haleyrc/pkg/pg"
-	"github.com/haleyrc/pkg/random"
 	"github.com/haleyrc/pkg/time"
 	"github.com/pborman/uuid"
 
@@ -26,8 +25,8 @@ type RosterRepository interface {
 	DeleteInvitationByCode(ctx context.Context, tx pg.Tx, hashedCode string) error
 	GetInvitation(ctx context.Context, tx pg.Tx, i *domain.Invitation, id string) error
 	GetInvitationByCode(ctx context.Context, tx pg.Tx, i *domain.Invitation, hashedCode string) error
-	InsertInvitation(ctx context.Context, tx pg.Tx, i *domain.Invitation, hashedCode string) error
-	UpdateInvitation(ctx context.Context, tx pg.Tx, i *domain.Invitation, hashedCode string) error
+	InsertInvitation(ctx context.Context, tx pg.Tx, i *domain.Invitation) error
+	UpdateInvitation(ctx context.Context, tx pg.Tx, i *domain.Invitation) error
 	GetMembership(ctx context.Context, tx pg.Tx, m *domain.Membership, orgID, userID string) error
 	InsertMembership(ctx context.Context, tx pg.Tx, m *domain.Membership) error
 	InsertOrganization(ctx context.Context, tx pg.Tx, org *domain.Organization) error
@@ -59,7 +58,7 @@ func (svc *rosterService) AcceptInvitation(ctx context.Context, userID, code str
 			return errors.WrapError(err)
 		}
 
-		if invitation.Expired() {
+		if invitation.Code.Expired() {
 			return errors.NewRawError(http.StatusGone, "Your invitation has expired. Please contact your organization administrator for a new invitation.")
 		}
 
@@ -153,18 +152,17 @@ func (svc *rosterService) InviteUserToOrganization(ctx context.Context, email, o
 			ID:             uuid.New(),
 			Email:          email,
 			OrganizationID: orgID,
-			Expires:        time.Now().Add(domain.InvitationValidFor),
+			Code:           domain.NewInvitationCode(),
 		}
 		if err := invitation.Validate(); err != nil {
 			return errors.WrapError(err)
 		}
 
-		code := random.String(domain.InvitationCodeLength)
-		if err := svc.Repo.InsertInvitation(ctx, tx, &invitation, hash.Generate(code)); err != nil {
+		if err := svc.Repo.InsertInvitation(ctx, tx, &invitation); err != nil {
 			return errors.WrapError(err)
 		}
 
-		return svc.Email.SendInvitation(ctx, invitation.Email, code)
+		return svc.Email.SendInvitation(ctx, invitation.Email, invitation.Code.Plaintext())
 	})
 	if err != nil {
 		return nil, fmt.Errorf("invite user to organization failed: %w", err)
@@ -194,14 +192,13 @@ func (svc *rosterService) RefreshInvitation(ctx context.Context, id string) (*do
 			return errors.WrapError(err)
 		}
 
-		invitation.Expires = time.Now().Add(domain.InvitationValidFor)
+		invitation.Refresh()
 
-		newCode := random.String(domain.InvitationCodeLength)
-		if err := svc.Repo.UpdateInvitation(ctx, tx, &invitation, hash.Generate(newCode)); err != nil {
+		if err := svc.Repo.UpdateInvitation(ctx, tx, &invitation); err != nil {
 			return errors.WrapError(err)
 		}
 
-		return svc.Email.SendInvitation(ctx, invitation.Email, newCode)
+		return svc.Email.SendInvitation(ctx, invitation.Email, invitation.Code.Plaintext())
 	})
 	if err != nil {
 		return nil, fmt.Errorf("refresh invitation failed: %w", err)
