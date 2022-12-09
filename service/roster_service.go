@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/haleyrc/pkg/errors"
 	"github.com/haleyrc/pkg/hash"
@@ -60,7 +59,7 @@ func (svc *rosterService) AcceptInvitation(ctx context.Context, userID, code str
 		}
 
 		if invitation.Expired() {
-			return errors.NewRawError(http.StatusGone, "Your invitation has expired. Please contact your organization administrator for a new invitation.")
+			return domain.InvitationExpiredError{}
 		}
 
 		membership := &domain.Membership{
