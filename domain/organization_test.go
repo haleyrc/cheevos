@@ -6,6 +6,7 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/assert"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
@@ -13,16 +14,12 @@ import (
 func TestNormalizingAnOrganizationNormalizesName(t *testing.T) {
 	subject := domain.Organization{Name: testutil.UnsafeString}
 	subject.Normalize()
-	if subject.Name != testutil.SafeString {
-		t.Errorf("Expected organization name to be normalized, but it wasn't.")
-	}
+	assert.String(t, "organization name", subject.Name).Equals(testutil.SafeString)
 }
 
 func TestOrganizationValidationReturnsNilForAValidOrganization(t *testing.T) {
 	o := fake.Organization(uuid.New())
-	if err := o.Validate(); err != nil {
-		t.Errorf("Expected validate to return nil, but got %v.", err)
-	}
+	assert.Error(t, o.Validate()).IsNil()
 }
 
 func TestOrganizationValidationReturnsAnErrorForAnInvalidOrganization(t *testing.T) {

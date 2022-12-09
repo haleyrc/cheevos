@@ -6,15 +6,14 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/assert"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
 func TestAwardValidationReturnsNilForAValidAward(t *testing.T) {
 	a := fake.Award(uuid.New(), uuid.New())
-	if err := a.Validate(); err != nil {
-		t.Errorf("Expected validate to return nil, but got %v.", err)
-	}
+	assert.Error(t, a.Validate()).IsNil()
 }
 
 func TestAwardValidationReturnsAnErrorForAnInvalidAward(t *testing.T) {

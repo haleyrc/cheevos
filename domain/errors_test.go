@@ -6,6 +6,7 @@ import (
 	"github.com/haleyrc/pkg/errors"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/assert"
 )
 
 func TestAllErrorsAreCoded(t *testing.T) {
@@ -69,18 +70,13 @@ func TestValidationErrorIsntAnError(t *testing.T) {
 
 func TestValidationErrorReturnsNilWithNoErrors(t *testing.T) {
 	err := domain.NewValidationError(testModel("Test")).Error()
-	if err != nil {
-		t.Errorf("Expected error to be nil, but got %v.", err)
-	}
+	assert.Error(t, err).IsNil()
 }
 
 func TestValidationErrorReturnsAnErrorWithFieldErrors(t *testing.T) {
 	ve := domain.NewValidationError(testModel("Test"))
 	ve.Add("MyField", "My Field shouldn't be blank")
-	err := ve.Error()
-	if err == nil {
-		t.Errorf("Expected to get an error, but got nil.")
-	}
+	assert.Error(t, ve.Error()).IsNotNil()
 }
 
 type testModel string

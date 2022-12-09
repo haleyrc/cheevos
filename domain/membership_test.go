@@ -6,15 +6,14 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/assert"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
 
 func TestMembershipValidationReturnsNilForAValidMembership(t *testing.T) {
 	m := fake.Membership(uuid.New(), uuid.New())
-	if err := m.Validate(); err != nil {
-		t.Errorf("Expected validate to return nil, but got %v.", err)
-	}
+	assert.Error(t, m.Validate()).IsNil()
 }
 
 func TestMembershipValidationReturnsAnErrorForAnInvalidMembership(t *testing.T) {

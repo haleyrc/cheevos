@@ -9,144 +9,80 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/assert"
 	"github.com/haleyrc/cheevos/internal/mock"
 )
 
 func TestAwardingACheevoSucceeds(t *testing.T) {
 	var (
-		ctx = context.Background()
+		assert = assert.New(t)
+		ctx    = context.Background()
+		mockDB = &mock.Database{}
+		repo   = &mock.Repository{
+			InsertAwardFn: func(_ context.Context, _ pg.Tx, _ *domain.Award) error { return nil },
+		}
+		svc = &cheevosService{DB: mockDB, Repo: repo}
 
 		cheevoID = uuid.New()
 		userID   = uuid.New()
 		now      = time.Now()
-
-		mockDB = &mock.Database{}
-
-		repo = &mock.Repository{
-			InsertAwardFn: func(_ context.Context, _ pg.Tx, _ *domain.Award) error { return nil },
-		}
-
-		svc = &cheevosService{
-			DB:   mockDB,
-			Repo: repo,
-		}
 	)
 
-	if err := svc.AwardCheevoToUser(ctx, userID, cheevoID); err != nil {
-		t.Fatal(err)
-	}
+	err := svc.AwardCheevoToUser(ctx, userID, cheevoID)
 
-	if repo.InsertAwardCalled.Count != 1 {
-		t.Errorf("Expected repository to receive InsertAward, but it didn't.")
-	}
-	if repo.InsertAwardCalled.With.Award.CheevoID != cheevoID {
-		t.Errorf(
-			"Expected repository.InsertAward to receive cheevo ID %q, but got %q.",
-			cheevoID, repo.InsertAwardCalled.With.Award.CheevoID,
-		)
-	}
-	if repo.InsertAwardCalled.With.Award.UserID != userID {
-		t.Errorf(
-			"Expected repository.InsertAward to receive user ID %q, but got %q.",
-			userID, repo.InsertAwardCalled.With.Award.UserID,
-		)
-	}
-	if repo.InsertAwardCalled.With.Award.Awarded != now {
-		t.Errorf(
-			"Expected repository.InsertAward to receive awarded %s, but got %s.",
-			now, repo.InsertAwardCalled.With.Award.Awarded,
-		)
-	}
+	assert.Error(err).IsUnexpected()
+	assert.Int("calls to InsertAward", repo.InsertAwardCalled.Count).Equals(1)
+	assert.String("cheevo id", repo.InsertAwardCalled.With.Award.CheevoID).Equals(cheevoID)
+	assert.String("user id", repo.InsertAwardCalled.With.Award.UserID).Equals(userID)
+	assert.
+		String("awarded", repo.InsertAwardCalled.With.Award.Awarded.String()).
+		Equals(now.UTC().String())
 }
 
 func TestCreatingAValidCheevoSucceeds(t *testing.T) {
 	var (
-		ctx = context.Background()
+		assert = assert.New(t)
+		ctx    = context.Background()
+		mockDB = &mock.Database{}
+		repo   = &mock.Repository{
+			InsertCheevoFn: func(_ context.Context, _ pg.Tx, _ *domain.Cheevo) error { return nil },
+		}
+		svc = &cheevosService{DB: mockDB, Repo: repo}
 
 		name        = "name"
 		description = "description"
 		orgID       = uuid.New()
-
-		mockDB = &mock.Database{}
-
-		repo = &mock.Repository{
-			InsertCheevoFn: func(_ context.Context, _ pg.Tx, _ *domain.Cheevo) error { return nil },
-		}
-
-		svc = &cheevosService{
-			DB:   mockDB,
-			Repo: repo,
-		}
 	)
 
 	cheevo, err := svc.CreateCheevo(ctx, name, description, orgID)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Error(err).IsUnexpected()
 
-	if repo.InsertCheevoCalled.Count != 1 {
-		t.Errorf("Expected repository to receive InsertCheevo, but it didn't.")
-	}
-	if repo.InsertCheevoCalled.With.Cheevo.ID != cheevo.ID {
-		t.Errorf(
-			"Expected repository.InsertCheevo to receive id %q, but got %q.",
-			cheevo.ID, repo.InsertCheevoCalled.With.Cheevo.ID,
-		)
-	}
-	if repo.InsertCheevoCalled.With.Cheevo.Name != name {
-		t.Errorf(
-			"Expected repository.InsertCheevo to receive name %q, but got %q.",
-			name, repo.InsertCheevoCalled.With.Cheevo.Name,
-		)
-	}
-	if repo.InsertCheevoCalled.With.Cheevo.Description != description {
-		t.Errorf(
-			"Expected repository.InsertCheevo to receive description %q, but got %q.",
-			description, repo.InsertCheevoCalled.With.Cheevo.Description,
-		)
-	}
+	assert.Int("calls to InsertCheevo", repo.InsertCheevoCalled.Count).Equals(1)
+	assert.String("id", repo.InsertCheevoCalled.With.Cheevo.ID).Equals(cheevo.ID)
+	assert.String("name", repo.InsertCheevoCalled.With.Cheevo.Name).Equals(name)
+	assert.String("description", repo.InsertCheevoCalled.With.Cheevo.Description).Equals(description)
 
-	if cheevo.ID == "" {
-		t.Error("ID shouldn't be blank, but it was.")
-	}
-	if cheevo.Name != name {
-		t.Errorf("Name should be %q, but got %q.", name, cheevo.Name)
-	}
-	if cheevo.Description != description {
-		t.Errorf("Description should be %q, but got %q.", description, cheevo.Description)
-	}
+	assert.String("id", cheevo.ID).NotBlank()
+	assert.String("name", cheevo.Name).Equals(name)
+	assert.String("description", cheevo.Description).Equals(description)
 }
 
 func TestGettingACheevoSucceeds(t *testing.T) {
 	var (
-		ctx = context.Background()
-
-		id = uuid.New()
-
+		assert = assert.New(t)
+		ctx    = context.Background()
 		mockDB = &mock.Database{}
-
-		repo = &mock.Repository{
+		repo   = &mock.Repository{
 			GetCheevoFn: func(_ context.Context, _ pg.Tx, _ *domain.Cheevo, _ string) error { return nil },
 		}
+		svc = &cheevosService{DB: mockDB, Repo: repo}
 
-		svc = &cheevosService{
-			DB:   mockDB,
-			Repo: repo,
-		}
+		id = uuid.New()
 	)
 
 	_, err := svc.GetCheevo(ctx, id)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	if repo.GetCheevoCalled.Count != 1 {
-		t.Errorf("Expected repository to receive GetCheevo, but it didn't.")
-	}
-	if repo.GetCheevoCalled.With.ID != id {
-		t.Errorf(
-			"Expected repository.GetCheevo to receive id %q, but got %q.",
-			id, repo.GetCheevoCalled.With.ID,
-		)
-	}
+	assert.Error(err).IsUnexpected()
+	assert.Int("calls to GetCheevo", repo.GetCheevoCalled.Count).Equals(1)
+	assert.String("id", repo.GetCheevoCalled.With.ID).Equals(id)
 }

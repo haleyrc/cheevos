@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/assert"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
 )
@@ -11,16 +12,12 @@ import (
 func TestNormalizingAUserNormalizesUsername(t *testing.T) {
 	subject := domain.User{Username: testutil.UnsafeString}
 	subject.Normalize()
-	if subject.Username != testutil.SafeString {
-		t.Errorf("Expected user username to be normalized, but it wasn't.")
-	}
+	assert.String(t, "username", subject.Username).Equals(testutil.SafeString)
 }
 
 func TestUserValidationReturnsNilForAValidUser(t *testing.T) {
 	u := fake.User()
-	if err := u.Validate(); err != nil {
-		t.Errorf("Expected validate to return nil, but got %v.", err)
-	}
+	assert.Error(t, u.Validate()).IsNil()
 }
 
 func TestUserValidationReturnsAnErrorForAnInvalidUser(t *testing.T) {

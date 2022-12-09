@@ -3,6 +3,7 @@ package stringutil_test
 import (
 	"testing"
 
+	"github.com/haleyrc/cheevos/internal/assert"
 	"github.com/haleyrc/cheevos/internal/lib/stringutil"
 )
 
@@ -35,9 +36,7 @@ func TestMakeSafe(t *testing.T) {
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
 			got := stringutil.MakeSafe(tc.input)
-			if got != tc.want {
-				t.Errorf("Expected safe string to be %q, but got %q.", tc.want, got)
-			}
+			assert.String(t, "safe string", got).Equals(tc.want)
 		})
 	}
 }

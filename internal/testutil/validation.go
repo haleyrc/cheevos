@@ -29,7 +29,8 @@ func RunValidationTests(t *testing.T, v Validator, msg string, fieldErrors map[s
 	for name, msg := range fieldErrors {
 		got, ok := ve.Fields[name]
 		if !ok {
-			t.Fatalf("Expected field errors to include %s, but they didn't.", name)
+			t.Errorf("Expected field errors to include %s, but they didn't.", name)
+			continue
 		}
 		if got != msg {
 			t.Errorf("Expected field error to be %q, but got %q.", msg, got)

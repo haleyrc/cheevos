@@ -8,92 +8,55 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/assert"
 	"github.com/haleyrc/cheevos/internal/mock"
 	"github.com/haleyrc/cheevos/internal/password"
 )
 
 func TestGettingAUserSucceeds(t *testing.T) {
 	var (
-		ctx = context.Background()
-
-		id = uuid.New()
-
+		assert = assert.New(t)
+		ctx    = context.Background()
 		mockDB = &mock.Database{}
-
-		repo = &mock.Repository{
+		repo   = &mock.Repository{
 			GetUserFn: func(_ context.Context, _ pg.Tx, _ *domain.User, _ string) error { return nil },
 		}
+		svc = &authService{DB: mockDB, Repo: repo}
 
-		svc = &authService{
-			DB:   mockDB,
-			Repo: repo,
-		}
+		id = uuid.New()
 	)
 
 	_, err := svc.GetUser(ctx, id)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if repo.GetUserCalled.Count != 1 {
-		t.Errorf("Expected repository to receive GetUser, but it didn't.")
-	}
-	if repo.GetUserCalled.With.ID != id {
-		t.Errorf(
-			"Expected repository.GetUser to receive id %q, but got %q.",
-			id, repo.GetUserCalled.With.ID,
-		)
-	}
+	assert.Error(err).IsUnexpected()
+	assert.Int("calls to GetUser", repo.GetUserCalled.Count).Equals(1)
+	assert.String("id", repo.GetUserCalled.With.ID).Equals(id)
 }
 
 func TestSigningUpSucceeds(t *testing.T) {
 	var (
-		ctx = context.Background()
-
-		username = "username"
-		pw       = "password"
-
+		assert = assert.New(t)
+		ctx    = context.Background()
 		mockDB = &mock.Database{}
-
-		repo = &mock.Repository{
+		repo   = &mock.Repository{
 			InsertUserFn: func(_ context.Context, _ pg.Tx, _ *domain.User, _ string) error { return nil },
 		}
-
 		svc = &authService{
 			DB:                mockDB,
 			Repo:              repo,
 			PasswordValidator: password.NewValidator(),
 		}
+
+		username = "username"
+		pw       = "password"
 	)
 
 	user, err := svc.SignUp(ctx, username, password.New(pw))
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	if repo.InsertUserCalled.Count != 1 {
-		t.Errorf("Expected repository to receive InsertUser, but it didn't.")
-	}
-	if repo.InsertUserCalled.With.User.ID != user.ID {
-		t.Errorf(
-			"Expected repository.InsertUser to receive id %q, but got %q.",
-			user.ID, repo.InsertUserCalled.With.User.ID,
-		)
-	}
-	if repo.InsertUserCalled.With.User.Username != username {
-		t.Errorf(
-			"Expected repository.InsertUser to receive username %q, but got %q.",
-			username, repo.InsertUserCalled.With.User.Username,
-		)
-	}
-	if repo.InsertUserCalled.With.PasswordHash == pw {
-		t.Errorf("Expected repository.InsertUser not to receive a plaintext password, but it did.")
-	}
-
-	if user.ID == "" {
-		t.Error("ID shouldn't be blank, but it was.")
-	}
-	if user.Username != username {
-		t.Errorf("Username should be %q, but got %q.", username, user.Username)
-	}
+	assert.Error(err).IsUnexpected()
+	assert.Int("calls to InsertUser", repo.InsertUserCalled.Count).Equals(1)
+	assert.String("id", repo.InsertUserCalled.With.User.ID).Equals(user.ID)
+	assert.String("username", repo.InsertUserCalled.With.User.Username).Equals(user.Username)
+	assert.String("password hash", repo.InsertUserCalled.With.PasswordHash).NotEquals(pw)
+	assert.String("id", user.ID).NotBlank()
+	assert.String("username", user.Username).Equals(username)
 }

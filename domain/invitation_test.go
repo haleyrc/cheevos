@@ -3,41 +3,34 @@ package domain_test
 import (
 	"testing"
 
+	"github.com/haleyrc/pkg/time"
 	"github.com/pborman/uuid"
 
 	"github.com/haleyrc/cheevos/domain"
+	"github.com/haleyrc/cheevos/internal/assert"
 	"github.com/haleyrc/cheevos/internal/fake"
 	"github.com/haleyrc/cheevos/internal/testutil"
-	"github.com/haleyrc/pkg/time"
 )
 
 func TestAnInvitationWithAnExpiresInThePastIsExpired(t *testing.T) {
 	i := domain.Invitation{Expires: time.Now().Sub(time.Hour)}
-	if !i.Expired() {
-		t.Errorf("Expected invitation expiring at %s to be expired, but it wasn't.", i.Expires)
-	}
+	assert.Bool(t, "expired", i.Expired()).IsTrue()
 }
 
 func TestAnInvitationWithAnExpiresInTheFutureIsNotExpired(t *testing.T) {
 	i := domain.Invitation{Expires: time.Now().Add(time.Hour)}
-	if i.Expired() {
-		t.Errorf("Expected invitation expiring at %s to not be expired, but it was.", i.Expires)
-	}
+	assert.Bool(t, "expired", i.Expired()).IsFalse()
 }
 
 func TestNormalizingAnInvitationNormalizesEmail(t *testing.T) {
 	subject := domain.Invitation{Email: testutil.UnsafeString}
 	subject.Normalize()
-	if subject.Email != testutil.SafeString {
-		t.Errorf("Expected invitation email to be normalized, but it wasn't.")
-	}
+	assert.String(t, "email", subject.Email).Equals(testutil.SafeString)
 }
 
 func TestInvitationValidationReturnsNilForAValidInvitation(t *testing.T) {
 	i := fake.Invitation(uuid.New())
-	if err := i.Validate(); err != nil {
-		t.Errorf("Expected validate to return nil, but got %v.", err)
-	}
+	assert.Error(t, i.Validate()).IsNil()
 }
 
 func TestInvitationValidationReturnsAnErrorForAnInvalidInvitation(t *testing.T) {
