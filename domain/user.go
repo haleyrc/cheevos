@@ -23,15 +23,23 @@ func (u *User) Normalize() {
 func (u *User) Validate() error {
 	u.Normalize()
 
-	ve := NewValidationError(u)
+	var fes []FieldError
 
 	if u.ID == "" {
-		ve.Add("ID", "ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "ID", Msg: "ID can't be blank.",
+		})
 	}
 
 	if u.Username == "" {
-		ve.Add("Username", "Username can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "Username", Msg: "Username can't be blank.",
+		})
 	}
 
-	return ve.Error()
+	if len(fes) > 0 {
+		return NewValidationError("User", fes)
+	}
+
+	return nil
 }

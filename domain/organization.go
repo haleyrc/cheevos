@@ -28,19 +28,29 @@ func (o *Organization) Normalize() {
 func (o *Organization) Validate() error {
 	o.Normalize()
 
-	ve := NewValidationError(o)
+	var fes []FieldError
 
 	if o.ID == "" {
-		ve.Add("ID", "ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "ID", Msg: "ID can't be blank.",
+		})
 	}
 
 	if o.Name == "" {
-		ve.Add("Name", "Name can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "Name", Msg: "Name can't be blank.",
+		})
 	}
 
 	if o.OwnerID == "" {
-		ve.Add("OwnerID", "Owner ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "OwnerID", Msg: "Owner ID can't be blank.",
+		})
 	}
 
-	return ve.Error()
+	if len(fes) > 0 {
+		return NewValidationError("Organization", fes)
+	}
+
+	return nil
 }

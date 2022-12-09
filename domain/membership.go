@@ -15,19 +15,29 @@ type Membership struct {
 func (m *Membership) Model() string { return "Membership" }
 
 func (m *Membership) Validate() error {
-	ve := NewValidationError(m)
+	var fes []FieldError
 
 	if m.OrganizationID == "" {
-		ve.Add("OrganizationID", "Organization ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "OrganizationID", Msg: "Organization ID can't be blank.",
+		})
 	}
 
 	if m.UserID == "" {
-		ve.Add("UserID", "User ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "UserID", Msg: "User ID can't be blank.",
+		})
 	}
 
 	if m.Joined.IsZero() {
-		ve.Add("Joined", "Joined time can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "Joined", Msg: "Joined time can't be blank.",
+		})
 	}
 
-	return ve.Error()
+	if len(fes) > 0 {
+		return NewValidationError("Membership", fes)
+	}
+
+	return nil
 }

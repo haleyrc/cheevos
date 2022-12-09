@@ -29,23 +29,35 @@ func (i *Invitation) Normalize() {
 func (i *Invitation) Validate() error {
 	i.Normalize()
 
-	ve := NewValidationError(i)
+	var fes []FieldError
 
 	if i.ID == "" {
-		ve.Add("ID", "ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "ID", Msg: "ID can't be blank.",
+		})
 	}
 
 	if i.Email == "" {
-		ve.Add("Email", "Email can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "Email", Msg: "Email can't be blank.",
+		})
 	}
 
 	if i.OrganizationID == "" {
-		ve.Add("OrganizationID", "Organization ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "OrganizationID", Msg: "Organization ID can't be blank.",
+		})
 	}
 
 	if i.Expires.IsZero() {
-		ve.Add("Expires", "Expiration time can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "Expires", Msg: "Expiration time can't be blank.",
+		})
 	}
 
-	return ve.Error()
+	if len(fes) > 0 {
+		return NewValidationError("Invitation", fes)
+	}
+
+	return nil
 }

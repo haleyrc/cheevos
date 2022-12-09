@@ -29,23 +29,35 @@ func (c *Cheevo) Normalize() {
 func (c *Cheevo) Validate() error {
 	c.Normalize()
 
-	ve := NewValidationError(c)
+	var fes []FieldError
 
 	if c.ID == "" {
-		ve.Add("ID", "ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "ID", Msg: "ID can't be blank.",
+		})
 	}
 
 	if c.Name == "" {
-		ve.Add("Name", "Name can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "Name", Msg: "Name can't be blank.",
+		})
 	}
 
 	if c.Description == "" {
-		ve.Add("Description", "Description can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "Description", Msg: "Description can't be blank.",
+		})
 	}
 
 	if c.OrganizationID == "" {
-		ve.Add("OrganizationID", "Organization ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "OrganizationID", Msg: "Organization ID can't be blank.",
+		})
 	}
 
-	return ve.Error()
+	if len(fes) > 0 {
+		return NewValidationError("Cheevo", fes)
+	}
+
+	return nil
 }

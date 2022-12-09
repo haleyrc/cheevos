@@ -15,19 +15,29 @@ type Award struct {
 func (a *Award) Model() string { return "Award" }
 
 func (a *Award) Validate() error {
-	ve := NewValidationError(a)
+	var fes []FieldError
 
 	if a.CheevoID == "" {
-		ve.Add("CheevoID", "Cheevo ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "CheevoID", Msg: "Cheevo ID can't be blank.",
+		})
 	}
 
 	if a.UserID == "" {
-		ve.Add("UserID", "User ID can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "UserID", Msg: "User ID can't be blank.",
+		})
 	}
 
 	if a.Awarded.IsZero() {
-		ve.Add("Awarded", "Awarded time can't be blank.")
+		fes = append(fes, FieldError{
+			Field: "Awarded", Msg: "Awarded time can't be blank.",
+		})
 	}
 
-	return ve.Error()
+	if len(fes) > 0 {
+		return NewValidationError("Award", fes)
+	}
+
+	return nil
 }
